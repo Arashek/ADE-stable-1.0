@@ -1,0 +1,32 @@
+[
+  {
+    "attribute": "authentication.method",
+    "values": {
+      "security": "oauth2",
+      "architecture": "jwt"
+    },
+    "selected_value": "oauth2",
+    "selected_agent": "security",
+    "confidence": 0.85
+  },
+  {
+    "attribute": "database.encryption.enabled",
+    "values": {
+      "security": true,
+      "performance": false
+    },
+    "selected_value": true,
+    "selected_agent": "security",
+    "confidence": 0.92
+  },
+  {
+    "attribute": "ui.framework",
+    "values": {
+      "design": "react",
+      "architecture": "angular"
+    },
+    "selected_value": "react",
+    "selected_agent": "design",
+    "confidence": 0.78
+  }
+]

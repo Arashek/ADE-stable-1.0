@@ -153,36 +153,36 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: D:/ADE stable 1.0 OSLLMS/ollama_models
+      device: D:/ADE-stable-1.0-OSLLMS/ollama_models
       o: bind
   model_cache:
     driver: local
     driver_opts:
       type: none
-      device: D:/ADE stable 1.0 OSLLMS/model_cache
+      device: D:/ADE-stable-1.0-OSLLMS/model_cache
       o: bind
   ade_data:
   redis_data:
     driver: local
     driver_opts:
       type: none
-      device: D:/ADE stable 1.0 OSLLMS/redis_data
+      device: D:/ADE-stable-1.0-OSLLMS/redis_data
       o: bind
   mongodb_data:
     driver: local
     driver_opts:
       type: none
-      device: D:/ADE stable 1.0 OSLLMS/mongodb_data
+      device: D:/ADE-stable-1.0-OSLLMS/mongodb_data
       o: bind
   prometheus_data:
     driver: local
     driver_opts:
       type: none
-      device: D:/ADE stable 1.0 OSLLMS/prometheus_data
+      device: D:/ADE-stable-1.0-OSLLMS/prometheus_data
       o: bind
   grafana_data:
     driver: local
     driver_opts:
       type: none
-      device: D:/ADE stable 1.0 OSLLMS/grafana_data
+      device: D:/ADE-stable-1.0-OSLLMS/grafana_data
       o: bind

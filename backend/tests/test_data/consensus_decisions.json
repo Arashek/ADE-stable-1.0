@@ -1,0 +1,65 @@
+[
+  {
+    "id": "decision_12345678",
+    "key": "database_type",
+    "description": "Choose database type for the application",
+    "options": [
+      "postgresql",
+      "mongodb",
+      "mysql"
+    ],
+    "selected_option": "postgresql",
+    "votes": [
+      {
+        "agent": "security",
+        "agent_id": "security-1",
+        "option": "postgresql",
+        "confidence": 0.8,
+        "reasoning": "PostgreSQL has better security features"
+      },
+      {
+        "agent": "architecture",
+        "agent_id": "architecture-1",
+        "option": "postgresql",
+        "confidence": 0.9,
+        "reasoning": "PostgreSQL is better for complex data models"
+      },
+      {
+        "agent": "design",
+        "agent_id": "design-1",
+        "option": "mongodb",
+        "confidence": 0.7,
+        "reasoning": "MongoDB is more flexible for UI data"
+      }
+    ],
+    "confidence": 0.85,
+    "status": "resolved"
+  },
+  {
+    "id": "decision_87654321",
+    "key": "frontend_framework",
+    "description": "Choose frontend framework for the application",
+    "options": [
+      "react",
+      "vue",
+      "angular"
+    ],
+    "status": "in_progress",
+    "votes": [
+      {
+        "agent": "design",
+        "agent_id": "design-1",
+        "option": "react",
+        "confidence": 0.9,
+        "reasoning": "React has better component reusability"
+      },
+      {
+        "agent": "performance",
+        "agent_id": "performance-1",
+        "option": "vue",
+        "confidence": 0.75,
+        "reasoning": "Vue has better performance for this use case"
+      }
+    ]
+  }
+]
