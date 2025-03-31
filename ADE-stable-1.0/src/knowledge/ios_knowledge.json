@@ -1,0 +1,268 @@
+{
+    "frameworks": {
+        "UIKit": {
+            "components": [
+                "UIViewController",
+                "UIView",
+                "UITableView",
+                "UICollectionView",
+                "UINavigationController",
+                "UITabBarController",
+                "UIScrollView",
+                "UIButton",
+                "UILabel",
+                "UITextField",
+                "UIImageView",
+                "UIStackView"
+            ],
+            "lifecycle": [
+                "viewDidLoad",
+                "viewWillAppear",
+                "viewDidAppear",
+                "viewWillDisappear",
+                "viewDidDisappear"
+            ],
+            "patterns": [
+                "Delegate",
+                "DataSource",
+                "Target-Action",
+                "Responder Chain"
+            ]
+        },
+        "SwiftUI": {
+            "components": [
+                "View",
+                "StateObject",
+                "EnvironmentObject",
+                "Binding",
+                "NavigationView",
+                "TabView",
+                "List",
+                "ScrollView",
+                "VStack",
+                "HStack",
+                "ZStack",
+                "Button",
+                "Text",
+                "TextField",
+                "Image"
+            ],
+            "lifecycle": [
+                "onAppear",
+                "onDisappear",
+                "onChange",
+                "onReceive"
+            ],
+            "patterns": [
+                "Property Wrapper",
+                "View Builder",
+                "Environment",
+                "Preference Key"
+            ]
+        },
+        "CoreData": {
+            "components": [
+                "NSManagedObject",
+                "NSManagedObjectContext",
+                "NSPersistentContainer",
+                "NSFetchRequest",
+                "NSPredicate",
+                "NSManagedObjectModel"
+            ],
+            "patterns": [
+                "CRUD Operations",
+                "Batch Operations",
+                "Migration",
+                "Concurrency"
+            ]
+        },
+        "Foundation": {
+            "components": [
+                "String",
+                "Array",
+                "Dictionary",
+                "Date",
+                "URL",
+                "Data",
+                "FileManager",
+                "UserDefaults",
+                "NotificationCenter"
+            ],
+            "patterns": [
+                "Protocol-Oriented",
+                "Value Types",
+                "Reference Types",
+                "Closures"
+            ]
+        }
+    },
+    "patterns": {
+        "MVVM": {
+            "components": [
+                "ViewModel",
+                "View",
+                "Model",
+                "Binding",
+                "Coordinator"
+            ],
+            "responsibilities": {
+                "ViewModel": [
+                    "Business Logic",
+                    "Data Transformation",
+                    "State Management",
+                    "User Input Handling"
+                ],
+                "View": [
+                    "UI Layout",
+                    "User Interaction",
+                    "Visual Feedback",
+                    "Data Display"
+                ],
+                "Model": [
+                    "Data Structure",
+                    "Business Rules",
+                    "Data Validation",
+                    "Persistence"
+                ]
+            }
+        },
+        "Clean Architecture": {
+            "layers": [
+                "Domain",
+                "Data",
+                "Presentation"
+            ],
+            "components": {
+                "Domain": [
+                    "Entities",
+                    "Use Cases",
+                    "Repository Interfaces"
+                ],
+                "Data": [
+                    "Repository Implementations",
+                    "Data Sources",
+                    "DTOs"
+                ],
+                "Presentation": [
+                    "ViewModels",
+                    "Views",
+                    "Presenters"
+                ]
+            }
+        },
+        "Coordinator": {
+            "components": [
+                "Coordinator",
+                "Router",
+                "Factory",
+                "Flow"
+            ],
+            "responsibilities": {
+                "Coordinator": [
+                    "Navigation Logic",
+                    "Flow Management",
+                    "Dependency Injection"
+                ],
+                "Router": [
+                    "Route Definition",
+                    "Route Handling",
+                    "Deep Linking"
+                ],
+                "Factory": [
+                    "View Creation",
+                    "Dependency Creation",
+                    "Configuration"
+                ]
+            }
+        }
+    },
+    "guidelines": {
+        "HIG": {
+            "navigation": [
+                "Hierarchical Navigation",
+                "Flat Navigation",
+                "Tab-Based Navigation",
+                "Modal Presentation"
+            ],
+            "layout": [
+                "Safe Areas",
+                "Margins",
+                "Spacing",
+                "Grid System"
+            ],
+            "typography": [
+                "System Fonts",
+                "Dynamic Type",
+                "Font Scaling",
+                "Text Styles"
+            ],
+            "colors": [
+                "System Colors",
+                "Dark Mode",
+                "Color Contrast",
+                "Accessibility"
+            ]
+        },
+        "Swift": {
+            "patterns": [
+                "Protocols",
+                "Extensions",
+                "Generics",
+                "Closures",
+                "Property Wrappers",
+                "Result Builders"
+            ],
+            "best_practices": [
+                "Value Types",
+                "Immutability",
+                "Dependency Injection",
+                "Error Handling",
+                "Memory Management",
+                "Concurrency"
+            ]
+        }
+    },
+    "testing": {
+        "unit_tests": {
+            "frameworks": [
+                "XCTest",
+                "Quick",
+                "Nimble"
+            ],
+            "patterns": [
+                "Arrange-Act-Assert",
+                "Given-When-Then",
+                "Test Doubles",
+                "Mocking"
+            ]
+        },
+        "ui_tests": {
+            "frameworks": [
+                "XCUITest",
+                "SnapshotTesting"
+            ],
+            "patterns": [
+                "Page Object",
+                "Screen Object",
+                "Test Data",
+                "Test Environment"
+            ]
+        }
+    },
+    "deployment": {
+        "requirements": [
+            "App Store Guidelines",
+            "Provisioning Profiles",
+            "Certificates",
+            "Bundle ID",
+            "Version Numbers"
+        ],
+        "process": [
+            "Build Configuration",
+            "Code Signing",
+            "Archive",
+            "Upload",
+            "Review"
+        ]
+    }
+} 

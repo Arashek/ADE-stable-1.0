@@ -1,0 +1,55 @@
+id: web-development
+name: Web Development Container
+projectType: web
+baseImage: node:18-alpine
+defaultResources:
+  cpu:
+    limit: 2
+    reservation: 1
+  memory:
+    limit: 4g
+    reservation: 2g
+  disk:
+    limit: 20g
+    reservation: 10g
+defaultEnvironment:
+  - name: NODE_ENV
+    value: development
+  - name: PORT
+    value: 3000
+defaultPorts:
+  - hostPort: 3000
+    containerPort: 3000
+    protocol: tcp
+  - hostPort: 9229
+    containerPort: 9229
+    protocol: tcp
+defaultVolumes:
+  - source: ./src
+    target: /app/src
+    type: bind
+  - source: ./public
+    target: /app/public
+    type: bind
+  - source: node_modules
+    target: /app/node_modules
+    type: volume
+defaultNetworks:
+  - name: web-network
+    driver: bridge
+defaultHealthCheck:
+  test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  startPeriod: 40s
+defaultCommand: ["npm", "start"]
+defaultWorkingDir: /app
+defaultUser: node
+description: Container template for web development with Node.js
+tags:
+  - web
+  - nodejs
+  - development
+  - frontend
+  - backend 

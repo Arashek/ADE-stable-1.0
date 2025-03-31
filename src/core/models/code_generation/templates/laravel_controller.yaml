@@ -1,0 +1,120 @@
+name: laravel_controller
+description: Template for generating Laravel controllers
+content: |
+  <?php
+  
+  namespace {{ namespace }};
+  
+  use Illuminate\Http\Request;
+  use App\Http\Controllers\Controller;
+  use Illuminate\Http\JsonResponse;
+  {% for import in imports %}
+  use {{ import }};
+  {% endfor %}
+  
+  class {{ controller_name }}Controller extends Controller
+  {
+      protected ${{ service_name }};
+      
+      public function __construct({{ service_type }} ${{ service_name }})
+      {
+          $this->{{ service_name }} = ${{ service_name }};
+      }
+      
+      {% for method in methods %}
+      /**
+       * {{ method.docstring }}
+       *
+       * @param Request $request
+       {% for param in method.params %}
+       * @param {{ param.type }} ${{ param.name }}
+       {% endfor %}
+       * @return {{ method.return_type }}
+       */
+      public function {{ method.name }}(Request $request{% for param in method.params %}, {{ param.type }} ${{ param.name }}{% endfor %})
+      {
+          {% for validation in method.validations %}
+          {{ validation }}
+          {% endfor %}
+          
+          {% for operation in method.operations %}
+          {{ operation }}
+          {% endfor %}
+          
+          {% if method.return_statement %}
+          return {{ method.return_statement }};
+          {% endif %}
+      }
+      {% endfor %}
+  }
+parameters:
+  namespace:
+    type: string
+    required: true
+    description: Namespace for the controller
+  controller_name:
+    type: string
+    required: true
+    description: Name of the controller class
+  service_type:
+    type: string
+    required: true
+    description: Type of the service to inject
+  service_name:
+    type: string
+    required: true
+    description: Name of the service property
+  imports:
+    type: array
+    required: false
+    description: List of additional use statements
+  methods:
+    type: array
+    required: false
+    description: List of controller methods
+    items:
+      name:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: false
+        description: PHPDoc description
+      params:
+        type: array
+        required: false
+        description: List of method parameters
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+        description: Return type of the method
+      validations:
+        type: array
+        required: false
+        description: List of validation rules
+      operations:
+        type: array
+        required: false
+        description: List of operations to perform
+      return_statement:
+        type: string
+        required: false
+        description: Return statement
+tags:
+  - php
+  - laravel
+  - controller
+  - backend
+language: php
+category: controller
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

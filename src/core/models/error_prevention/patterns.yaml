@@ -1,0 +1,203 @@
+# Error Prevention Patterns Configuration
+# This file defines common error patterns and their prevention strategies
+
+patterns:
+  # Resource-related patterns
+  - type: "resource_exhaustion"
+    description: "System resources are being exhausted"
+    severity: "high"
+    confidence: 0.9
+    affected_components: ["system", "memory", "cpu", "disk"]
+    prevention_strategies:
+      - "implement_resource_limits"
+      - "add_monitoring"
+      - "optimize_resource_usage"
+      - "implement_caching"
+      - "scale_resources"
+
+  - type: "resource_leak"
+    description: "Resources are not being properly released"
+    severity: "critical"
+    confidence: 0.85
+    affected_components: ["system", "memory", "file_handles", "database_connections"]
+    prevention_strategies:
+      - "use_context_managers"
+      - "implement_proper_cleanup"
+      - "add_resource_tracking"
+      - "use_weak_references"
+      - "implement_finalizers"
+
+  # Code complexity patterns
+  - type: "high_complexity"
+    description: "Code complexity exceeds recommended thresholds"
+    severity: "high"
+    confidence: 0.8
+    affected_components: ["code_quality", "maintainability"]
+    prevention_strategies:
+      - "refactor_complex_methods"
+      - "extract_common_logic"
+      - "use_design_patterns"
+      - "add_unit_tests"
+      - "document_complex_logic"
+
+  - type: "nested_conditionals"
+    description: "Deeply nested conditional statements"
+    severity: "medium"
+    confidence: 0.75
+    affected_components: ["code_quality", "readability"]
+    prevention_strategies:
+      - "use_early_returns"
+      - "extract_conditions"
+      - "use_guard_clauses"
+      - "implement_strategy_pattern"
+      - "use_switch_statements"
+
+  # Error handling patterns
+  - type: "unhandled_exceptions"
+    description: "Exceptions are not being properly handled"
+    severity: "critical"
+    confidence: 0.95
+    affected_components: ["error_handling", "reliability"]
+    prevention_strategies:
+      - "implement_try_except_blocks"
+      - "add_error_logging"
+      - "define_custom_exceptions"
+      - "implement_error_recovery"
+      - "add_error_monitoring"
+
+  - type: "silent_failures"
+    description: "Errors are being silently ignored"
+    severity: "high"
+    confidence: 0.85
+    affected_components: ["error_handling", "debugging"]
+    prevention_strategies:
+      - "add_proper_logging"
+      - "implement_error_reporting"
+      - "use_error_tracking"
+      - "add_assertions"
+      - "implement_fail_fast"
+
+  # Performance patterns
+  - type: "inefficient_algorithms"
+    description: "Use of inefficient algorithms or data structures"
+    severity: "medium"
+    confidence: 0.7
+    affected_components: ["performance", "scalability"]
+    prevention_strategies:
+      - "optimize_algorithm_complexity"
+      - "use_appropriate_data_structures"
+      - "implement_caching"
+      - "add_performance_monitoring"
+      - "profile_code"
+
+  - type: "memory_inefficiency"
+    description: "Inefficient memory usage patterns"
+    severity: "high"
+    confidence: 0.8
+    affected_components: ["memory", "performance"]
+    prevention_strategies:
+      - "optimize_data_structures"
+      - "implement_memory_pooling"
+      - "use_generators"
+      - "implement_lazy_loading"
+      - "add_memory_profiling"
+
+  # Security patterns
+  - type: "security_vulnerability"
+    description: "Potential security vulnerabilities"
+    severity: "critical"
+    confidence: 0.9
+    affected_components: ["security", "authentication", "authorization"]
+    prevention_strategies:
+      - "implement_input_validation"
+      - "use_secure_libraries"
+      - "add_security_headers"
+      - "implement_rate_limiting"
+      - "conduct_security_audits"
+
+  - type: "insecure_dependencies"
+    description: "Use of outdated or insecure dependencies"
+    severity: "high"
+    confidence: 0.85
+    affected_components: ["security", "dependencies"]
+    prevention_strategies:
+      - "update_dependencies"
+      - "use_dependency_scanner"
+      - "implement_version_pinning"
+      - "conduct_dependency_audits"
+      - "use_security_alerts"
+
+  # Concurrency patterns
+  - type: "race_condition"
+    description: "Potential race conditions in concurrent code"
+    severity: "critical"
+    confidence: 0.85
+    affected_components: ["concurrency", "threading"]
+    prevention_strategies:
+      - "use_locks"
+      - "implement_atomic_operations"
+      - "use_thread_safe_structures"
+      - "add_concurrency_testing"
+      - "implement_proper_synchronization"
+
+  - type: "deadlock_risk"
+    description: "Potential deadlock situations"
+    severity: "critical"
+    confidence: 0.8
+    affected_components: ["concurrency", "threading"]
+    prevention_strategies:
+      - "implement_lock_ordering"
+      - "use_timeout_mechanisms"
+      - "avoid_nested_locks"
+      - "implement_deadlock_detection"
+      - "use_concurrent_structures"
+
+  # API patterns
+  - type: "api_inconsistency"
+    description: "Inconsistent API design or usage"
+    severity: "medium"
+    confidence: 0.75
+    affected_components: ["api", "interfaces"]
+    prevention_strategies:
+      - "standardize_api_design"
+      - "implement_versioning"
+      - "add_api_documentation"
+      - "use_api_contracts"
+      - "implement_api_testing"
+
+  - type: "poor_error_responses"
+    description: "Poorly designed error responses"
+    severity: "medium"
+    confidence: 0.7
+    affected_components: ["api", "error_handling"]
+    prevention_strategies:
+      - "standardize_error_responses"
+      - "add_error_codes"
+      - "implement_error_details"
+      - "add_error_documentation"
+      - "implement_error_tracking"
+
+  # Testing patterns
+  - type: "insufficient_testing"
+    description: "Insufficient test coverage or quality"
+    severity: "medium"
+    confidence: 0.7
+    affected_components: ["testing", "quality"]
+    prevention_strategies:
+      - "increase_test_coverage"
+      - "add_integration_tests"
+      - "implement_mutation_testing"
+      - "add_performance_tests"
+      - "implement_continuous_testing"
+
+  - type: "flaky_tests"
+    description: "Unreliable or flaky tests"
+    severity: "low"
+    confidence: 0.65
+    affected_components: ["testing", "reliability"]
+    prevention_strategies:
+      - "isolate_test_dependencies"
+      - "implement_test_retries"
+      - "add_test_timeouts"
+      - "use_test_fixtures"
+      - "implement_test_monitoring" 

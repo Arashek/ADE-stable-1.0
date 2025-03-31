@@ -1,0 +1,80 @@
+- name: "critical_alerts"
+  stages:
+    - delay_seconds: 300  # 5 minutes
+      channels:
+        - type: "email"
+          config:
+            from: "alerts@example.com"
+            to: "ops@example.com"
+            smtp_server: "smtp.example.com"
+            username: "alerts"
+            password: "secret"
+        - type: "slack"
+          config:
+            webhook_url: "https://hooks.slack.com/services/xxx/yyy/zzz"
+      message: "Critical alert: {alert_name} - Stage 1"
+      
+    - delay_seconds: 900  # 15 minutes
+      channels:
+        - type: "email"
+          config:
+            from: "alerts@example.com"
+            to: "ops-manager@example.com"
+            smtp_server: "smtp.example.com"
+            username: "alerts"
+            password: "secret"
+        - type: "sms"
+          config:
+            from_number: "+1234567890"
+            to_number: "+1987654321"
+      message: "Critical alert: {alert_name} - Stage 2 - Escalating to management"
+      
+    - delay_seconds: 1800  # 30 minutes
+      channels:
+        - type: "email"
+          config:
+            from: "alerts@example.com"
+            to: "executive@example.com"
+            smtp_server: "smtp.example.com"
+            username: "alerts"
+            password: "secret"
+        - type: "webhook"
+          config:
+            url: "https://incident-response.example.com/webhook"
+            headers:
+              Authorization: "Bearer secret"
+      message: "Critical alert: {alert_name} - Stage 3 - Escalating to executive team"
+  max_stages: 3
+
+- name: "performance_alerts"
+  stages:
+    - delay_seconds: 600  # 10 minutes
+      channels:
+        - type: "email"
+          config:
+            from: "alerts@example.com"
+            to: "performance@example.com"
+            smtp_server: "smtp.example.com"
+            username: "alerts"
+            password: "secret"
+        - type: "slack"
+          config:
+            webhook_url: "https://hooks.slack.com/services/xxx/yyy/zzz"
+      message: "Performance alert: {alert_name} - Stage 1"
+      
+    - delay_seconds: 1800  # 30 minutes
+      channels:
+        - type: "email"
+          config:
+            from: "alerts@example.com"
+            to: "ops@example.com"
+            smtp_server: "smtp.example.com"
+            username: "alerts"
+            password: "secret"
+        - type: "webhook"
+          config:
+            url: "https://performance-monitoring.example.com/webhook"
+            headers:
+              Authorization: "Bearer secret"
+      message: "Performance alert: {alert_name} - Stage 2 - Escalating to operations"
+  max_stages: 2 

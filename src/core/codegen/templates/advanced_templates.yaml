@@ -1,0 +1,323 @@
+react:
+  templates:
+    context:
+      name: "React Context Template"
+      description: "React context provider and consumer template"
+      content: |
+        import React, { createContext, useContext, useReducer } from 'react';
+
+        const {{context_name}}Context = createContext();
+
+        const initialState = {
+            {{initial_state}}
+        };
+
+        function {{context_name}}Reducer(state, action) {
+            switch (action.type) {
+                {{reducer_cases}}
+                default:
+                    return state;
+            }
+        }
+
+        export function {{context_name}}Provider({ children }) {
+            const [state, dispatch] = useReducer({{context_name}}Reducer, initialState);
+
+            return (
+                <{{context_name}}Context.Provider value={{state, dispatch}}>
+                    {children}
+                </{{context_name}}Context.Provider>
+            );
+        }
+
+        export function use{{context_name}}() {
+            const context = useContext({{context_name}}Context);
+            if (!context) {
+                throw new Error('use{{context_name}} must be used within a {{context_name}}Provider');
+            }
+            return context;
+        }
+
+    error_boundary:
+      name: "React Error Boundary Template"
+      description: "React error boundary component template"
+      content: |
+        import React from 'react';
+
+        class {{error_boundary_name}} extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = { hasError: false, error: null };
+            }
+
+            static getDerivedStateFromError(error) {
+                return { hasError: true, error };
+            }
+
+            componentDidCatch(error, errorInfo) {
+                console.error('Error caught by boundary:', error, errorInfo);
+                {{error_handling}}
+            }
+
+            render() {
+                if (this.state.hasError) {
+                    return (
+                        <div className="error-boundary">
+                            {{error_ui}}
+                        </div>
+                    );
+                }
+
+                return this.props.children;
+            }
+        }
+
+        export default {{error_boundary_name}};
+
+vue:
+  templates:
+    store:
+      name: "Vuex Store Template"
+      description: "Vuex store module template with TypeScript"
+      content: |
+        import { Module } from 'vuex';
+        import { RootState } from '@/store/types';
+
+        interface {{module_name}}State {
+            {{state_properties}}
+        }
+
+        const state: {{module_name}}State = {
+            {{initial_state}}
+        };
+
+        const getters = {
+            {{getters}}
+        };
+
+        const mutations = {
+            {{mutations}}
+        };
+
+        const actions = {
+            {{actions}}
+        };
+
+        const {{module_name}}Module: Module<{{module_name}}State, RootState> = {
+            namespaced: true,
+            state,
+            getters,
+            mutations,
+            actions
+        };
+
+        export default {{module_name}}Module;
+
+    composable:
+      name: "Vue Composable Template"
+      description: "Vue 3 composable function template"
+      content: |
+        import { ref, computed, onMounted, onUnmounted } from 'vue';
+
+        export function use{{composable_name}}({{parameters}}) {
+            const state = ref({{initial_state}});
+            const loading = ref(false);
+            const error = ref(null);
+
+            const computedValue = computed(() => {
+                {{computed_logic}}
+            });
+
+            async function fetchData() {
+                try {
+                    loading.value = true;
+                    {{fetch_logic}}
+                } catch (e) {
+                    error.value = e;
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            onMounted(() => {
+                {{mounted_logic}}
+            });
+
+            onUnmounted(() => {
+                {{cleanup_logic}}
+            });
+
+            return {
+                state,
+                loading,
+                error,
+                computedValue,
+                fetchData
+            };
+        }
+
+angular:
+  templates:
+    resolver:
+      name: "Angular Resolver Template"
+      description: "Angular route resolver template"
+      content: |
+        import { Injectable } from '@angular/core';
+        import { Resolve } from '@angular/router';
+        import { Observable } from 'rxjs';
+        import { {{service_name}}Service } from './{{service_name}}.service';
+
+        @Injectable({
+            providedIn: 'root'
+        })
+        export class {{resolver_name}}Resolver implements Resolve<any> {
+            constructor(private {{service_name}}Service: {{service_name}}Service) {}
+
+            resolve(): Observable<any> {
+                return this.{{service_name}}Service.getData();
+            }
+        }
+
+    guard:
+      name: "Angular Guard Template"
+      description: "Angular route guard template"
+      content: |
+        import { Injectable } from '@angular/core';
+        import { CanActivate, Router } from '@angular/router';
+        import { {{service_name}}Service } from './{{service_name}}.service';
+
+        @Injectable({
+            providedIn: 'root'
+        })
+        export class {{guard_name}}Guard implements CanActivate {
+            constructor(
+                private {{service_name}}Service: {{service_name}}Service,
+                private router: Router
+            ) {}
+
+            canActivate(): boolean {
+                if (this.{{service_name}}Service.isAuthenticated()) {
+                    return true;
+                }
+
+                this.router.navigate(['/login']);
+                return false;
+            }
+        }
+
+nodejs:
+  templates:
+    middleware:
+      name: "Express Middleware Template"
+      description: "Express middleware template with error handling"
+      content: |
+        const {{middleware_name}} = (req, res, next) => {
+            try {
+                {{middleware_logic}}
+                next();
+            } catch (error) {
+                next(error);
+            }
+        };
+
+        module.exports = {{middleware_name}};
+
+    service:
+      name: "Node.js Service Template"
+      description: "Node.js service template with dependency injection"
+      content: |
+        class {{service_name}}Service {
+            constructor({{dependencies}}) {
+                {{initialization}}
+            }
+
+            async {{method_name}}({{parameters}}) {
+                try {
+                    {{implementation}}
+                } catch (error) {
+                    {{error_handling}}
+                    throw error;
+                }
+            }
+        }
+
+        module.exports = {{service_name}}Service;
+
+flutter:
+  templates:
+    bloc:
+      name: "Flutter BLoC Template"
+      description: "Flutter BLoC pattern template"
+      content: |
+        import 'package:flutter_bloc/flutter_bloc.dart';
+
+        // Events
+        abstract class {{event_name}}Event {}
+
+        class {{event_name}}Started extends {{event_name}}Event {
+            {{parameters}}
+        }
+
+        // States
+        abstract class {{state_name}}State {}
+
+        class {{state_name}}Initial extends {{state_name}}State {}
+        class {{state_name}}Loading extends {{state_name}}State {}
+        class {{state_name}}Loaded extends {{state_name}}State {
+            final {{data_type}} data;
+            {{state_name}}Loaded(this.data);
+        }
+        class {{state_name}}Error extends {{state_name}}State {
+            final String message;
+            {{state_name}}Error(this.message);
+        }
+
+        // BLoC
+        class {{bloc_name}}Bloc extends Bloc<{{event_name}}Event, {{state_name}}State> {
+            {{bloc_name}}Bloc() : super({{state_name}}Initial()) {
+                on<{{event_name}}Started>(_onStarted);
+            }
+
+            Future<void> _onStarted(
+                {{event_name}}Started event,
+                Emitter<{{state_name}}State> emit,
+            ) async {
+                try {
+                    emit({{state_name}}Loading());
+                    {{implementation}}
+                    emit({{state_name}}Loaded(result));
+                } catch (e) {
+                    emit({{state_name}}Error(e.toString()));
+                }
+            }
+        }
+
+    repository:
+      name: "Flutter Repository Template"
+      description: "Flutter repository pattern template"
+      content: |
+        import 'package:dio/dio.dart';
+
+        class {{repository_name}}Repository {
+            final Dio _dio;
+            final String _baseUrl;
+
+            {{repository_name}}Repository({
+                required Dio dio,
+                required String baseUrl,
+            })  : _dio = dio,
+                  _baseUrl = baseUrl;
+
+            Future<{{return_type}}> {{method_name}}({{parameters}}) async {
+                try {
+                    final response = await _dio.get(
+                        '$_baseUrl/{{endpoint}}',
+                        queryParameters: {{query_params}},
+                    );
+                    return {{response_handling}};
+                } catch (e) {
+                    {{error_handling}}
+                    throw e;
+                }
+            }
+        } 

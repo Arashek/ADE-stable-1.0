@@ -1,0 +1,269 @@
+name: graphql_schema
+description: Template for generating GraphQL schemas
+content: |
+  type {{ type_name }} {
+    {% for field in fields %}
+    {{ field.name }}: {{ field.type }}{% if field.required %}!{% endif %}{% if field.description %} # {{ field.description }}{% endif %}
+    {% endfor %}
+  }
+  
+  {% for input in inputs %}
+  input {{ input.name }} {
+    {% for field in input.fields %}
+    {{ field.name }}: {{ field.type }}{% if field.required %}!{% endif %}{% if field.description %} # {{ field.description }}{% endif %}
+    {% endfor %}
+  }
+  {% endfor %}
+  
+  {% for query in queries %}
+  type Query {
+    {{ query.name }}({% for arg in query.arguments %}{{ arg.name }}: {{ arg.type }}{% if arg.required %}!{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}): {{ query.return_type }}{% if query.required %}!{% endif %}{% if query.description %} # {{ query.description }}{% endif %}
+  }
+  {% endfor %}
+  
+  {% for mutation in mutations %}
+  type Mutation {
+    {{ mutation.name }}({% for arg in mutation.arguments %}{{ arg.name }}: {{ arg.type }}{% if arg.required %}!{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}): {{ mutation.return_type }}{% if mutation.required %}!{% endif %}{% if mutation.description %} # {{ mutation.description }}{% endif %}
+  }
+  {% endfor %}
+  
+  {% for subscription in subscriptions %}
+  type Subscription {
+    {{ subscription.name }}({% for arg in subscription.arguments %}{{ arg.name }}: {{ arg.type }}{% if arg.required %}!{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}): {{ subscription.return_type }}{% if subscription.required %}!{% endif %}{% if subscription.description %} # {{ subscription.description }}{% endif %}
+  }
+  {% endfor %}
+  
+  {% for enum in enums %}
+  enum {{ enum.name }} {
+    {% for value in enum.values %}
+    {{ value }}{% if value.description %} # {{ value.description }}{% endif %}
+    {% endfor %}
+  }
+  {% endfor %}
+  
+  {% for interface in interfaces %}
+  interface {{ interface.name }} {
+    {% for field in interface.fields %}
+    {{ field.name }}: {{ field.type }}{% if field.required %}!{% endif %}{% if field.description %} # {{ field.description }}{% endif %}
+    {% endfor %}
+  }
+  {% endfor %}
+  
+  {% for union in unions %}
+  union {{ union.name }} = {% for type in union.types %}{{ type }}{% if not loop.last %} | {% endif %}{% endfor %}
+  {% endfor %}
+parameters:
+  type_name:
+    type: string
+    required: true
+    description: Name of the main type
+  fields:
+    type: array
+    required: true
+    description: List of type fields
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      required:
+        type: boolean
+        required: false
+        default: false
+      description:
+        type: string
+        required: false
+  inputs:
+    type: array
+    required: false
+    description: List of input types
+    items:
+      name:
+        type: string
+        required: true
+      fields:
+        type: array
+        required: true
+        description: List of input fields
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+          required:
+            type: boolean
+            required: false
+            default: false
+          description:
+            type: string
+            required: false
+  queries:
+    type: array
+    required: false
+    description: List of queries
+    items:
+      name:
+        type: string
+        required: true
+      arguments:
+        type: array
+        required: false
+        description: List of query arguments
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+          required:
+            type: boolean
+            required: false
+            default: false
+      return_type:
+        type: string
+        required: true
+      required:
+        type: boolean
+        required: false
+        default: false
+      description:
+        type: string
+        required: false
+  mutations:
+    type: array
+    required: false
+    description: List of mutations
+    items:
+      name:
+        type: string
+        required: true
+      arguments:
+        type: array
+        required: false
+        description: List of mutation arguments
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+          required:
+            type: boolean
+            required: false
+            default: false
+      return_type:
+        type: string
+        required: true
+      required:
+        type: boolean
+        required: false
+        default: false
+      description:
+        type: string
+        required: false
+  subscriptions:
+    type: array
+    required: false
+    description: List of subscriptions
+    items:
+      name:
+        type: string
+        required: true
+      arguments:
+        type: array
+        required: false
+        description: List of subscription arguments
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+          required:
+            type: boolean
+            required: false
+            default: false
+      return_type:
+        type: string
+        required: true
+      required:
+        type: boolean
+        required: false
+        default: false
+      description:
+        type: string
+        required: false
+  enums:
+    type: array
+    required: false
+    description: List of enums
+    items:
+      name:
+        type: string
+        required: true
+      values:
+        type: array
+        required: true
+        description: List of enum values
+        items:
+          type: string
+          required: true
+          description: Optional description of the enum value
+  interfaces:
+    type: array
+    required: false
+    description: List of interfaces
+    items:
+      name:
+        type: string
+        required: true
+      fields:
+        type: array
+        required: true
+        description: List of interface fields
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+          required:
+            type: boolean
+            required: false
+            default: false
+          description:
+            type: string
+            required: false
+  unions:
+    type: array
+    required: false
+    description: List of unions
+    items:
+      name:
+        type: string
+        required: true
+      types:
+        type: array
+        required: true
+        description: List of union types
+        items:
+          type: string
+          required: true
+tags:
+  - graphql
+  - api
+  - schema
+language: graphql
+category: schema
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

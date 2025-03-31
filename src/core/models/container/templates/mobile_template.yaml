@@ -1,0 +1,65 @@
+id: mobile-development
+name: Mobile Development Container
+projectType: mobile
+baseImage: node:18-alpine
+defaultResources:
+  cpu:
+    limit: 4
+    reservation: 2
+  memory:
+    limit: 8g
+    reservation: 4g
+  disk:
+    limit: 30g
+    reservation: 15g
+defaultEnvironment:
+  - name: NODE_ENV
+    value: development
+  - name: ANDROID_HOME
+    value: /opt/android
+  - name: JAVA_HOME
+    value: /usr/lib/jvm/java-11-openjdk
+  - name: PATH
+    value: ${PATH}:/opt/android/platform-tools:/opt/android/tools/bin
+defaultPorts:
+  - hostPort: 8081
+    containerPort: 8081
+    protocol: tcp
+  - hostPort: 9090
+    containerPort: 9090
+    protocol: tcp
+defaultVolumes:
+  - source: ./src
+    target: /app/src
+    type: bind
+  - source: ./android
+    target: /app/android
+    type: bind
+  - source: ./ios
+    target: /app/ios
+    type: bind
+  - source: node_modules
+    target: /app/node_modules
+    type: volume
+  - source: android-sdk
+    target: /opt/android
+    type: volume
+defaultNetworks:
+  - name: mobile-network
+    driver: bridge
+defaultHealthCheck:
+  test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  startPeriod: 40s
+defaultCommand: ["npm", "start"]
+defaultWorkingDir: /app
+defaultUser: root
+description: Container template for React Native mobile development
+tags:
+  - mobile
+  - react-native
+  - android
+  - ios
+  - development 

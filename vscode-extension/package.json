@@ -1,0 +1,98 @@
+{
+  "name": "ade-vscode",
+  "displayName": "ADE for VS Code",
+  "description": "ADE (AI Development Environment) integration for VS Code",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages",
+    "Machine Learning",
+    "Snippets"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "ade.connect",
+        "title": "Connect to ADE Platform"
+      },
+      {
+        "command": "ade.sync",
+        "title": "Sync with ADE Web IDE"
+      },
+      {
+        "command": "ade.startAgent",
+        "title": "Start ADE Agent"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ade-sidebar",
+          "title": "ADE",
+          "icon": "resources/ade.svg"
+        }
+      ]
+    },
+    "views": {
+      "ade-sidebar": [
+        {
+          "id": "ade.projectExplorer",
+          "name": "Project Explorer"
+        },
+        {
+          "id": "ade.agents",
+          "name": "AI Agents"
+        },
+        {
+          "id": "ade.sync",
+          "name": "Sync Status"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "ADE",
+      "properties": {
+        "ade.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:3000",
+          "description": "ADE Platform server URL"
+        },
+        "ade.syncInterval": {
+          "type": "number",
+          "default": 30,
+          "description": "Sync interval in seconds"
+        },
+        "ade.autoSync": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic synchronization"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/node": "^16.11.7",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
+    "@typescript-eslint/parser": "^5.42.0",
+    "eslint": "^8.26.0",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.5.1",
+    "axios": "^0.27.2"
+  }
+}

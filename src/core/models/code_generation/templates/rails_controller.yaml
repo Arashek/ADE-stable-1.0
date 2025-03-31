@@ -1,0 +1,88 @@
+name: rails_controller
+description: Template for generating Ruby on Rails controllers
+content: |
+  class {{ controller_name }}Controller < ApplicationController
+    {% for before_action in before_actions %}
+    before_action :{{ before_action }}
+    {% endfor %}
+    
+    {% for action in actions %}
+    def {{ action.name }}
+      {% for operation in action.operations %}
+      {{ operation }}
+      {% endfor %}
+      
+      {% if action.respond_to %}
+      respond_to do |format|
+        {% for format_block in action.respond_to %}
+        format.{{ format_block.format }} do
+          {{ format_block.content }}
+        end
+        {% endfor %}
+      end
+      {% endif %}
+    end
+    {% endfor %}
+    
+    private
+    
+    {% for private_method in private_methods %}
+    def {{ private_method.name }}
+      {{ private_method.content }}
+    end
+    {% endfor %}
+  end
+parameters:
+  controller_name:
+    type: string
+    required: true
+    description: Name of the controller class
+  before_actions:
+    type: array
+    required: false
+    description: List of before_action callbacks
+  actions:
+    type: array
+    required: false
+    description: List of controller actions
+    items:
+      name:
+        type: string
+        required: true
+      operations:
+        type: array
+        required: false
+        description: List of operations to perform
+      respond_to:
+        type: array
+        required: false
+        description: List of format blocks
+        items:
+          format:
+            type: string
+            required: true
+          content:
+            type: string
+            required: true
+  private_methods:
+    type: array
+    required: false
+    description: List of private methods
+    items:
+      name:
+        type: string
+        required: true
+      content:
+        type: string
+        required: true
+tags:
+  - ruby
+  - rails
+  - controller
+  - backend
+language: ruby
+category: controller
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

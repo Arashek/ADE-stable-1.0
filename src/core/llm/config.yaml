@@ -1,0 +1,157 @@
+# LLM Integration Layer Configuration
+
+# Default settings
+defaults:
+  max_tokens: 2048
+  temperature: 0.7
+  top_p: 1.0
+  frequency_penalty: 0.0
+  presence_penalty: 0.0
+  timeout: 30
+  retry_attempts: 3
+  retry_delay: 1
+
+# Provider configurations
+providers:
+  openai:
+    enabled: true
+    models:
+      - name: "gpt-4"
+        max_tokens: 8192
+        cost_per_token: 0.03
+        max_requests_per_minute: 60
+        max_tokens_per_minute: 100000
+      - name: "gpt-4-turbo"
+        max_tokens: 128000
+        cost_per_token: 0.01
+        max_requests_per_minute: 60
+        max_tokens_per_minute: 100000
+      - name: "gpt-3.5-turbo"
+        max_tokens: 4096
+        cost_per_token: 0.001
+        max_requests_per_minute: 60
+        max_tokens_per_minute: 100000
+
+  anthropic:
+    enabled: true
+    models:
+      - name: "claude-3-opus"
+        max_tokens: 4096
+        cost_per_token: 0.015
+        max_requests_per_minute: 60
+        max_tokens_per_minute: 100000
+      - name: "claude-3-sonnet"
+        max_tokens: 4096
+        cost_per_token: 0.003
+        max_requests_per_minute: 60
+        max_tokens_per_minute: 100000
+
+  local:
+    enabled: true
+    models:
+      - name: "llama-2-70b"
+        max_tokens: 4096
+        cost_per_token: 0.0
+        max_requests_per_minute: 30
+        max_tokens_per_minute: 50000
+      - name: "mistral-7b"
+        max_tokens: 4096
+        cost_per_token: 0.0
+        max_requests_per_minute: 30
+        max_tokens_per_minute: 50000
+
+# Task-specific configurations
+tasks:
+  code_analysis:
+    preferred_providers:
+      - "openai"
+      - "anthropic"
+    model_preferences:
+      - "gpt-4"
+      - "claude-3-opus"
+    max_tokens: 4096
+    temperature: 0.2
+
+  pattern_recognition:
+    preferred_providers:
+      - "openai"
+      - "anthropic"
+    model_preferences:
+      - "gpt-4"
+      - "claude-3-opus"
+    max_tokens: 2048
+    temperature: 0.3
+
+  tool_selection:
+    preferred_providers:
+      - "openai"
+      - "anthropic"
+    model_preferences:
+      - "gpt-3.5-turbo"
+      - "claude-3-sonnet"
+    max_tokens: 1024
+    temperature: 0.1
+
+  resource_optimization:
+    preferred_providers:
+      - "openai"
+      - "anthropic"
+    model_preferences:
+      - "gpt-4"
+      - "claude-3-opus"
+    max_tokens: 2048
+    temperature: 0.2
+
+# Fallback configuration
+fallback:
+  enabled: true
+  max_retries: 3
+  retry_delay: 1
+  backoff_factor: 2
+  max_retry_delay: 10
+  providers:
+    - "openai"
+    - "anthropic"
+    - "local"
+
+# Cost optimization
+cost_optimization:
+  enabled: true
+  max_cost_per_request: 0.10
+  preferred_models:
+    - "gpt-3.5-turbo"
+    - "claude-3-sonnet"
+  fallback_models:
+    - "gpt-4"
+    - "claude-3-opus"
+
+# Rate limiting
+rate_limits:
+  global:
+    max_requests_per_minute: 60
+    max_tokens_per_minute: 100000
+  per_provider:
+    max_requests_per_minute: 30
+    max_tokens_per_minute: 50000
+
+# Monitoring
+monitoring:
+  enabled: true
+  metrics:
+    - "latency"
+    - "cost"
+    - "success_rate"
+    - "error_rate"
+  retention_days: 30
+  alert_thresholds:
+    latency_ms: 5000
+    error_rate: 0.05
+    cost_per_request: 0.10
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/llm.log"
+  max_size_mb: 100
+  backup_count: 5 

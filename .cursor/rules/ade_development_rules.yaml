@@ -1,0 +1,142 @@
+name: ADE Development Rules
+description: Rules and guidelines for ADE platform development
+version: 1.0.0
+
+# Rule Categories
+categories:
+  - name: Core Principles
+    priority: 1
+    rules:
+      - user_centric_development
+      - intelligent_automation
+      - container_management
+      - security_first
+      - backup_recovery
+
+  - name: Development Guidelines
+    priority: 2
+    rules:
+      - agent_system
+      - container_system
+      - security_implementation
+      - backup_system
+      - user_interface
+
+  - name: Code Standards
+    priority: 3
+    rules:
+      - architecture
+      - security
+      - performance
+      - testing
+
+# Rule Definitions
+rules:
+  user_centric_development:
+    description: "User-Centric Development Principles"
+    priority: 1
+    applies_to: ["all"]
+    checks:
+      - "User consultation for critical decisions"
+      - "Security and privacy considerations"
+      - "User experience enhancement"
+
+  intelligent_automation:
+    description: "Intelligent Automation Guidelines"
+    priority: 1
+    applies_to: ["all"]
+    checks:
+      - "LLM agent integration"
+      - "Automated task handling"
+      - "Decision explanation"
+
+  container_management:
+    description: "Container Management Requirements"
+    priority: 1
+    applies_to: ["container", "deployment"]
+    checks:
+      - "Resource allocation"
+      - "Security isolation"
+      - "Dynamic scaling"
+
+  security_first:
+    description: "Security-First Approach"
+    priority: 1
+    applies_to: ["all"]
+    checks:
+      - "Security monitoring"
+      - "Audit trails"
+      - "Regular assessments"
+
+  backup_recovery:
+    description: "Backup and Recovery Standards"
+    priority: 1
+    applies_to: ["data", "deployment"]
+    checks:
+      - "Automated backups"
+      - "Multiple locations"
+      - "Recovery procedures"
+
+# Integration Points
+integration:
+  - type: "chat"
+    triggers:
+      - "new_chat"
+      - "feature_development"
+      - "security_review"
+      - "deployment_planning"
+
+  - type: "code"
+    triggers:
+      - "new_file"
+      - "code_review"
+      - "security_scan"
+      - "performance_test"
+
+# Validation Rules
+validation:
+  - type: "security"
+    checks:
+      - "Authentication"
+      - "Authorization"
+      - "Data protection"
+      - "Compliance"
+
+  - type: "performance"
+    checks:
+      - "Resource usage"
+      - "Response times"
+      - "Scalability"
+      - "Reliability"
+
+# Documentation Requirements
+documentation:
+  - type: "code"
+    requirements:
+      - "Function documentation"
+      - "API documentation"
+      - "Architecture diagrams"
+      - "Security protocols"
+
+  - type: "user"
+    requirements:
+      - "User guides"
+      - "API documentation"
+      - "Security guidelines"
+      - "Troubleshooting guides"
+
+# Change Management
+change_management:
+  - type: "feature"
+    requirements:
+      - "Specification"
+      - "Security assessment"
+      - "Performance analysis"
+      - "User consultation"
+
+  - type: "update"
+    requirements:
+      - "Version control"
+      - "Change logging"
+      - "User notification"
+      - "Rollback procedures" 

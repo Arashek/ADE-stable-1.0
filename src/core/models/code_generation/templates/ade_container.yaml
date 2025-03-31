@@ -1,0 +1,261 @@
+name: ade_container
+description: Template for managing ADE development containers
+content: |
+  version: '3.8'
+  
+  services:
+    development:
+      image: {{ base_image }}
+      container_name: {{ container_name }}
+      {% if build_context %}
+      build:
+        context: {{ build_context }}
+        dockerfile: {{ dockerfile }}
+      {% endif %}
+      volumes:
+        {% for volume in volumes %}
+        - {{ volume.source }}:{{ volume.target }}{% if volume.type %} :{{ volume.type }}{% endif %}
+        {% endfor %}
+      environment:
+        {% for env in environment %}
+        - {{ env.key }}={{ env.value }}
+        {% endfor %}
+      ports:
+        {% for port in ports %}
+        - "{{ port.host }}:{{ port.container }}"
+        {% endfor %}
+      {% if command %}
+      command: {{ command }}
+      {% endif %}
+      {% if working_dir %}
+      working_dir: {{ working_dir }}
+      {% endif %}
+      {% if user %}
+      user: {{ user }}
+      {% endif %}
+      {% if depends_on %}
+      depends_on:
+        {% for dependency in depends_on %}
+        - {{ dependency }}
+        {% endfor %}
+      {% endif %}
+      {% if networks %}
+      networks:
+        {% for network in networks %}
+        - {{ network }}
+        {% endfor %}
+      {% endif %}
+      {% if healthcheck %}
+      healthcheck:
+        test: {{ healthcheck.test }}
+        interval: {{ healthcheck.interval }}
+        timeout: {{ healthcheck.timeout }}
+        retries: {{ healthcheck.retries }}
+        start_period: {{ healthcheck.start_period }}
+      {% endif %}
+      {% if deploy %}
+      deploy:
+        resources:
+          limits:
+            cpus: {{ deploy.resources.limits.cpus }}
+            memory: {{ deploy.resources.limits.memory }}
+          reservations:
+            cpus: {{ deploy.resources.reservations.cpus }}
+            memory: {{ deploy.resources.reservations.memory }}
+        restart_policy:
+          condition: {{ deploy.restart_policy.condition }}
+          max_attempts: {{ deploy.restart_policy.max_attempts }}
+          window: {{ deploy.restart_policy.window }}
+      {% endif %}
+  
+  {% if networks %}
+  networks:
+    {% for network in networks %}
+    {{ network.name }}:
+      driver: {{ network.driver }}
+      {% if network.options %}
+      options:
+        {% for option in network.options %}
+        {{ option.key }}: {{ option.value }}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  
+  {% if volumes %}
+  volumes:
+    {% for volume in volumes %}
+    {{ volume.name }}:
+      driver: {{ volume.driver }}
+      {% if volume.options %}
+      options:
+        {% for option in volume.options %}
+        {{ option.key }}: {{ option.value }}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+parameters:
+  base_image:
+    type: string
+    required: true
+    description: Base image for the development container
+  container_name:
+    type: string
+    required: true
+    description: Name of the container
+  build_context:
+    type: string
+    required: false
+    description: Build context for custom Dockerfile
+  dockerfile:
+    type: string
+    required: false
+    description: Path to Dockerfile
+  volumes:
+    type: array
+    required: false
+    description: List of volume mounts
+    items:
+      source:
+        type: string
+        required: true
+      target:
+        type: string
+        required: true
+      type:
+        type: string
+        required: false
+  environment:
+    type: array
+    required: false
+    description: List of environment variables
+    items:
+      key:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+  ports:
+    type: array
+    required: false
+    description: List of port mappings
+    items:
+      host:
+        type: string
+        required: true
+      container:
+        type: string
+        required: true
+  command:
+    type: string
+    required: false
+    description: Command to run in container
+  working_dir:
+    type: string
+    required: false
+    description: Working directory in container
+  user:
+    type: string
+    required: false
+    description: User to run as in container
+  depends_on:
+    type: array
+    required: false
+    description: List of service dependencies
+  networks:
+    type: array
+    required: false
+    description: List of networks to connect to
+    items:
+      name:
+        type: string
+        required: true
+      driver:
+        type: string
+        required: false
+      options:
+        type: array
+        required: false
+        description: List of network options
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+  healthcheck:
+    type: object
+    required: false
+    description: Container health check configuration
+    properties:
+      test:
+        type: string
+        required: true
+      interval:
+        type: string
+        required: true
+      timeout:
+        type: string
+        required: true
+      retries:
+        type: integer
+        required: true
+      start_period:
+        type: string
+        required: true
+  deploy:
+    type: object
+    required: false
+    description: Deployment configuration
+    properties:
+      resources:
+        type: object
+        required: true
+        properties:
+          limits:
+            type: object
+            required: true
+            properties:
+              cpus:
+                type: string
+                required: true
+              memory:
+                type: string
+                required: true
+          reservations:
+            type: object
+            required: true
+            properties:
+              cpus:
+                type: string
+                required: true
+              memory:
+                type: string
+                required: true
+      restart_policy:
+        type: object
+        required: true
+        properties:
+          condition:
+            type: string
+            required: true
+          max_attempts:
+            type: integer
+            required: true
+          window:
+            type: string
+            required: true
+tags:
+  - ade
+  - container
+  - development
+  - cloud
+language: yaml
+category: configuration
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

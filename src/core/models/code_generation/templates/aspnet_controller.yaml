@@ -1,0 +1,111 @@
+name: aspnet_controller
+description: Template for generating ASP.NET Core controllers
+content: |
+  using Microsoft.AspNetCore.Mvc;
+  using Microsoft.AspNetCore.Authorization;
+  {% for import in imports %}
+  using {{ import }};
+  {% endfor %}
+  
+  namespace {{ namespace }}
+  {
+      [ApiController]
+      [Route("api/[controller]")]
+      {% for attribute in attributes %}
+      [{{ attribute }}]
+      {% endfor %}
+      public class {{ controller_name }}Controller : ControllerBase
+      {
+          private readonly {{ service_type }} _service;
+          
+          public {{ controller_name }}Controller({{ service_type }} service)
+          {
+              _service = service;
+          }
+          
+          {% for action in actions %}
+          [Http{{ action.method }}("{{ action.route }}")]
+          {% for attribute in action.attributes %}
+          [{{ attribute }}]
+          {% endfor %}
+          public async Task<{{ action.return_type }}> {{ action.name }}({{ action.parameters }})
+          {
+              {% for operation in action.operations %}
+              {{ operation }}
+              {% endfor %}
+              
+              {% if action.return_statement %}
+              return {{ action.return_statement }};
+              {% endif %}
+          }
+          {% endfor %}
+      }
+  }
+parameters:
+  namespace:
+    type: string
+    required: true
+    description: Namespace for the controller
+  controller_name:
+    type: string
+    required: true
+    description: Name of the controller class
+  service_type:
+    type: string
+    required: true
+    description: Type of the service to inject
+  imports:
+    type: array
+    required: false
+    description: List of additional using statements
+  attributes:
+    type: array
+    required: false
+    description: List of controller attributes
+  actions:
+    type: array
+    required: false
+    description: List of controller actions
+    items:
+      name:
+        type: string
+        required: true
+      method:
+        type: string
+        required: true
+        description: HTTP method (Get, Post, Put, Delete)
+      route:
+        type: string
+        required: true
+        description: Route template
+      attributes:
+        type: array
+        required: false
+        description: List of action attributes
+      return_type:
+        type: string
+        required: true
+        description: Return type of the action
+      parameters:
+        type: string
+        required: true
+        description: Action parameters
+      operations:
+        type: array
+        required: false
+        description: List of operations to perform
+      return_statement:
+        type: string
+        required: false
+        description: Return statement
+tags:
+  - csharp
+  - aspnet
+  - controller
+  - backend
+language: csharp
+category: controller
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

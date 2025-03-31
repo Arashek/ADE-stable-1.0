@@ -1,0 +1,593 @@
+name: ADE Core Rules
+description: Core principles and direction for ADE platform development
+version: 1.0.0
+
+# Core Purpose Rules
+purpose:
+  - name: intelligent_backend
+    description: "ADE serves as an intelligent backend system for application development"
+    principles:
+      - "Automated development environment management"
+      - "Containerized development support"
+      - "Intelligent requirement analysis"
+      - "User-centric development process"
+
+  - name: user_workflow
+    description: "User-centric workflow management"
+    principles:
+      - "Project initialization through user consultation"
+      - "Automated development process management"
+      - "Resource and environment management"
+      - "Deployment support"
+
+# Agent System Rules
+agent_system:
+  - name: agent_hub
+    description: "Central coordination of LLM agents"
+    responsibilities:
+      - "Orchestrate multiple specialized agents"
+      - "Facilitate agent communication"
+      - "Manage decision-making process"
+      - "Ensure consensus building"
+
+  - name: agent_consensus
+    description: "Build agreement on project specifications"
+    responsibilities:
+      - "Analyze conflicting requirements"
+      - "Propose balanced solutions"
+      - "Validate against best practices"
+      - "Maintain user preferences"
+
+# Development Process Rules
+development_process:
+  - name: project_initialization
+    description: "Structured project setup process"
+    steps:
+      - "User requirement gathering"
+      - "Agent analysis and proposal"
+      - "User consultation and feedback"
+      - "Environment setup"
+
+  - name: development_workflow
+    description: "Automated development workflow"
+    features:
+      - "Isolated development environments"
+      - "Automated process management"
+      - "Resource optimization"
+      - "Environment monitoring"
+    agent_workflows:
+      - "Design Agent Workflow"
+        steps:
+          - "UI/UX analysis"
+            activities:
+              - "Pattern recognition"
+              - "Accessibility audit"
+              - "Performance analysis"
+              - "User flow mapping"
+              - "Design system review"
+          - "Design pattern identification"
+            activities:
+              - "Component analysis"
+              - "Layout assessment"
+              - "Interaction review"
+              - "Visual hierarchy check"
+              - "Consistency validation"
+          - "Improvement suggestions"
+            activities:
+              - "Pattern recommendations"
+              - "Layout optimizations"
+              - "Accessibility improvements"
+              - "Performance enhancements"
+              - "User experience refinements"
+          - "Design system updates"
+            activities:
+              - "Component updates"
+              - "Style guide maintenance"
+              - "Pattern library updates"
+              - "Documentation updates"
+              - "Version control"
+          - "User feedback integration"
+            activities:
+              - "Feedback analysis"
+              - "Metric tracking"
+              - "Iteration planning"
+              - "Implementation tracking"
+              - "Success validation"
+
+      - "Development Agent Workflow"
+        steps:
+          - "Code analysis"
+            activities:
+              - "Static code analysis"
+              - "Dependency review"
+              - "Architecture assessment"
+              - "Performance profiling"
+              - "Security scanning"
+          - "Architecture review"
+            activities:
+              - "Pattern validation"
+              - "Scalability assessment"
+              - "Maintainability analysis"
+              - "Integration review"
+              - "Documentation check"
+          - "Implementation planning"
+            activities:
+              - "Task breakdown"
+              - "Resource allocation"
+              - "Timeline planning"
+              - "Risk assessment"
+              - "Success criteria definition"
+          - "Quality checks"
+            activities:
+              - "Unit testing"
+              - "Integration testing"
+              - "Performance testing"
+              - "Security testing"
+              - "Code coverage analysis"
+          - "Performance optimization"
+            activities:
+              - "Bottleneck identification"
+              - "Resource optimization"
+              - "Caching strategies"
+              - "Load balancing"
+              - "Monitoring setup"
+
+      - "Testing Agent Workflow"
+        steps:
+          - "Test planning"
+            activities:
+              - "Test strategy development"
+              - "Test case design"
+              - "Test environment setup"
+              - "Resource allocation"
+              - "Schedule planning"
+          - "Automated testing"
+            activities:
+              - "Unit test execution"
+              - "Integration test running"
+              - "Performance testing"
+              - "Security testing"
+              - "Regression testing"
+          - "Coverage analysis"
+            activities:
+              - "Code coverage measurement"
+              - "Branch coverage analysis"
+              - "Path coverage review"
+              - "Mutation testing"
+              - "Coverage reporting"
+          - "Bug detection"
+            activities:
+              - "Static analysis"
+              - "Dynamic analysis"
+              - "Memory leak detection"
+              - "Race condition testing"
+              - "Security vulnerability scanning"
+          - "Performance testing"
+            activities:
+              - "Load testing"
+              - "Stress testing"
+              - "Endurance testing"
+              - "Spike testing"
+              - "Scalability testing"
+
+      - "Security Agent Workflow"
+        steps:
+          - "Security analysis"
+            activities:
+              - "Vulnerability scanning"
+              - "Threat modeling"
+              - "Risk assessment"
+              - "Compliance checking"
+              - "Security architecture review"
+          - "Vulnerability scanning"
+            activities:
+              - "Dependency scanning"
+              - "Code scanning"
+              - "Configuration scanning"
+              - "Infrastructure scanning"
+              - "Container scanning"
+          - "Compliance checking"
+            activities:
+              - "Standards validation"
+              - "Policy enforcement"
+              - "Audit logging"
+              - "Documentation review"
+              - "Control testing"
+          - "Security updates"
+            activities:
+              - "Patch management"
+              - "Dependency updates"
+              - "Configuration updates"
+              - "Security controls"
+              - "Monitoring setup"
+          - "Audit logging"
+            activities:
+              - "Event logging"
+              - "Access tracking"
+              - "Change monitoring"
+              - "Alert management"
+              - "Report generation"
+
+      - "Deployment Agent Workflow"
+        steps:
+          - "Deployment planning"
+            activities:
+              - "Environment preparation"
+              - "Resource allocation"
+              - "Rollback planning"
+              - "Monitoring setup"
+              - "Documentation review"
+          - "Environment preparation"
+            activities:
+              - "Infrastructure setup"
+              - "Configuration management"
+              - "Dependency installation"
+              - "Security hardening"
+              - "Performance tuning"
+          - "Resource allocation"
+            activities:
+              - "Capacity planning"
+              - "Resource provisioning"
+              - "Load balancing"
+              - "Scaling setup"
+              - "Cost optimization"
+          - "Deployment execution"
+            activities:
+              - "Version control"
+              - "Build process"
+              - "Deployment automation"
+              - "Health checks"
+              - "Rollback procedures"
+          - "Post-deployment checks"
+            activities:
+              - "Health monitoring"
+              - "Performance validation"
+              - "Security verification"
+              - "User impact assessment"
+              - "Documentation updates"
+
+# User Collaboration Rules
+user_collaboration:
+  - name: consultation_process
+    description: "Interactive user consultation"
+    aspects:
+      - "Technical decision making"
+      - "Resource allocation"
+      - "Environment customization"
+      - "Deployment planning"
+      - "Design collaboration"
+        features:
+          - "Design hub access"
+          - "UI/UX modification interface"
+          - "Design agent interaction"
+          - "Real-time preview"
+          - "Design feedback system"
+
+  - name: design_collaboration
+    description: "Design system collaboration"
+    components:
+      - "Design Hub"
+        features:
+          - "UI/UX modification interface"
+            capabilities:
+              - "Real-time component editing"
+              - "Style system management"
+              - "Layout adjustment tools"
+              - "Theme customization"
+              - "Component library management"
+          - "Design agent command center"
+            capabilities:
+              - "AI-powered design suggestions"
+              - "Pattern recognition"
+              - "Accessibility analysis"
+              - "Performance impact assessment"
+              - "Design system consistency checks"
+          - "Real-time preview system"
+            capabilities:
+              - "Live component preview"
+              - "Responsive design testing"
+              - "Theme switching"
+              - "State visualization"
+              - "Animation preview"
+          - "Design feedback collection"
+            capabilities:
+              - "In-context commenting"
+              - "User behavior tracking"
+              - "A/B testing setup"
+              - "Heatmap generation"
+              - "User journey mapping"
+          - "Version control for designs"
+            capabilities:
+              - "Design history tracking"
+              - "Branch management"
+              - "Merge conflict resolution"
+              - "Rollback support"
+              - "Design documentation"
+
+      - "Design Agent"
+        responsibilities:
+          - "UI/UX analysis and suggestions"
+            capabilities:
+              - "Pattern recognition"
+              - "Best practice validation"
+              - "Accessibility scoring"
+              - "Performance impact analysis"
+              - "User experience optimization"
+          - "Design pattern recommendations"
+            capabilities:
+              - "Component pattern matching"
+              - "Layout optimization"
+              - "Interaction pattern analysis"
+              - "Visual hierarchy assessment"
+              - "Consistency checking"
+          - "Accessibility compliance"
+            capabilities:
+              - "WCAG compliance checking"
+              - "Screen reader compatibility"
+              - "Color contrast analysis"
+              - "Keyboard navigation testing"
+              - "Focus management validation"
+          - "User experience optimization"
+            capabilities:
+              - "User flow analysis"
+              - "Interaction optimization"
+              - "Performance impact assessment"
+              - "Mobile responsiveness"
+              - "Cross-browser compatibility"
+          - "Design system maintenance"
+            capabilities:
+              - "Component documentation"
+              - "Style guide generation"
+              - "Pattern library management"
+              - "Version control integration"
+              - "Change impact analysis"
+
+      - "Design Workflow"
+        steps:
+          - "Design analysis"
+            activities:
+              - "Current state assessment"
+              - "Pattern identification"
+              - "Accessibility audit"
+              - "Performance analysis"
+              - "User feedback review"
+          - "Improvement suggestions"
+            activities:
+              - "Pattern recommendations"
+              - "Layout optimizations"
+              - "Accessibility improvements"
+              - "Performance enhancements"
+              - "User experience refinements"
+          - "User consultation"
+            activities:
+              - "Design review sessions"
+              - "Feedback collection"
+              - "A/B testing setup"
+              - "User testing coordination"
+              - "Stakeholder alignment"
+          - "Implementation planning"
+            activities:
+              - "Change prioritization"
+              - "Resource allocation"
+              - "Timeline planning"
+              - "Risk assessment"
+              - "Success metrics definition"
+          - "Feedback integration"
+            activities:
+              - "User feedback analysis"
+              - "Metric tracking"
+              - "Iteration planning"
+              - "Documentation updates"
+              - "Knowledge sharing"
+
+      - "Voting System"
+        capabilities:
+          - "Design decision voting"
+            features:
+              - "Multi-stakeholder voting"
+              - "Weighted voting system"
+              - "Vote tracking and analytics"
+              - "Consensus visualization"
+              - "Decision history"
+          - "Feedback collection"
+            features:
+              - "Structured feedback forms"
+              - "Rating systems"
+              - "Comment threads"
+              - "Attachment support"
+              - "Feedback categorization"
+          - "Decision tracking"
+            features:
+              - "Decision timeline"
+              - "Impact assessment"
+              - "Implementation status"
+              - "Success metrics"
+              - "Review scheduling"
+
+# Integration Rules
+integration:
+  - name: development_flow
+    description: "Development process integration"
+    points:
+      - "Project initialization"
+      - "Development workflow"
+      - "Deployment process"
+      - "Monitoring and management"
+    triggers:
+      - "new_project"
+      - "feature_development"
+      - "deployment_request"
+      - "monitoring_setup"
+
+  - name: user_interaction
+    description: "User interaction points"
+    points:
+      - "Requirement gathering"
+      - "Consultation sessions"
+      - "Environment setup"
+      - "Deployment configuration"
+    triggers:
+      - "user_input"
+      - "consultation_request"
+      - "environment_customization"
+      - "deployment_preparation"
+
+  - name: agent_coordination
+    description: "Agent system coordination"
+    workflows:
+      - "Design Decision Process"
+        steps:
+          - "Design agent analysis"
+          - "Agent hub review"
+          - "Consensus building"
+          - "Implementation planning"
+          - "User notification"
+      - "Quality Assurance Process"
+        steps:
+          - "Multi-agent review"
+          - "Quality metrics analysis"
+          - "Improvement suggestions"
+          - "Implementation tracking"
+          - "Verification"
+      - "Deployment Process"
+        steps:
+          - "Pre-deployment checks"
+          - "Resource verification"
+          - "Deployment execution"
+          - "Post-deployment validation"
+          - "Monitoring setup"
+
+# Directional Guidelines
+direction:
+  - name: user_centric
+    description: "User-centric development focus"
+    guidelines:
+      - "Prioritize user experience"
+      - "Maintain user control"
+      - "Provide clear feedback"
+      - "Enable customization"
+
+  - name: automation
+    description: "Intelligent automation focus"
+    guidelines:
+      - "Automate routine tasks"
+      - "Maintain human oversight"
+      - "Provide transparency"
+      - "Enable manual override"
+
+# Development Priorities
+priorities:
+  - name: core_features
+    description: "Core feature development"
+    order:
+      - "Agent system development"
+        weight: 1.0
+        dependencies: []
+        success_criteria:
+          - "Agent communication established"
+          - "Decision-making process validated"
+          - "User feedback integration working"
+      - "Container management"
+        weight: 0.9
+        dependencies: ["Agent system development"]
+        success_criteria:
+          - "Container lifecycle management"
+          - "Resource allocation system"
+          - "Environment isolation"
+      - "User consultation"
+        weight: 0.8
+        dependencies: ["Agent system development"]
+        success_criteria:
+          - "Interactive consultation flow"
+          - "Preference management"
+          - "Feedback processing"
+      - "Environment setup"
+        weight: 0.7
+        dependencies: ["Container management", "User consultation"]
+        success_criteria:
+          - "Environment provisioning"
+          - "Configuration management"
+          - "Resource optimization"
+
+  - name: enhancement
+    description: "Feature enhancement"
+    order:
+      - "User experience improvement"
+        weight: 0.8
+        dependencies: ["core_features"]
+        success_criteria:
+          - "Interface responsiveness"
+          - "User feedback integration"
+          - "Error handling"
+      - "Automation enhancement"
+        weight: 0.7
+        dependencies: ["core_features"]
+        success_criteria:
+          - "Task automation coverage"
+          - "Process optimization"
+          - "Error recovery"
+      - "Resource optimization"
+        weight: 0.6
+        dependencies: ["core_features"]
+        success_criteria:
+          - "Resource utilization"
+          - "Cost efficiency"
+          - "Performance metrics"
+      - "Monitoring improvement"
+        weight: 0.5
+        dependencies: ["core_features"]
+        success_criteria:
+          - "Metric collection"
+          - "Alert system"
+          - "Performance analysis"
+
+  - name: maintenance
+    description: "System maintenance"
+    order:
+      - "Performance optimization"
+        weight: 0.6
+        dependencies: ["enhancement"]
+        success_criteria:
+          - "Response time targets"
+          - "Resource efficiency"
+          - "System stability"
+      - "Security updates"
+        weight: 0.7
+        dependencies: ["core_features"]
+        success_criteria:
+          - "Vulnerability patching"
+          - "Security monitoring"
+          - "Compliance maintenance"
+      - "Documentation updates"
+        weight: 0.4
+        dependencies: ["core_features", "enhancement"]
+        success_criteria:
+          - "Documentation accuracy"
+          - "User guide updates"
+          - "API documentation"
+
+# Priority Management
+priority_management:
+  - name: weight_calculation
+    description: "Priority weight calculation"
+    factors:
+      - "Dependency impact"
+      - "User value"
+      - "Technical complexity"
+      - "Resource requirements"
+
+  - name: dependency_resolution
+    description: "Dependency resolution process"
+    steps:
+      - "Identify dependencies"
+      - "Calculate critical path"
+      - "Resolve conflicts"
+      - "Optimize sequence"
+
+  - name: success_tracking
+    description: "Success criteria tracking"
+    metrics:
+      - "Feature completion"
+      - "User satisfaction"
+      - "System performance"
+      - "Resource efficiency" 

@@ -1,0 +1,169 @@
+name: react_native_component
+description: Template for generating React Native components with TypeScript
+content: |
+  import React, { FC, useState, useEffect } from 'react';
+  import { View, StyleSheet } from 'react-native';
+  import { {{ imports | join(', ') }} } from '{{ import_path }}';
+  
+  interface {{ component_name }}Props {
+    {% for prop in props %}
+    {{ prop.name }}: {{ prop.type }}{% if not prop.required %}?{% endif %};
+    {% endfor %}
+  }
+  
+  export const {{ component_name }}: FC<{{ component_name }}Props> = ({
+    {% for prop in props %}
+    {{ prop.name }}{% if not prop.required %} = {{ prop.default }}{% endif %},
+    {% endfor %}
+  }) => {
+    {% for state in state_vars %}
+    const [{{ state.name }}, set{{ state.name | title }}] = useState<{{ state.type }}>({{ state.default }});
+    {% endfor %}
+    
+    {% for effect in effects %}
+    useEffect(() => {
+      {{ effect.code }}
+    }, [{{ effect.dependencies | join(', ') }}]);
+    {% endfor %}
+    
+    {% for handler in handlers %}
+    const handle{{ handler.name | title }} = {{ handler.type }}(() => {
+      {{ handler.code }}
+    });
+    {% endfor %}
+    
+    return (
+      <View style={[styles.container, {{ component_name | lower }}Styles.container]}>
+        {% for child in children %}
+        {{ child }}
+        {% endfor %}
+      </View>
+    );
+  };
+  
+  const styles = StyleSheet.create({
+    container: {
+      {% for style in styles %}
+      {{ style.property }}: {{ style.value }},
+      {% endfor %}
+    }
+  });
+  
+  const {{ component_name | lower }}Styles = StyleSheet.create({
+    container: {
+      {% for style in component_styles %}
+      {{ style.property }}: {{ style.value }},
+      {% endfor %}
+    }
+  });
+  
+  export default {{ component_name }};
+parameters:
+  component_name:
+    type: string
+    required: true
+    description: Name of the React Native component
+  imports:
+    type: array
+    required: false
+    description: List of imports from the import path
+  import_path:
+    type: string
+    required: false
+    description: Path to import from
+  props:
+    type: array
+    required: false
+    description: List of component props
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      required:
+        type: boolean
+        required: false
+        default: true
+      default:
+        type: string
+        required: false
+  state_vars:
+    type: array
+    required: false
+    description: List of state variables
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      default:
+        type: string
+        required: true
+  effects:
+    type: array
+    required: false
+    description: List of useEffect hooks
+    items:
+      code:
+        type: string
+        required: true
+      dependencies:
+        type: array
+        required: false
+        default: []
+  handlers:
+    type: array
+    required: false
+    description: List of event handlers
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+        default: "() =>"
+      code:
+        type: string
+        required: true
+  children:
+    type: array
+    required: false
+    description: List of child components
+  styles:
+    type: array
+    required: false
+    description: List of base styles
+    items:
+      property:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+  component_styles:
+    type: array
+    required: false
+    description: List of component-specific styles
+    items:
+      property:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+tags:
+  - react-native
+  - typescript
+  - mobile
+  - component
+language: typescript
+category: component
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

@@ -1,0 +1,193 @@
+html:
+  rules:
+    xss:
+      - name: "Unescaped Output"
+        pattern: "innerHTML\\s*=\\s*[^;]+"
+        description: "Avoid using innerHTML"
+        severity: "high"
+        fix: "Use textContent or sanitize HTML"
+      - name: "Event Handlers"
+        pattern: "on\\w+\\s*=\\s*\"[^\"]+\""
+        description: "Avoid inline event handlers"
+        severity: "medium"
+        fix: "Use addEventListener"
+    csrf:
+      - name: "CSRF Token"
+        pattern: "<form[^>]*>"
+        description: "Include CSRF token in forms"
+        severity: "high"
+        fix: "Add CSRF token to forms"
+
+css:
+  rules:
+    injection:
+      - name: "URL Injection"
+        pattern: "url\\([^)]+\\)"
+        description: "Sanitize URLs in CSS"
+        severity: "medium"
+        fix: "Use sanitized URLs"
+
+react:
+  rules:
+    xss:
+      - name: "Dangerously Set HTML"
+        pattern: "dangerouslySetInnerHTML"
+        description: "Avoid dangerouslySetInnerHTML"
+        severity: "high"
+        fix: "Use sanitized HTML or React components"
+    security:
+      - name: "Secure Props"
+        pattern: "href=\\{\\{[^}]+\\}\\}"
+        description: "Sanitize dynamic URLs"
+        severity: "high"
+        fix: "Use URL sanitization"
+
+vue:
+  rules:
+    xss:
+      - name: "v-html"
+        pattern: "v-html=\"[^\"]+\""
+        description: "Avoid v-html"
+        severity: "high"
+        fix: "Use sanitized HTML or components"
+    security:
+      - name: "Dynamic URLs"
+        pattern: ":href=\"[^\"]+\""
+        description: "Sanitize dynamic URLs"
+        severity: "high"
+        fix: "Use URL sanitization"
+
+angular:
+  rules:
+    xss:
+      - name: "DomSanitizer"
+        pattern: "bypassSecurityTrustHtml"
+        description: "Avoid bypassing security"
+        severity: "high"
+        fix: "Use proper sanitization"
+    security:
+      - name: "URL Security"
+        pattern: "\\[routerLink\\]=\"[^\"]+\""
+        description: "Sanitize router links"
+        severity: "high"
+        fix: "Use sanitized URLs"
+
+csharp:
+  rules:
+    sql:
+      - name: "SQL Injection"
+        pattern: "\\+\\s*\\\"[^\"]+\\\""
+        description: "Use parameterized queries"
+        severity: "high"
+        fix: "Use SqlParameter or Entity Framework"
+    xss:
+      - name: "HTML Encoding"
+        pattern: "Response\\.Write\\([^)]+\\)"
+        description: "Encode HTML output"
+        severity: "high"
+        fix: "Use HtmlEncode"
+
+go:
+  rules:
+    sql:
+      - name: "SQL Injection"
+        pattern: "fmt\\.Sprintf\\([^)]+\\)"
+        description: "Use parameterized queries"
+        severity: "high"
+        fix: "Use database/sql with parameters"
+    xss:
+      - name: "HTML Output"
+        pattern: "template\\.HTML\\([^)]+\\)"
+        description: "Sanitize HTML output"
+        severity: "high"
+        fix: "Use html/template"
+
+nodejs:
+  rules:
+    sql:
+      - name: "SQL Injection"
+        pattern: "\\+\\s*req\\.body"
+        description: "Use parameterized queries"
+        severity: "high"
+        fix: "Use prepared statements"
+    xss:
+      - name: "HTML Output"
+        pattern: "res\\.send\\([^)]+\\)"
+        description: "Sanitize HTML output"
+        severity: "high"
+        fix: "Use xss package"
+
+php:
+  rules:
+    sql:
+      - name: "SQL Injection"
+        pattern: "\\$sql\\s*=\\s*\"[^\"]+\\\"\\s*\\."
+        description: "Use prepared statements"
+        severity: "high"
+        fix: "Use PDO or mysqli prepared statements"
+    xss:
+      - name: "HTML Output"
+        pattern: "echo\\s+\\$_GET\\["
+        description: "Escape output"
+        severity: "high"
+        fix: "Use htmlspecialchars"
+
+react-native:
+  rules:
+    storage:
+      - name: "Secure Storage"
+        pattern: "AsyncStorage\\.setItem"
+        description: "Use secure storage"
+        severity: "high"
+        fix: "Use react-native-keychain"
+    network:
+      - name: "SSL Pinning"
+        pattern: "fetch\\([^)]+\\)"
+        description: "Use SSL pinning"
+        severity: "high"
+        fix: "Implement SSL pinning"
+
+flutter:
+  rules:
+    storage:
+      - name: "Secure Storage"
+        pattern: "SharedPreferences"
+        description: "Use secure storage"
+        severity: "high"
+        fix: "Use flutter_secure_storage"
+    network:
+      - name: "SSL Pinning"
+        pattern: "http\\.get\\([^)]+\\)"
+        description: "Use SSL pinning"
+        severity: "high"
+        fix: "Implement SSL pinning"
+
+nosql:
+  rules:
+    injection:
+      - name: "NoSQL Injection"
+        pattern: "\\$where\\s*:\\s*[^}]+"
+        description: "Avoid $where operator"
+        severity: "high"
+        fix: "Use proper query operators"
+    access:
+      - name: "Access Control"
+        pattern: "db\\.collection\\([^)]+\\)"
+        description: "Implement proper access control"
+        severity: "high"
+        fix: "Use role-based access control"
+
+rest:
+  rules:
+    auth:
+      - name: "Authentication"
+        pattern: "security:\\s*\\[\\]"
+        description: "Use proper authentication"
+        severity: "high"
+        fix: "Add authentication requirements"
+    cors:
+      - name: "CORS"
+        pattern: "Access-Control-Allow-Origin:\\s*\\*"
+        description: "Restrict CORS"
+        severity: "high"
+        fix: "Set specific CORS origins" 

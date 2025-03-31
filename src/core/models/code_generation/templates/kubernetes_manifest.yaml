@@ -1,0 +1,387 @@
+name: kubernetes_manifest
+description: Template for generating Kubernetes manifests
+content: |
+  apiVersion: {{ api_version }}
+  kind: {{ kind }}
+  metadata:
+    name: {{ name }}
+    {% if namespace %}
+    namespace: {{ namespace }}
+    {% endif %}
+    {% if labels %}
+    labels:
+      {% for label in labels %}
+      {{ label.key }}: {{ label.value }}
+      {% endfor %}
+    {% endif %}
+    {% if annotations %}
+    annotations:
+      {% for annotation in annotations %}
+      {{ annotation.key }}: {{ annotation.value }}
+      {% endfor %}
+    {% endif %}
+  {% if spec %}
+  spec:
+    {% if spec.replicas %}
+    replicas: {{ spec.replicas }}
+    {% endif %}
+    {% if spec.selector %}
+    selector:
+      matchLabels:
+        {% for label in spec.selector.matchLabels %}
+        {{ label.key }}: {{ label.value }}
+        {% endfor %}
+    {% endif %}
+    {% if spec.template %}
+    template:
+      metadata:
+        {% if spec.template.metadata.labels %}
+        labels:
+          {% for label in spec.template.metadata.labels %}
+          {{ label.key }}: {{ label.value }}
+          {% endfor %}
+        {% endif %}
+      spec:
+        {% if spec.template.spec.containers %}
+        containers:
+          {% for container in spec.template.spec.containers %}
+          - name: {{ container.name }}
+            image: {{ container.image }}
+            {% if container.imagePullPolicy %}
+            imagePullPolicy: {{ container.imagePullPolicy }}
+            {% endif %}
+            {% if container.command %}
+            command: {{ container.command }}
+            {% endif %}
+            {% if container.args %}
+            args: {{ container.args }}
+            {% endif %}
+            {% if container.ports %}
+            ports:
+              {% for port in container.ports %}
+              - containerPort: {{ port.containerPort }}
+                {% if port.name %}
+                name: {{ port.name }}
+                {% endif %}
+                {% if port.protocol %}
+                protocol: {{ port.protocol }}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+            {% if container.env %}
+            env:
+              {% for env in container.env %}
+              - name: {{ env.name }}
+                {% if env.value %}
+                value: {{ env.value }}
+                {% endif %}
+                {% if env.valueFrom %}
+                valueFrom:
+                  {{ env.valueFrom }}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+            {% if container.envFrom %}
+            envFrom:
+              {% for envFrom in container.envFrom %}
+              - {{ envFrom }}
+              {% endfor %}
+            {% endif %}
+            {% if container.resources %}
+            resources:
+              {% if container.resources.requests %}
+              requests:
+                {% for resource in container.resources.requests %}
+                {{ resource.name }}: {{ resource.value }}
+                {% endfor %}
+              {% endif %}
+              {% if container.resources.limits %}
+              limits:
+                {% for resource in container.resources.limits %}
+                {{ resource.name }}: {{ resource.value }}
+                {% endfor %}
+              {% endif %}
+            {% endif %}
+            {% if container.volumeMounts %}
+            volumeMounts:
+              {% for mount in container.volumeMounts %}
+              - name: {{ mount.name }}
+                mountPath: {{ mount.mountPath }}
+                {% if mount.subPath %}
+                subPath: {{ mount.subPath }}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+            {% if container.livenessProbe %}
+            livenessProbe:
+              {{ container.livenessProbe }}
+            {% endif %}
+            {% if container.readinessProbe %}
+            readinessProbe:
+              {{ container.readinessProbe }}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {% if spec.template.spec.volumes %}
+        volumes:
+          {% for volume in spec.template.spec.volumes %}
+          - name: {{ volume.name }}
+            {% if volume.emptyDir %}
+            emptyDir: {}
+            {% endif %}
+            {% if volume.configMap %}
+            configMap:
+              name: {{ volume.configMap.name }}
+              {% if volume.configMap.items %}
+              items:
+                {% for item in volume.configMap.items %}
+                - key: {{ item.key }}
+                  path: {{ item.path }}
+                {% endfor %}
+              {% endif %}
+            {% endif %}
+            {% if volume.secret %}
+            secret:
+              secretName: {{ volume.secret.secretName }}
+              {% if volume.secret.items %}
+              items:
+                {% for item in volume.secret.items %}
+                - key: {{ item.key }}
+                  path: {{ item.path }}
+                {% endfor %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+parameters:
+  api_version:
+    type: string
+    required: true
+    description: API version of the resource
+  kind:
+    type: string
+    required: true
+    description: Kind of the resource
+  name:
+    type: string
+    required: true
+    description: Name of the resource
+  namespace:
+    type: string
+    required: false
+    description: Namespace of the resource
+  labels:
+    type: array
+    required: false
+    description: List of labels
+    items:
+      key:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+  annotations:
+    type: array
+    required: false
+    description: List of annotations
+    items:
+      key:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+  spec:
+    type: object
+    required: false
+    description: Resource specification
+    properties:
+      replicas:
+        type: integer
+        required: false
+      selector:
+        type: object
+        required: false
+        properties:
+          matchLabels:
+            type: array
+            required: true
+            items:
+              key:
+                type: string
+                required: true
+              value:
+                type: string
+                required: true
+      template:
+        type: object
+        required: false
+        properties:
+          metadata:
+            type: object
+            required: false
+            properties:
+              labels:
+                type: array
+                required: false
+                items:
+                  key:
+                    type: string
+                    required: true
+                  value:
+                    type: string
+                    required: true
+          spec:
+            type: object
+            required: false
+            properties:
+              containers:
+                type: array
+                required: false
+                items:
+                  name:
+                    type: string
+                    required: true
+                  image:
+                    type: string
+                    required: true
+                  imagePullPolicy:
+                    type: string
+                    required: false
+                  command:
+                    type: array
+                    required: false
+                  args:
+                    type: array
+                    required: false
+                  ports:
+                    type: array
+                    required: false
+                    items:
+                      containerPort:
+                        type: integer
+                        required: true
+                      name:
+                        type: string
+                        required: false
+                      protocol:
+                        type: string
+                        required: false
+                  env:
+                    type: array
+                    required: false
+                    items:
+                      name:
+                        type: string
+                        required: true
+                      value:
+                        type: string
+                        required: false
+                      valueFrom:
+                        type: object
+                        required: false
+                  envFrom:
+                    type: array
+                    required: false
+                  resources:
+                    type: object
+                    required: false
+                    properties:
+                      requests:
+                        type: array
+                        required: false
+                        items:
+                          name:
+                            type: string
+                            required: true
+                          value:
+                            type: string
+                            required: true
+                      limits:
+                        type: array
+                        required: false
+                        items:
+                          name:
+                            type: string
+                            required: true
+                          value:
+                            type: string
+                            required: true
+                  volumeMounts:
+                    type: array
+                    required: false
+                    items:
+                      name:
+                        type: string
+                        required: true
+                      mountPath:
+                        type: string
+                        required: true
+                      subPath:
+                        type: string
+                        required: false
+                  livenessProbe:
+                    type: object
+                    required: false
+                  readinessProbe:
+                    type: object
+                    required: false
+              volumes:
+                type: array
+                required: false
+                items:
+                  name:
+                    type: string
+                    required: true
+                  emptyDir:
+                    type: object
+                    required: false
+                  configMap:
+                    type: object
+                    required: false
+                    properties:
+                      name:
+                        type: string
+                        required: true
+                      items:
+                        type: array
+                        required: false
+                        items:
+                          key:
+                            type: string
+                            required: true
+                          path:
+                            type: string
+                            required: true
+                  secret:
+                    type: object
+                    required: false
+                    properties:
+                      secretName:
+                        type: string
+                        required: true
+                      items:
+                        type: array
+                        required: false
+                        items:
+                          key:
+                            type: string
+                            required: true
+                          path:
+                            type: string
+                            required: true
+tags:
+  - kubernetes
+  - container
+  - deployment
+  - orchestration
+language: yaml
+category: configuration
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

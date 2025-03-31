@@ -1,0 +1,206 @@
+# Resource Monitoring Configuration
+
+# Manager settings
+manager:
+  enabled: true
+  update_interval: 60  # seconds
+  export_interval: 3600  # seconds
+  max_history: 1000
+  auto_optimize: true
+  auto_export: true
+
+# Resource policies
+resource_policies:
+  cpu:
+    min_cores: 1
+    max_cores: 8
+    scale_factor: 1.5
+    
+  memory:
+    min_gb: 2
+    max_gb: 32
+    scale_factor: 1.5
+    
+  disk:
+    min_gb: 10
+    max_gb: 500
+    scale_factor: 1.5
+
+# Monitoring thresholds
+thresholds:
+  cpu:
+    warning: 80  # percent
+    critical: 90  # percent
+    
+  memory:
+    warning: 80  # percent
+    critical: 90  # percent
+    
+  disk:
+    warning: 80  # percent
+    critical: 90  # percent
+    
+  network:
+    warning: 80  # percent
+    critical: 90  # percent
+    
+  gpu:
+    warning: 80  # percent
+    critical: 90  # percent
+    
+  gpu_memory:
+    warning: 80  # percent
+    critical: 90  # percent
+
+# Monitoring intervals
+intervals:
+  metrics: 1  # seconds
+  prediction: 60  # seconds
+  alert: 300  # seconds
+  export: 3600  # seconds
+
+# Prediction settings
+prediction:
+  window_size: 60  # seconds
+  min_samples: 30
+  confidence_threshold: 0.8
+  max_history: 1000  # samples
+  
+# Resource limits
+limits:
+  cpu:
+    per_process: 50  # percent
+    total: 80  # percent
+    
+  memory:
+    per_process: 2  # GB
+    total: 8  # GB
+    
+  disk:
+    per_process: 10  # GB
+    total: 100  # GB
+    
+  network:
+    per_process: 10  # Mbps
+    total: 100  # Mbps
+
+# Alert settings
+alerts:
+  enabled: true
+  channels:
+    - "log"
+    - "email"
+    - "slack"
+    
+  email:
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    sender: "alerts@example.com"
+    recipients:
+      - "admin@example.com"
+      
+  slack:
+    webhook_url: "https://hooks.slack.com/services/xxx/yyy/zzz"
+    channel: "#alerts"
+    
+  notification_frequency: 300  # seconds
+
+# Logging settings
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "resource_monitor.log"
+  max_size: 10  # MB
+  backup_count: 5
+  
+# Export settings
+export:
+  enabled: true
+  format: "json"
+  directory: "metrics"
+  retention_days: 30
+  
+# Performance optimization
+optimization:
+  batch_size: 100
+  max_workers: 4
+  cache_size: 1000
+  compression: true
+  
+# Resource usage analytics
+analytics:
+  enabled: true
+  metrics:
+    - "cpu_usage"
+    - "memory_usage"
+    - "disk_usage"
+    - "network_usage"
+    - "gpu_usage"
+    
+  aggregation:
+    - "hourly"
+    - "daily"
+    - "weekly"
+    
+  retention:
+    hourly: 24  # hours
+    daily: 30  # days
+    weekly: 12  # weeks
+    
+# Cost optimization
+cost_optimization:
+  enabled: true
+  llm:
+    max_tokens_per_request: 1000
+    max_requests_per_minute: 60
+    cost_threshold: 100  # USD per day
+    
+  cloud:
+    max_instances: 3
+    auto_scale: true
+    scale_up_threshold: 80  # percent
+    scale_down_threshold: 20  # percent
+    
+# Resource allocation
+allocation:
+  strategy: "dynamic"
+  priorities:
+    high:
+      cpu: 50  # percent
+      memory: 50  # percent
+      disk: 50  # percent
+      
+    medium:
+      cpu: 30  # percent
+      memory: 30  # percent
+      disk: 30  # percent
+      
+    low:
+      cpu: 20  # percent
+      memory: 20  # percent
+      disk: 20  # percent
+      
+# Performance monitoring
+performance:
+  metrics:
+    - "response_time"
+    - "throughput"
+    - "error_rate"
+    - "queue_size"
+    
+  thresholds:
+    response_time:
+      warning: 1000  # ms
+      critical: 5000  # ms
+      
+    throughput:
+      warning: 100  # requests/second
+      critical: 50  # requests/second
+      
+    error_rate:
+      warning: 1  # percent
+      critical: 5  # percent
+      
+    queue_size:
+      warning: 100
+      critical: 500 

@@ -1,0 +1,322 @@
+name: ansible_playbook
+description: Template for generating Ansible playbooks
+content: |
+  ---
+  - name: {{ playbook_name }}
+    hosts: {{ hosts }}
+    {% if become %}
+    become: {{ become }}
+    {% endif %}
+    {% if gather_facts %}
+    gather_facts: {{ gather_facts }}
+    {% endif %}
+    {% if vars %}
+    vars:
+      {% for var in vars %}
+      {{ var.name }}: {{ var.value }}
+      {% endfor %}
+    {% endif %}
+    {% if vars_files %}
+    vars_files:
+      {% for file in vars_files %}
+      - {{ file }}
+      {% endfor %}
+    {% endif %}
+    {% if roles %}
+    roles:
+      {% for role in roles %}
+      - {{ role.name }}{% if role.tags %} tags: {{ role.tags }}{% endif %}
+      {% endfor %}
+    {% endif %}
+    {% if tasks %}
+    tasks:
+      {% for task in tasks %}
+      - name: {{ task.name }}
+        {% if task.module %}
+        {{ task.module }}:
+          {% for param in task.parameters %}
+          {{ param.key }}: {{ param.value }}
+          {% endfor %}
+        {% endif %}
+        {% if task.register %}
+        register: {{ task.register }}
+        {% endif %}
+        {% if task.when %}
+        when: {{ task.when }}
+        {% endif %}
+        {% if task.notify %}
+        notify: {{ task.notify }}
+        {% endif %}
+        {% if task.tags %}
+        tags: {{ task.tags }}
+        {% endif %}
+        {% if task.ignore_errors %}
+        ignore_errors: {{ task.ignore_errors }}
+        {% endif %}
+        {% if task.retries %}
+        retries: {{ task.retries }}
+        {% endif %}
+        {% if task.delay %}
+        delay: {{ task.delay }}
+        {% endif %}
+        {% if task.until %}
+        until: {{ task.until }}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    {% if handlers %}
+    handlers:
+      {% for handler in handlers %}
+      - name: {{ handler.name }}
+        {% if handler.module %}
+        {{ handler.module }}:
+          {% for param in handler.parameters %}
+          {{ param.key }}: {{ param.value }}
+          {% endfor %}
+        {% endif %}
+        {% if handler.listen %}
+        listen: {{ handler.listen }}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    {% if pre_tasks %}
+    pre_tasks:
+      {% for task in pre_tasks %}
+      - name: {{ task.name }}
+        {% if task.module %}
+        {{ task.module }}:
+          {% for param in task.parameters %}
+          {{ param.key }}: {{ param.value }}
+          {% endfor %}
+        {% endif %}
+        {% if task.register %}
+        register: {{ task.register }}
+        {% endif %}
+        {% if task.when %}
+        when: {{ task.when }}
+        {% endif %}
+        {% if task.notify %}
+        notify: {{ task.notify }}
+        {% endif %}
+        {% if task.tags %}
+        tags: {{ task.tags }}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    {% if post_tasks %}
+    post_tasks:
+      {% for task in post_tasks %}
+      - name: {{ task.name }}
+        {% if task.module %}
+        {{ task.module }}:
+          {% for param in task.parameters %}
+          {{ param.key }}: {{ param.value }}
+          {% endfor %}
+        {% endif %}
+        {% if task.register %}
+        register: {{ task.register }}
+        {% endif %}
+        {% if task.when %}
+        when: {{ task.when }}
+        {% endif %}
+        {% if task.notify %}
+        notify: {{ task.notify }}
+        {% endif %}
+        {% if task.tags %}
+        tags: {{ task.tags }}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+parameters:
+  playbook_name:
+    type: string
+    required: true
+    description: Name of the playbook
+  hosts:
+    type: string
+    required: true
+    description: Target hosts or groups
+  become:
+    type: boolean
+    required: false
+    description: Whether to use privilege escalation
+  gather_facts:
+    type: boolean
+    required: false
+    description: Whether to gather facts
+  vars:
+    type: array
+    required: false
+    description: List of variables
+    items:
+      name:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+  vars_files:
+    type: array
+    required: false
+    description: List of variable files to include
+  roles:
+    type: array
+    required: false
+    description: List of roles to include
+    items:
+      name:
+        type: string
+        required: true
+      tags:
+        type: string
+        required: false
+  tasks:
+    type: array
+    required: false
+    description: List of tasks
+    items:
+      name:
+        type: string
+        required: true
+      module:
+        type: string
+        required: false
+      parameters:
+        type: array
+        required: false
+        description: List of module parameters
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+      register:
+        type: string
+        required: false
+      when:
+        type: string
+        required: false
+      notify:
+        type: string
+        required: false
+      tags:
+        type: string
+        required: false
+      ignore_errors:
+        type: boolean
+        required: false
+      retries:
+        type: integer
+        required: false
+      delay:
+        type: integer
+        required: false
+      until:
+        type: string
+        required: false
+  handlers:
+    type: array
+    required: false
+    description: List of handlers
+    items:
+      name:
+        type: string
+        required: true
+      module:
+        type: string
+        required: false
+      parameters:
+        type: array
+        required: false
+        description: List of module parameters
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+      listen:
+        type: string
+        required: false
+  pre_tasks:
+    type: array
+    required: false
+    description: List of pre-tasks
+    items:
+      name:
+        type: string
+        required: true
+      module:
+        type: string
+        required: false
+      parameters:
+        type: array
+        required: false
+        description: List of module parameters
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+      register:
+        type: string
+        required: false
+      when:
+        type: string
+        required: false
+      notify:
+        type: string
+        required: false
+      tags:
+        type: string
+        required: false
+  post_tasks:
+    type: array
+    required: false
+    description: List of post-tasks
+    items:
+      name:
+        type: string
+        required: true
+      module:
+        type: string
+        required: false
+      parameters:
+        type: array
+        required: false
+        description: List of module parameters
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+      register:
+        type: string
+        required: false
+      when:
+        type: string
+        required: false
+      notify:
+        type: string
+        required: false
+      tags:
+        type: string
+        required: false
+tags:
+  - ansible
+  - automation
+  - configuration
+  - deployment
+language: yaml
+category: configuration
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

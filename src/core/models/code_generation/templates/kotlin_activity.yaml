@@ -1,0 +1,109 @@
+name: kotlin_activity
+description: Template for generating Kotlin Android activities
+content: |
+  package {{ package_name }}
+  
+  import android.os.Bundle
+  import androidx.appcompat.app.AppCompatActivity
+  {% for import in imports %}
+  import {{ import }}
+  {% endfor %}
+  
+  class {{ activity_name }} : AppCompatActivity() {
+    {% for property in properties %}
+    private lateinit var {{ property.name }}: {{ property.type }}
+    {% endfor %}
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+      super.onCreate(savedInstanceState)
+      setContentView(R.layout.{{ layout_name }})
+      
+      {% for initialization in initializations %}
+      {{ initialization }}
+      {% endfor %}
+      
+      {% for setup in setups %}
+      setup{{ setup.name }}()
+      {% endfor %}
+    }
+    
+    {% for setup in setups %}
+    private fun setup{{ setup.name }}() {
+      {{ setup.content }}
+    }
+    {% endfor %}
+    
+    {% for override in overrides %}
+    override fun {{ override.name }}({{ override.parameters }}) {
+      {{ override.content }}
+    }
+    {% endfor %}
+  }
+parameters:
+  package_name:
+    type: string
+    required: true
+    description: Package name for the activity
+  activity_name:
+    type: string
+    required: true
+    description: Name of the activity class
+  layout_name:
+    type: string
+    required: true
+    description: Name of the layout resource
+  imports:
+    type: array
+    required: false
+    description: List of additional imports
+  properties:
+    type: array
+    required: false
+    description: List of activity properties
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  initializations:
+    type: array
+    required: false
+    description: List of property initializations
+  setups:
+    type: array
+    required: false
+    description: List of setup functions
+    items:
+      name:
+        type: string
+        required: true
+      content:
+        type: string
+        required: true
+  overrides:
+    type: array
+    required: false
+    description: List of override functions
+    items:
+      name:
+        type: string
+        required: true
+      parameters:
+        type: string
+        required: true
+      content:
+        type: string
+        required: true
+tags:
+  - kotlin
+  - android
+  - activity
+  - mobile
+language: kotlin
+category: activity
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

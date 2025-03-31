@@ -1,0 +1,166 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: restricted-enhanced
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+    - NET_RAW
+    - NET_BIND_SERVICE
+    - SYS_ADMIN
+    - SYS_MODULE
+    - SYS_RAWIO
+    - SYS_RESOURCE
+    - SYS_TIME
+    - SYS_TTY_CONFIG
+    - MKNOD
+    - SETUID
+    - SETGID
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  readOnlyRootFilesystem: true
+  allowedHostPaths:
+    - pathPrefix: "/var/run/secrets/kubernetes.io/serviceaccount"
+      readOnly: true
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: gpu-restricted
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+    - NET_RAW
+    - NET_BIND_SERVICE
+    - SYS_ADMIN
+    - SYS_MODULE
+    - SYS_RAWIO
+    - SYS_RESOURCE
+    - SYS_TIME
+    - SYS_TTY_CONFIG
+    - MKNOD
+    - SETUID
+    - SETGID
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+    - 'hostPath'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  readOnlyRootFilesystem: true
+  allowedHostPaths:
+    - pathPrefix: "/var/run/secrets/kubernetes.io/serviceaccount"
+      readOnly: true
+    - pathPrefix: "/dev/nvidia"
+      readOnly: false
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: default
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-egress
+  namespace: default
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring-ingress
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 9090
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gpu-access
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      nvidia.com/gpu: "true"
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: default
+    ports:
+    - protocol: TCP
+      port: 22
+    - protocol: TCP
+      port: 8888
+    - protocol: TCP
+      port: 6006
+    - protocol: TCP
+      port: 8080 

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADE Training Monitor</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">ADE Training Monitor</h1>
+        
+        <!-- Training Sessions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div id="sessions-list" class="col-span-full">
+                <!-- Sessions will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Selected Training Session -->
+        <div id="selected-session" class="hidden">
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="session-title" class="text-2xl font-semibold"></h2>
+                    <div class="space-x-4">
+                        <button id="pause-btn" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                            Pause
+                        </button>
+                        <button id="resume-btn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                            Resume
+                        </button>
+                        <button id="stop-btn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                            Stop
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Status -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2">Status</h3>
+                    <div id="status" class="text-gray-700"></div>
+                </div>
+                
+                <!-- Metrics -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Training Metrics</h3>
+                        <canvas id="metrics-chart"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Resource Usage</h3>
+                        <canvas id="resources-chart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Checkpoints -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2">Checkpoints</h3>
+                    <div id="checkpoints-list" class="space-y-2"></div>
+                </div>
+                
+                <!-- Hyperparameters -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Hyperparameters</h3>
+                    <div id="hyperparameters" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // WebSocket connection
+        let ws = null;
+        let currentSession = null;
+        let metricsChart = null;
+        let resourcesChart = null;
+        
+        // Initialize charts
+        function initCharts() {
+            // Metrics chart
+            const metricsCtx = document.getElementById('metrics-chart').getContext('2d');
+            metricsChart = new Chart(metricsCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Training Loss',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }, {
+                        label: 'Validation Loss',
+                        data: [],
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Resources chart
+            const resourcesCtx = document.getElementById('resources-chart').getContext('2d');
+            resourcesChart = new Chart(resourcesCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'CPU Usage',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }, {
+                        label: 'Memory Usage',
+                        data: [],
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Connect to WebSocket server
+        function connectWebSocket(sessionId, trainingId) {
+            ws = new WebSocket(`ws://localhost:8000/ws/${sessionId}/${trainingId}`);
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleMessage(data);
+            };
+            
+            ws.onclose = function() {
+                console.log('WebSocket connection closed');
+                setTimeout(() => connectWebSocket(sessionId, trainingId), 5000);
+            };
+        }
+        
+        // Handle incoming messages
+        function handleMessage(data) {
+            switch(data.type) {
+                case 'metrics_update':
+                    updateMetrics(data.metrics);
+                    break;
+                case 'status_update':
+                    updateStatus(data.status);
+                    break;
+                case 'checkpoint_created':
+                    addCheckpoint(data.checkpoint);
+                    break;
+                case 'resources_update':
+                    updateResources(data.resources);
+                    break;
+            }
+        }
+        
+        // Update metrics chart
+        function updateMetrics(metrics) {
+            const timestamp = new Date().toLocaleTimeString();
+            
+            metricsChart.data.labels.push(timestamp);
+            metricsChart.data.datasets[0].data.push(metrics.loss);
+            if (metrics.val_loss) {
+                metricsChart.data.datasets[1].data.push(metrics.val_loss);
+            }
+            
+            metricsChart.update();
+        }
+        
+        // Update resources chart
+        function updateResources(resources) {
+            const timestamp = new Date().toLocaleTimeString();
+            
+            resourcesChart.data.labels.push(timestamp);
+            resourcesChart.data.datasets[0].data.push(resources.cpu_percent);
+            resourcesChart.data.datasets[1].data.push(resources.memory_percent);
+            
+            resourcesChart.update();
+        }
+        
+        // Update status display
+        function updateStatus(status) {
+            document.getElementById('status').textContent = status;
+        }
+        
+        // Add checkpoint to list
+        function addCheckpoint(checkpoint) {
+            const checkpointsList = document.getElementById('checkpoints-list');
+            const checkpointElement = document.createElement('div');
+            checkpointElement.className = 'bg-gray-50 p-3 rounded';
+            checkpointElement.innerHTML = `
+                <div class="font-semibold">Epoch ${checkpoint.epoch}</div>
+                <div class="text-sm text-gray-600">Step: ${checkpoint.step}</div>
+                <div class="text-sm text-gray-600">Metric: ${checkpoint.metric}</div>
+                <div class="text-sm text-gray-600">Path: ${checkpoint.path}</div>
+            `;
+            checkpointsList.appendChild(checkpointElement);
+        }
+        
+        // Control buttons
+        document.getElementById('pause-btn').addEventListener('click', () => {
+            if (ws) {
+                ws.send(JSON.stringify({
+                    type: 'control',
+                    command: { type: 'pause' }
+                }));
+            }
+        });
+        
+        document.getElementById('resume-btn').addEventListener('click', () => {
+            if (ws) {
+                ws.send(JSON.stringify({
+                    type: 'control',
+                    command: { type: 'resume' }
+                }));
+            }
+        });
+        
+        document.getElementById('stop-btn').addEventListener('click', () => {
+            if (ws) {
+                ws.send(JSON.stringify({
+                    type: 'control',
+                    command: { type: 'stop' }
+                }));
+            }
+        });
+        
+        // Initialize
+        initCharts();
+        
+        // Load sessions
+        fetch('http://localhost:8000/sessions')
+            .then(response => response.json())
+            .then(data => {
+                const sessionsList = document.getElementById('sessions-list');
+                data.sessions.forEach(session => {
+                    const sessionElement = document.createElement('div');
+                    sessionElement.className = 'bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-md';
+                    sessionElement.innerHTML = `
+                        <div class="font-semibold">${session.training_id}</div>
+                        <div class="text-sm text-gray-600">Status: ${session.status}</div>
+                        <div class="text-sm text-gray-600">Last Activity: ${session.last_activity}</div>
+                    `;
+                    sessionElement.addEventListener('click', () => {
+                        currentSession = session;
+                        document.getElementById('selected-session').classList.remove('hidden');
+                        document.getElementById('session-title').textContent = session.training_id;
+                        connectWebSocket(session.session_id, session.training_id);
+                    });
+                    sessionsList.appendChild(sessionElement);
+                });
+            });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADE API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .endpoint {
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            overflow: auto;
+            max-height: 300px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <h1>ADE Platform API Test</h1>
+    
+    <div class="card">
+        <h2>Backend Status</h2>
+        <div id="backend-status" class="status">Checking...</div>
+        <button onclick="checkBackendStatus()">Check Backend Status</button>
+    </div>
+
+    <div class="card">
+        <h2>API Documentation</h2>
+        <button onclick="openApiDocs()">Open API Docs</button>
+    </div>
+
+    <div class="card endpoint">
+        <h2>Design Hub API</h2>
+        
+        <div>
+            <h3>List Designs</h3>
+            <button onclick="listDesigns()">Get Designs</button>
+            <div id="designs-result"></div>
+        </div>
+        
+        <div>
+            <h3>Create Design</h3>
+            <textarea id="design-data" placeholder="Enter design JSON here...">
+{
+  "name": "Test Design",
+  "description": "A test design created via the API test page",
+  "components": [],
+  "styles": [],
+  "pages": [],
+  "projectId": "test-project"
+}
+            </textarea>
+            <button onclick="createDesign()">Create Design</button>
+            <div id="create-design-result"></div>
+        </div>
+    </div>
+
+    <div class="card endpoint">
+        <h2>Agent API</h2>
+        
+        <div>
+            <h3>List Agents</h3>
+            <button onclick="listAgents()">Get Agents</button>
+            <div id="agents-result"></div>
+        </div>
+        
+        <div>
+            <h3>Agent Capabilities</h3>
+            <button onclick="getAgentCapabilities()">Get Capabilities</button>
+            <div id="capabilities-result"></div>
+        </div>
+    </div>
+
+    <div class="card endpoint">
+        <h2>Validation API</h2>
+        
+        <div>
+            <h3>Validate Design</h3>
+            <textarea id="validation-data" placeholder="Enter design JSON for validation...">
+{
+  "name": "Test Design",
+  "description": "A design to validate",
+  "components": [
+    {
+      "id": "btn1",
+      "type": "button",
+      "props": {
+        "text": "Click Me"
+      }
+    }
+  ],
+  "styles": [],
+  "pages": []
+}
+            </textarea>
+            <button onclick="validateDesign()">Validate Design</button>
+            <div id="validation-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        
+        // Helper function to format JSON
+        function formatJSON(json) {
+            return JSON.stringify(json, null, 2);
+        }
+        
+        // Helper function to display results
+        function displayResult(elementId, data, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <div class="status ${isSuccess ? 'success' : 'error'}">
+                    ${isSuccess ? 'Success' : 'Error'}
+                </div>
+                <pre>${typeof data === 'object' ? formatJSON(data) : data}</pre>
+            `;
+        }
+        
+        // Check backend status
+        async function checkBackendStatus() {
+            const statusElement = document.getElementById('backend-status');
+            statusElement.textContent = 'Checking...';
+            statusElement.className = 'status';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    statusElement.textContent = 'Backend is running';
+                    statusElement.className = 'status success';
+                } else {
+                    statusElement.textContent = `Backend error: ${response.status}`;
+                    statusElement.className = 'status error';
+                }
+            } catch (error) {
+                statusElement.textContent = `Cannot connect to backend: ${error.message}`;
+                statusElement.className = 'status error';
+            }
+        }
+        
+        // Open API docs
+        function openApiDocs() {
+            window.open(`${API_BASE_URL}/docs`, '_blank');
+        }
+        
+        // List designs
+        async function listDesigns() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/designs`);
+                const data = await response.json();
+                displayResult('designs-result', data);
+            } catch (error) {
+                displayResult('designs-result', `Error: ${error.message}`, false);
+            }
+        }
+        
+        // Create design
+        async function createDesign() {
+            try {
+                const designData = JSON.parse(document.getElementById('design-data').value);
+                const response = await fetch(`${API_BASE_URL}/api/designs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(designData)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult('create-design-result', data);
+                } else {
+                    const errorText = await response.text();
+                    displayResult('create-design-result', `Error ${response.status}: ${errorText}`, false);
+                }
+            } catch (error) {
+                displayResult('create-design-result', `Error: ${error.message}`, false);
+            }
+        }
+        
+        // List agents
+        async function listAgents() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/agents`);
+                const data = await response.json();
+                displayResult('agents-result', data);
+            } catch (error) {
+                displayResult('agents-result', `Error: ${error.message}`, false);
+            }
+        }
+        
+        // Get agent capabilities
+        async function getAgentCapabilities() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/agents/capabilities`);
+                const data = await response.json();
+                displayResult('capabilities-result', data);
+            } catch (error) {
+                displayResult('capabilities-result', `Error: ${error.message}`, false);
+            }
+        }
+        
+        // Validate design
+        async function validateDesign() {
+            try {
+                const designData = JSON.parse(document.getElementById('validation-data').value);
+                const response = await fetch(`${API_BASE_URL}/api/validation/design`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(designData)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult('validation-result', data);
+                } else {
+                    const errorText = await response.text();
+                    displayResult('validation-result', `Error ${response.status}: ${errorText}`, false);
+                }
+            } catch (error) {
+                displayResult('validation-result', `Error: ${error.message}`, false);
+            }
+        }
+        
+        // Check backend status on page load
+        window.onload = checkBackendStatus;
+    </script>
+</body>
+</html>

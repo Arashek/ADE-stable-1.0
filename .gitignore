@@ -1,0 +1,301 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Environment-specific files
+environments/*/.env
+environments/*/secrets/
+environments/*/backup/
+environments/*/logs/
+environments/*/data/
+
+# Development environment
+environments/development/node_modules/
+environments/development/.pytest_cache/
+environments/development/__pycache__/
+environments/development/*.pyc
+environments/development/.coverage
+environments/development/htmlcov/
+
+# Testing environment
+environments/testing/test_data/
+environments/testing/test_results/
+environments/testing/coverage/
+environments/testing/.pytest_cache/
+
+# Production environment
+environments/production/secrets/
+environments/production/backup/
+environments/production/logs/
+environments/production/data/
+environments/production/ssl/
+environments/production/certificates/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+logs/
+log/
+
+# Local development
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Testing
+.coverage
+coverage/
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Build output
+dist/
+build/
+out/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Project specific
+development/data/
+development/models/
+development/logs/
+production/logs/
+*.log
+*.db
+*.sqlite3
+
+# Build and deployment
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.app
+
+# Documentation
+docs/_build/
+site/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory 

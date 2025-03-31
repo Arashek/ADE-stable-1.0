@@ -1,0 +1,181 @@
+name: fastapi_endpoint
+description: Template for generating FastAPI endpoints with TypeScript
+content: |
+  from fastapi import APIRouter, HTTPException, Depends
+  from typing import List, Optional
+  from pydantic import BaseModel
+  {% for import in imports %}
+  from {{ import }}
+  {% endfor %}
+  
+  router = APIRouter(
+      prefix="{{ route_prefix }}",
+      tags=["{{ tag_name }}"]
+  )
+  
+  {% for model in models %}
+  class {{ model.name }}(BaseModel):
+      {% for field in model.fields %}
+      {{ field.name }}: {{ field.type }}{% if field.optional %} = None{% endif %}
+      {% endfor %}
+      
+      class Config:
+          orm_mode = True
+  {% endfor %}
+  
+  {% for dependency in dependencies %}
+  async def {{ dependency.name }}({{ dependency.parameters }}):
+      {{ dependency.body }}
+  {% endfor %}
+  
+  @router.{{ method | lower }}("{{ path }}")
+  async def {{ handler_name }}(
+      {% for param in parameters %}
+      {{ param.name }}: {{ param.type }}{% if param.optional %} = None{% endif %},
+      {% endfor %}
+      {% for dep in endpoint_dependencies %}
+      {{ dep.name }}: {{ dep.type }} = Depends({{ dep.dependency }}),
+      {% endfor %}
+  ):
+      """
+      {{ docstring }}
+      """
+      try:
+          {% for validation in validations %}
+          {{ validation }}
+          {% endfor %}
+          
+          {% for operation in operations %}
+          {{ operation }}
+          {% endfor %}
+          
+          return {{ return_value }}
+          
+      except Exception as e:
+          raise HTTPException(
+              status_code={{ error_status_code }},
+              detail=str(e)
+          )
+parameters:
+  route_prefix:
+    type: string
+    required: true
+    description: Route prefix for the endpoint
+  tag_name:
+    type: string
+    required: true
+    description: Tag name for API documentation
+  imports:
+    type: array
+    required: false
+    description: List of imports
+  models:
+    type: array
+    required: false
+    description: List of Pydantic models
+    items:
+      name:
+        type: string
+        required: true
+      fields:
+        type: array
+        required: true
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+          optional:
+            type: boolean
+            required: false
+            default: false
+  dependencies:
+    type: array
+    required: false
+    description: List of dependency functions
+    items:
+      name:
+        type: string
+        required: true
+      parameters:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  method:
+    type: string
+    required: true
+    description: HTTP method (GET, POST, PUT, DELETE)
+  path:
+    type: string
+    required: true
+    description: Endpoint path
+  handler_name:
+    type: string
+    required: true
+    description: Name of the handler function
+  parameters:
+    type: array
+    required: false
+    description: List of endpoint parameters
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      optional:
+        type: boolean
+        required: false
+        default: false
+  endpoint_dependencies:
+    type: array
+    required: false
+    description: List of endpoint dependencies
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      dependency:
+        type: string
+        required: true
+  docstring:
+    type: string
+    required: true
+    description: Function docstring
+  validations:
+    type: array
+    required: false
+    description: List of validation statements
+  operations:
+    type: array
+    required: true
+    description: List of operations to perform
+  return_value:
+    type: string
+    required: true
+    description: Value to return
+  error_status_code:
+    type: integer
+    required: false
+    default: 500
+    description: HTTP status code for errors
+tags:
+  - python
+  - fastapi
+  - backend
+  - api
+  - endpoint
+language: python
+category: endpoint
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

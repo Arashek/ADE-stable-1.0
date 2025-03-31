@@ -1,0 +1,143 @@
+finance:
+  - name: payment_processing
+    description: "Payment processing and transaction management patterns"
+    code_patterns:
+      - "transaction_isolation"
+      - "double_entry_bookkeeping"
+      - "audit_logging"
+    best_practices:
+      - "Use decimal for monetary values"
+      - "Implement idempotency"
+      - "Include transaction rollback"
+    compliance_rules:
+      - "PCI DSS compliance"
+      - "GDPR data handling"
+      - "Financial reporting standards"
+    security_requirements:
+      - "Encryption at rest"
+      - "TLS 1.3+"
+      - "2FA for admin access"
+    performance_metrics:
+      transaction_time: "< 2s"
+      concurrent_users: "> 1000"
+      data_consistency: "100%"
+
+healthcare:
+  - name: patient_records
+    description: "Patient data management and medical records"
+    code_patterns:
+      - "audit_trail"
+      - "data_encryption"
+      - "access_control"
+    best_practices:
+      - "HIPAA compliance"
+      - "Data anonymization"
+      - "Secure data transfer"
+    compliance_rules:
+      - "HIPAA requirements"
+      - "HITECH Act compliance"
+      - "State privacy laws"
+    security_requirements:
+      - "End-to-end encryption"
+      - "Role-based access"
+      - "Audit logging"
+    performance_metrics:
+      response_time: "< 1s"
+      uptime: "99.99%"
+      backup_frequency: "hourly"
+
+ecommerce:
+  - name: inventory_management
+    description: "Inventory and order management system"
+    code_patterns:
+      - "stock_synchronization"
+      - "order_processing"
+      - "cart_management"
+    best_practices:
+      - "Real-time inventory updates"
+      - "Order status tracking"
+      - "Cart abandonment handling"
+    compliance_rules:
+      - "Tax regulations"
+      - "Consumer protection laws"
+      - "Payment gateway requirements"
+    security_requirements:
+      - "Secure checkout"
+      - "Fraud detection"
+      - "Data protection"
+    performance_metrics:
+      page_load: "< 2s"
+      cart_update: "< 500ms"
+      order_processing: "< 5s"
+
+education:
+  - name: learning_management
+    description: "Learning management system patterns"
+    code_patterns:
+      - "course_tracking"
+      - "assessment_engine"
+      - "progress_monitoring"
+    best_practices:
+      - "Accessibility compliance"
+      - "Multi-format content"
+      - "Progress tracking"
+    compliance_rules:
+      - "FERPA compliance"
+      - "Accessibility standards"
+      - "Data retention policies"
+    security_requirements:
+      - "Student data protection"
+      - "Secure assessments"
+      - "Privacy controls"
+    performance_metrics:
+      video_streaming: "HD quality"
+      concurrent_users: "> 500"
+      file_upload: "< 3s"
+
+manufacturing:
+  - name: production_control
+    description: "Production and quality control system"
+    code_patterns:
+      - "real_time_monitoring"
+      - "quality_control"
+      - "resource_planning"
+    best_practices:
+      - "IoT integration"
+      - "Predictive maintenance"
+      - "Quality assurance"
+    compliance_rules:
+      - "ISO 9001"
+      - "Industry standards"
+      - "Safety regulations"
+    security_requirements:
+      - "OT security"
+      - "Access control"
+      - "Data integrity"
+    performance_metrics:
+      sensor_data: "real-time"
+      system_latency: "< 100ms"
+      data_accuracy: "99.99%"
+
+logistics:
+  - name: supply_chain
+    description: "Supply chain and logistics management"
+    code_patterns:
+      - "route_optimization"
+      - "inventory_tracking"
+      - "shipment_management"
+    best_practices:
+      - "Real-time tracking"
+      - "Route optimization"
+      - "Inventory forecasting"
+    compliance_rules:
+      - "Transportation regulations"
+      - "International shipping laws"
+      - "Customs requirements"
+    security_requirements:
+      - "Location data security"
+      - "Supply chain integrity"
+      - "Access control"
+    performance_metrics:
+      tracking_update: "< 5min"
+      route_calculation: "< 1s"
+      inventory_sync: "real-time"

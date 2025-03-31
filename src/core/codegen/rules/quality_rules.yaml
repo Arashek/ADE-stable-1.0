@@ -1,0 +1,265 @@
+html:
+  rules:
+    accessibility:
+      - name: "ARIA Labels"
+        pattern: "aria-label=\"[^\"]+\""
+        description: "Include ARIA labels for interactive elements"
+        severity: "high"
+        fix: "Add aria-label attribute to interactive elements"
+      - name: "Alt Text"
+        pattern: "<img[^>]*alt=\"[^\"]+\"[^>]*>"
+        description: "Include alt text for images"
+        severity: "high"
+        fix: "Add alt attribute to img elements"
+    semantic:
+      - name: "Semantic Structure"
+        pattern: "<div[^>]*>.*?</div>"
+        description: "Use semantic elements instead of divs"
+        severity: "medium"
+        fix: "Replace div with appropriate semantic element"
+    performance:
+      - name: "Script Loading"
+        pattern: "<script[^>]*src=\"[^\"]+\"[^>]*>"
+        description: "Use async/defer for script loading"
+        severity: "medium"
+        fix: "Add async/defer attribute to script tags"
+
+css:
+  rules:
+    maintainability:
+      - name: "CSS Variables"
+        pattern: "color:\\s*#[0-9a-fA-F]{6}"
+        description: "Use CSS variables for colors"
+        severity: "medium"
+        fix: "Replace hardcoded colors with CSS variables"
+      - name: "Specificity"
+        pattern: "\\w+\\s+\\w+\\s+\\w+\\s+\\w+"
+        description: "Avoid high specificity selectors"
+        severity: "medium"
+        fix: "Simplify selector specificity"
+    performance:
+      - name: "Animation Performance"
+        pattern: "animation:\\s*\\w+\\s+\\d+s"
+        description: "Use transform for animations"
+        severity: "high"
+        fix: "Use transform instead of animating layout properties"
+
+react:
+  rules:
+    hooks:
+      - name: "Hook Dependencies"
+        pattern: "useEffect\\([^)]+\\)"
+        description: "Include all dependencies in useEffect"
+        severity: "high"
+        fix: "Add missing dependencies to useEffect"
+      - name: "Hook Order"
+        pattern: "if\\s*\\([^)]+\\)\\s*{[^}]*use[A-Z]\\w+"
+        description: "Hooks must be called in the same order"
+        severity: "high"
+        fix: "Move hooks outside conditional statements"
+    performance:
+      - name: "Memoization"
+        pattern: "const\\s+\\w+\\s*=\\s*\\w+\\([^)]*\\)"
+        description: "Use useMemo for expensive computations"
+        severity: "medium"
+        fix: "Wrap expensive computations in useMemo"
+
+vue:
+  rules:
+    composition:
+      - name: "Composition API"
+        pattern: "data\\(\\)\\s*{\\s*return\\s*{"
+        description: "Use Composition API instead of Options API"
+        severity: "medium"
+        fix: "Convert to Composition API"
+      - name: "Props Validation"
+        pattern: "props:\\s*\\["
+        description: "Use defineProps for type validation"
+        severity: "medium"
+        fix: "Use defineProps with type validation"
+    performance:
+      - name: "v-show vs v-if"
+        pattern: "v-if=\"[^\"]+\""
+        description: "Use v-show for frequent toggles"
+        severity: "medium"
+        fix: "Replace v-if with v-show for frequent toggles"
+
+angular:
+  rules:
+    architecture:
+      - name: "Component Size"
+        pattern: "export\\s+class\\s+\\w+Component\\s*{"
+        description: "Keep components small and focused"
+        severity: "medium"
+        fix: "Split component into smaller components"
+      - name: "Service Usage"
+        pattern: "constructor\\([^)]*\\)\\s*{"
+        description: "Use services for shared logic"
+        severity: "medium"
+        fix: "Move shared logic to services"
+    performance:
+      - name: "Change Detection"
+        pattern: "ChangeDetectionStrategy\\.Default"
+        description: "Use OnPush change detection"
+        severity: "high"
+        fix: "Set change detection to OnPush"
+
+csharp:
+  rules:
+    async:
+      - name: "Async/Await"
+        pattern: "\\.Result|\\s+Wait\\(\\)"
+        description: "Avoid blocking async calls"
+        severity: "high"
+        fix: "Use async/await instead of blocking calls"
+      - name: "Exception Handling"
+        pattern: "catch\\s*\\(Exception\\s+e\\)"
+        description: "Catch specific exceptions"
+        severity: "medium"
+        fix: "Catch specific exception types"
+    performance:
+      - name: "String Concatenation"
+        pattern: "\\+\\s*\\\"[^\"]+\\\""
+        description: "Use StringBuilder for string concatenation"
+        severity: "medium"
+        fix: "Use StringBuilder for multiple concatenations"
+
+go:
+  rules:
+    error:
+      - name: "Error Handling"
+        pattern: "if\\s+err\\s*!=\\s*nil\\s*{"
+        description: "Handle all errors"
+        severity: "high"
+        fix: "Add proper error handling"
+      - name: "Error Wrapping"
+        pattern: "fmt\\.Errorf\\([^)]+\\)"
+        description: "Wrap errors with context"
+        severity: "medium"
+        fix: "Use errors.Wrap for error context"
+    performance:
+      - name: "Slice Capacity"
+        pattern: "make\\(\\[\\]\\w+,\\s*\\d+\\)"
+        description: "Pre-allocate slice capacity"
+        severity: "medium"
+        fix: "Specify slice capacity in make"
+
+nodejs:
+  rules:
+    async:
+      - name: "Promise Chain"
+        pattern: "\\.then\\([^)]+\\)\\.then\\([^)]+\\)"
+        description: "Use async/await instead of promise chains"
+        severity: "medium"
+        fix: "Convert to async/await"
+      - name: "Error Handling"
+        pattern: "catch\\s*\\(error\\)\\s*{"
+        description: "Handle specific errors"
+        severity: "medium"
+        fix: "Handle specific error types"
+    security:
+      - name: "SQL Injection"
+        pattern: "\\s*\\+\\s*req\\.body"
+        description: "Use parameterized queries"
+        severity: "high"
+        fix: "Use parameterized queries"
+
+php:
+  rules:
+    security:
+      - name: "SQL Injection"
+        pattern: "\\$sql\\s*=\\s*\"[^\"]+\\\"\\s*\\."
+        description: "Use prepared statements"
+        severity: "high"
+        fix: "Use PDO or mysqli prepared statements"
+      - name: "XSS"
+        pattern: "echo\\s+\\$_GET\\["
+        description: "Escape output"
+        severity: "high"
+        fix: "Use htmlspecialchars for output"
+    performance:
+      - name: "Database Queries"
+        pattern: "while\\s*\\(\\$row\\s*=\\s*mysql_fetch_array"
+        description: "Use PDO or mysqli"
+        severity: "high"
+        fix: "Use modern database extensions"
+
+react-native:
+  rules:
+    performance:
+      - name: "List Rendering"
+        pattern: "map\\([^)]+\\)\\s*=>\\s*<View>"
+        description: "Use FlatList for long lists"
+        severity: "high"
+        fix: "Replace map with FlatList"
+      - name: "Image Loading"
+        pattern: "source=\\{\\{uri:\\s*'[^']+'\\}\\}"
+        description: "Use proper image caching"
+        severity: "medium"
+        fix: "Use react-native-fast-image"
+    layout:
+      - name: "Flex Layout"
+        pattern: "position:\\s*'absolute'"
+        description: "Use flex layout when possible"
+        severity: "medium"
+        fix: "Use flex layout instead of absolute positioning"
+
+flutter:
+  rules:
+    performance:
+      - name: "Widget Rebuild"
+        pattern: "build\\([^)]*\\)\\s*{"
+        description: "Optimize widget rebuilds"
+        severity: "high"
+        fix: "Use const constructors and shouldRebuild"
+      - name: "Image Loading"
+        pattern: "Image\\.network\\([^)]+\\)"
+        description: "Use proper image caching"
+        severity: "medium"
+        fix: "Use cached_network_image"
+    state:
+      - name: "State Management"
+        pattern: "setState\\([^)]+\\)"
+        description: "Use proper state management"
+        severity: "medium"
+        fix: "Use Provider or Bloc"
+
+nosql:
+  rules:
+    performance:
+      - name: "Index Usage"
+        pattern: "\\.find\\([^)]*\\)\\.sort\\([^)]*\\)"
+        description: "Use proper indexes"
+        severity: "high"
+        fix: "Add appropriate indexes"
+      - name: "Query Optimization"
+        pattern: "\\.find\\([^)]*\\)\\.skip\\([^)]*\\)"
+        description: "Optimize pagination"
+        severity: "medium"
+        fix: "Use proper pagination techniques"
+    schema:
+      - name: "Schema Validation"
+        pattern: "required:\\s*true"
+        description: "Use schema validation"
+        severity: "medium"
+        fix: "Add proper schema validation"
+
+rest:
+  rules:
+    security:
+      - name: "Authentication"
+        pattern: "security:\\s*\\[\\]"
+        description: "Use proper authentication"
+        severity: "high"
+        fix: "Add authentication requirements"
+      - name: "Input Validation"
+        pattern: "parameters:\\s*\\[\\]"
+        description: "Validate input parameters"
+        severity: "high"
+        fix: "Add input validation"
+    performance:
+      - name: "Response Caching"
+        pattern: "responses:\\s*{[^}]*}"
+        description: "Use response caching"
+        severity: "medium"
+        fix: "Add caching headers" 

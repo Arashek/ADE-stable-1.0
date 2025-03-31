@@ -1,0 +1,502 @@
+name: decorator
+description: Decorator design pattern for dynamically adding behavior to objects
+category: structural
+language: python
+template: |
+  from abc import ABC, abstractmethod
+  from typing import Any, Dict, List, Optional, Callable
+  from functools import wraps
+  from dataclasses import dataclass
+  from datetime import datetime
+  
+  class {{ component_type }}(ABC):
+      """Abstract base class for {{ component_type }}"""
+      
+      @abstractmethod
+      def {{ operation }}(self{% for arg in operation_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ operation_return_type }}:
+          """
+          Execute the {{ component_type }} operation
+          
+          Args:
+              {% for arg in operation_args %}
+              {{ arg.name }}: {{ arg.description }}
+              {% endfor %}
+              
+          Returns:
+              {{ operation_return_description }}
+          """
+          pass
+          
+      {% for method in common_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  class {{ concrete_component }}({{ component_type }}):
+      """Concrete implementation of {{ component_type }}"""
+      
+      def __init__(self{% for arg in concrete_init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in concrete_init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ operation }}(self{% for arg in operation_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ operation_return_type }}:
+          """
+          Implementation of {{ operation }} for concrete component
+          """
+          {{ concrete_operation_implementation }}
+          
+      {% for method in concrete_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  class {{ decorator_base }}({{ component_type }}):
+      """Base decorator class"""
+      
+      def __init__(self, component: {{ component_type }}{% for arg in decorator_init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          self._component = component
+          {% for init in decorator_init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ operation }}(self{% for arg in operation_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ operation_return_type }}:
+          """
+          Delegate to the wrapped component
+          """
+          return self._component.{{ operation }}({{ operation_args | map(attribute='name') | join(', ') }})
+          
+      {% for method in decorator_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  {% for decorator in concrete_decorators %}
+  class {{ decorator.name }}({{ decorator_base }}):
+      """Concrete decorator implementation"""
+      
+      def __init__(self, component: {{ component_type }}{% for arg in decorator.init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          super().__init__(component{% for arg in decorator.init_args %}, {{ arg.name }}{% endfor %})
+          {% for init in decorator.init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ operation }}(self{% for arg in operation_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ operation_return_type }}:
+          """
+          Implementation of {{ operation }} with additional behavior
+          """
+          {{ decorator.operation_implementation }}
+          
+      {% for method in decorator.methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  {% endfor %}
+  
+  def {{ decorator_function }}(func: Callable) -> Callable:
+      """
+      Decorator function for adding behavior to functions
+      
+      Args:
+          func: The function to decorate
+          
+      Returns:
+          The decorated function
+      """
+      @wraps(func)
+      def wrapper(*args, **kwargs):
+          {{ decorator_function_implementation }}
+      return wrapper
+parameters:
+  component_type:
+    type: string
+    required: true
+    description: Name of the component type (e.g., Stream, Window)
+  operation:
+    type: string
+    required: true
+    description: Name of the main operation method
+  operation_args:
+    type: array
+    required: false
+    description: Arguments for the main operation method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+  operation_return_type:
+    type: string
+    required: true
+    description: Return type of the main operation method
+  operation_return_description:
+    type: string
+    required: true
+    description: Description of what the operation returns
+  common_methods:
+    type: array
+    required: false
+    description: Common methods shared by all components
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  concrete_component:
+    type: string
+    required: true
+    description: Name of the concrete component class
+  concrete_init_args:
+    type: array
+    required: false
+    description: Arguments for the concrete component's __init__ method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  concrete_init_body:
+    type: array
+    required: false
+    description: Body statements for the concrete component's __init__ method
+    items:
+      type: string
+  concrete_operation_implementation:
+    type: string
+    required: true
+    description: Implementation of the operation for the concrete component
+  concrete_methods:
+    type: array
+    required: false
+    description: Additional methods for the concrete component
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  decorator_base:
+    type: string
+    required: true
+    description: Name of the base decorator class
+  decorator_init_args:
+    type: array
+    required: false
+    description: Arguments for the decorator's __init__ method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  decorator_init_body:
+    type: array
+    required: false
+    description: Body statements for the decorator's __init__ method
+    items:
+      type: string
+  decorator_methods:
+    type: array
+    required: false
+    description: Additional methods for the decorator class
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  concrete_decorators:
+    type: array
+    required: false
+    description: List of concrete decorator implementations
+    items:
+      name:
+        type: string
+        required: true
+      init_args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      init_body:
+        type: array
+        required: false
+        items:
+          type: string
+      operation_implementation:
+        type: string
+        required: true
+      methods:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          args:
+            type: array
+            required: false
+            items:
+              name:
+                type: string
+                required: true
+              type:
+                type: string
+                required: true
+          return_type:
+            type: string
+            required: true
+          docstring:
+            type: string
+            required: true
+          body:
+            type: string
+            required: true
+  decorator_function:
+    type: string
+    required: false
+    description: Name of the decorator function
+  decorator_function_implementation:
+    type: string
+    required: false
+    description: Implementation of the decorator function
+examples:
+  - name: text_stream
+    description: Text stream example using the decorator pattern
+    parameters:
+      component_type: TextStream
+      operation: write
+      operation_args:
+        - name: text
+          type: str
+          description: Text to write
+      operation_return_type: None
+      operation_return_description: None
+      concrete_component: SimpleTextStream
+      concrete_init_args:
+        - name: file_path
+          type: str
+      concrete_init_body:
+        - self.file_path = file_path
+      concrete_operation_implementation: |
+        with open(self.file_path, 'a') as f:
+            f.write(text)
+      decorator_base: TextStreamDecorator
+      concrete_decorators:
+        - name: EncryptedTextStream
+          init_args:
+            - name: key
+              type: str
+          init_body:
+            - self.key = key
+          operation_implementation: |
+            # Encrypt the text before writing
+            encrypted_text = self._encrypt(text)
+            super().write(encrypted_text)
+          methods:
+            - name: _encrypt
+              args:
+                - name: text
+                  type: str
+              return_type: str
+              docstring: Encrypt the text using the key
+              body: |
+                # Simple encryption for demonstration
+                return ''.join(chr(ord(c) ^ ord(self.key[i % len(self.key)])) for i, c in enumerate(text))
+        - name: CompressedTextStream
+          init_args:
+            - name: compression_level
+              type: int
+          init_body:
+            - self.compression_level = compression_level
+          operation_implementation: |
+            # Compress the text before writing
+            compressed_text = self._compress(text)
+            super().write(compressed_text)
+          methods:
+            - name: _compress
+              args:
+                - name: text
+                  type: str
+              return_type: str
+              docstring: Compress the text
+              body: |
+                # Simple compression for demonstration
+                return text[::2]  # Remove every other character
+    code: |
+      from abc import ABC, abstractmethod
+      from typing import Optional
+      
+      class TextStream(ABC):
+          """Abstract base class for text streams"""
+          
+          @abstractmethod
+          def write(self, text: str) -> None:
+              """
+              Write text to the stream
+              
+              Args:
+                  text: Text to write
+              """
+              pass
+      
+      class SimpleTextStream(TextStream):
+          """Concrete implementation of text stream"""
+          
+          def __init__(self, file_path: str):
+              self.file_path = file_path
+              
+          def write(self, text: str) -> None:
+              """
+              Implementation of write for simple text stream
+              """
+              with open(self.file_path, 'a') as f:
+                  f.write(text)
+      
+      class TextStreamDecorator(TextStream):
+          """Base decorator class for text streams"""
+          
+          def __init__(self, component: TextStream):
+              self._component = component
+              
+          def write(self, text: str) -> None:
+              """
+              Delegate to the wrapped component
+              """
+              return self._component.write(text)
+      
+      class EncryptedTextStream(TextStreamDecorator):
+          """Concrete decorator implementation for encryption"""
+          
+          def __init__(self, component: TextStream, key: str):
+              super().__init__(component)
+              self.key = key
+              
+          def write(self, text: str) -> None:
+              """
+              Implementation of write with encryption
+              """
+              # Encrypt the text before writing
+              encrypted_text = self._encrypt(text)
+              super().write(encrypted_text)
+              
+          def _encrypt(self, text: str) -> str:
+              """
+              Encrypt the text using the key
+              """
+              # Simple encryption for demonstration
+              return ''.join(chr(ord(c) ^ ord(self.key[i % len(self.key)])) for i, c in enumerate(text))
+      
+      class CompressedTextStream(TextStreamDecorator):
+          """Concrete decorator implementation for compression"""
+          
+          def __init__(self, component: TextStream, compression_level: int):
+              super().__init__(component)
+              self.compression_level = compression_level
+              
+          def write(self, text: str) -> None:
+              """
+              Implementation of write with compression
+              """
+              # Compress the text before writing
+              compressed_text = self._compress(text)
+              super().write(compressed_text)
+              
+          def _compress(self, text: str) -> str:
+              """
+              Compress the text
+              """
+              # Simple compression for demonstration
+              return text[::2]  # Remove every other character
+best_practices:
+  - Use the decorator pattern when you need to add behavior to objects dynamically
+  - Keep decorators focused on a single responsibility
+  - Use abstract base classes to define the component interface
+  - Consider using function decorators for simpler cases
+  - Document the decorator pattern usage and available decorators
+  - Handle decorator composition properly
+anti_patterns:
+  - Creating too many decorators for simple operations
+  - Not properly maintaining the component interface
+  - Mixing business logic with decoration
+  - Not handling decorator composition correctly
+  - Not documenting the decorator pattern usage
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

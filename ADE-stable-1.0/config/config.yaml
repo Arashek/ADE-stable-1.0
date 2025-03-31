@@ -1,0 +1,82 @@
+# ADE Training Manager Configuration
+
+# Application Settings
+app:
+  name: "ADE Training Manager"
+  version: "1.0.0"
+  theme: "light"
+  window:
+    width: 1280
+    height: 800
+    title: "ADE Training Manager"
+
+# Model Settings
+model:
+  default_model: "Hybrid Architecture"
+  available_models:
+    - "Hybrid Architecture"
+    - "CodeLlama-34B"
+    - "StarCoder-33B"
+    - "Claude 3.7 Sonnet"
+    - "GPT-4 Turbo"
+    - "DeepSeek Coder"
+
+# Dataset Settings
+dataset:
+  sources:
+    - "GitHub Repository"
+    - "Local Directory"
+    - "Cloud Storage"
+    - "Public Dataset"
+    - "Custom Source"
+  default_source: "GitHub Repository"
+  max_file_size_mb: 100
+  supported_languages:
+    - "Python"
+    - "JavaScript"
+    - "TypeScript"
+    - "Java"
+    - "C++"
+    - "Go"
+    - "Rust"
+
+# Training Settings
+training:
+  batch_sizes: [16, 32, 64, 128]
+  default_batch_size: 32
+  learning_rates: [1e-5, 3e-5, 5e-5]
+  default_learning_rate: 3e-5
+  epochs_range: [1, 100]
+  default_epochs: 10
+
+# Cloud Integration
+cloud:
+  providers:
+    - name: "AWS"
+      regions:
+        - "us-east-1"
+        - "us-west-2"
+        - "eu-west-1"
+    - name: "Google Cloud"
+      regions:
+        - "us-central1"
+        - "europe-west1"
+        - "asia-east1"
+
+# Monitoring
+monitoring:
+  metrics:
+    - "Loss"
+    - "Accuracy"
+    - "GPU Usage"
+    - "Memory Usage"
+    - "Training Speed"
+  update_interval_seconds: 5
+  history_retention_days: 30
+
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/training.log"
+  max_size_mb: 100
+  backup_count: 5 

@@ -1,0 +1,150 @@
+{
+    "version": "1.0",
+    "commands": {
+        "preview": {
+            "start": {
+                "description": "Start preview server for current project",
+                "command": "npm run dev",
+                "frameworks": {
+                    "react": "npm start",
+                    "next.js": "npm run dev",
+                    "vue.js": "npm run serve",
+                    "angular": "ng serve",
+                    "flask": "flask run",
+                    "django": "python manage.py runserver"
+                }
+            },
+            "build": {
+                "description": "Build project for preview",
+                "command": "npm run build",
+                "frameworks": {
+                    "react": "npm run build",
+                    "next.js": "npm run build",
+                    "vue.js": "npm run build",
+                    "angular": "ng build",
+                    "flask": "python setup.py build",
+                    "django": "python manage.py collectstatic"
+                }
+            }
+        },
+        "validate": {
+            "code": {
+                "description": "Validate code quality and standards",
+                "command": "npm run lint",
+                "frameworks": {
+                    "react": "npm run lint",
+                    "next.js": "npm run lint",
+                    "vue.js": "npm run lint",
+                    "angular": "ng lint",
+                    "flask": "flake8",
+                    "django": "flake8"
+                }
+            },
+            "types": {
+                "description": "Check TypeScript types",
+                "command": "npm run type-check",
+                "frameworks": {
+                    "react": "tsc --noEmit",
+                    "next.js": "tsc --noEmit",
+                    "vue.js": "vue-tsc --noEmit",
+                    "angular": "ng build --aot"
+                }
+            }
+        },
+        "test": {
+            "unit": {
+                "description": "Run unit tests",
+                "command": "npm test",
+                "frameworks": {
+                    "react": "npm test",
+                    "next.js": "npm test",
+                    "vue.js": "npm run test:unit",
+                    "angular": "ng test",
+                    "flask": "python -m pytest tests/",
+                    "django": "python manage.py test"
+                }
+            },
+            "e2e": {
+                "description": "Run end-to-end tests",
+                "command": "npm run e2e",
+                "frameworks": {
+                    "react": "npm run cypress",
+                    "next.js": "npm run cypress",
+                    "vue.js": "npm run test:e2e",
+                    "angular": "ng e2e",
+                    "flask": "python -m pytest tests/e2e/",
+                    "django": "python manage.py test e2e"
+                }
+            }
+        },
+        "docker": {
+            "build": {
+                "description": "Build Docker container",
+                "command": "docker-compose build"
+            },
+            "up": {
+                "description": "Start Docker containers",
+                "command": "docker-compose up -d"
+            },
+            "down": {
+                "description": "Stop Docker containers",
+                "command": "docker-compose down"
+            }
+        }
+    },
+    "preview": {
+        "supportedFrameworks": [
+            "react",
+            "next.js",
+            "vue.js",
+            "angular",
+            "flask",
+            "django"
+        ],
+        "features": {
+            "hotReload": true,
+            "componentPreview": true,
+            "responsiveDesign": true,
+            "consoleIntegration": true,
+            "networkInspector": true
+        },
+        "ports": {
+            "react": 3000,
+            "next.js": 3000,
+            "vue.js": 8080,
+            "angular": 4200,
+            "flask": 5000,
+            "django": 8000
+        }
+    },
+    "boundaries": {
+        "development": {
+            "allowedPaths": [
+                "src/",
+                "public/",
+                "assets/",
+                "components/",
+                "pages/",
+                "styles/"
+            ],
+            "watchPaths": [
+                "src/**/*",
+                "public/**/*",
+                "assets/**/*"
+            ],
+            "ignorePaths": [
+                "node_modules/",
+                "dist/",
+                "build/",
+                ".git/",
+                "*.log"
+            ]
+        },
+        "preview": {
+            "serveFromMemory": true,
+            "cacheDirectory": "./preview-cache",
+            "maxCacheSize": "500MB",
+            "refreshRate": 1000
+        }
+    }
+} 

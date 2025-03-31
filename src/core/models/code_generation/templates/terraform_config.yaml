@@ -1,0 +1,288 @@
+name: terraform_config
+description: Template for generating Terraform configurations
+content: |
+  terraform {
+    required_version = "{{ required_version }}"
+    {% if required_providers %}
+    required_providers {
+      {% for provider in required_providers %}
+      {{ provider.name }} = {
+        source  = "{{ provider.source }}"
+        version = "{{ provider.version }}"
+      }
+      {% endfor %}
+    }
+    {% endif %}
+    {% if backend %}
+    backend "{{ backend.type }}" {
+      {% for config in backend.config %}
+      {{ config.key }} = "{{ config.value }}"
+      {% endfor %}
+    }
+    {% endif %}
+  }
+  
+  {% for provider in providers %}
+  provider "{{ provider.name }}" {
+    {% for config in provider.config %}
+    {{ config.key }} = "{{ config.value }}"
+    {% endfor %}
+  }
+  {% endfor %}
+  
+  {% for variable in variables %}
+  variable "{{ variable.name }}" {
+    type        = {{ variable.type }}
+    description = "{{ variable.description }}"
+    {% if variable.default %}
+    default     = {{ variable.default }}
+    {% endif %}
+    {% if variable.validation %}
+    validation {
+      condition     = {{ variable.validation.condition }}
+      error_message = "{{ variable.validation.error_message }}"
+    }
+    {% endif %}
+  }
+  {% endfor %}
+  
+  {% for output in outputs %}
+  output "{{ output.name }}" {
+    value       = {{ output.value }}
+    description = "{{ output.description }}"
+  }
+  {% endfor %}
+  
+  {% for resource in resources %}
+  resource "{{ resource.type }}" "{{ resource.name }}" {
+    {% for attribute in resource.attributes %}
+    {{ attribute.key }} = {{ attribute.value }}
+    {% endfor %}
+    {% if resource.depends_on %}
+    depends_on = [
+      {% for dependency in resource.depends_on %}
+      {{ dependency }}{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+    {% endif %}
+    {% if resource.lifecycle %}
+    lifecycle {
+      {% for rule in resource.lifecycle %}
+      {{ rule.type }} = {{ rule.value }}
+      {% endfor %}
+    }
+    {% endif %}
+  }
+  {% endfor %}
+  
+  {% for data in data_sources %}
+  data "{{ data.type }}" "{{ data.name }}" {
+    {% for attribute in data.attributes %}
+    {{ attribute.key }} = {{ attribute.value }}
+    {% endfor %}
+  }
+  {% endfor %}
+  
+  {% for module in modules %}
+  module "{{ module.name }}" {
+    source = "{{ module.source }}"
+    {% for input in module.inputs %}
+    {{ input.key }} = {{ input.value }}
+    {% endfor %}
+    {% if module.depends_on %}
+    depends_on = [
+      {% for dependency in module.depends_on %}
+      {{ dependency }}{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+    {% endif %}
+  }
+  {% endfor %}
+parameters:
+  required_version:
+    type: string
+    required: true
+    description: Required Terraform version
+  required_providers:
+    type: array
+    required: false
+    description: List of required providers
+    items:
+      name:
+        type: string
+        required: true
+      source:
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
+  backend:
+    type: object
+    required: false
+    properties:
+      type:
+        type: string
+        required: true
+      config:
+        type: array
+        required: true
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+  providers:
+    type: array
+    required: false
+    description: List of provider configurations
+    items:
+      name:
+        type: string
+        required: true
+      config:
+        type: array
+        required: true
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+  variables:
+    type: array
+    required: false
+    description: List of variable definitions
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+      default:
+        type: string
+        required: false
+      validation:
+        type: object
+        required: false
+        properties:
+          condition:
+            type: string
+            required: true
+          error_message:
+            type: string
+            required: true
+  outputs:
+    type: array
+    required: false
+    description: List of output definitions
+    items:
+      name:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+  resources:
+    type: array
+    required: false
+    description: List of resource definitions
+    items:
+      type:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+      attributes:
+        type: array
+        required: true
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+      depends_on:
+        type: array
+        required: false
+        description: List of dependencies
+      lifecycle:
+        type: array
+        required: false
+        description: List of lifecycle rules
+        items:
+          type:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+  data_sources:
+    type: array
+    required: false
+    description: List of data source definitions
+    items:
+      type:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+      attributes:
+        type: array
+        required: true
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+  modules:
+    type: array
+    required: false
+    description: List of module definitions
+    items:
+      name:
+        type: string
+        required: true
+      source:
+        type: string
+        required: true
+      inputs:
+        type: array
+        required: true
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+      depends_on:
+        type: array
+        required: false
+        description: List of dependencies
+tags:
+  - terraform
+  - infrastructure
+  - iac
+  - cloud
+language: hcl
+category: configuration
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

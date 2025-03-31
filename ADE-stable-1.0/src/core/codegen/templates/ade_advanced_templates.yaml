@@ -1,0 +1,201 @@
+ade:
+  templates:
+    cache_manager:
+      name: "ADE Cache Manager Template"
+      description: "Template for ADE cache management with performance optimizations"
+      content: |
+        import { CacheManager } from '@ade/core';
+        import { LRUCache } from './lru_cache';
+        import { MemoryCache } from './memory_cache';
+        import { DiskCache } from './disk_cache';
+
+        export class {{cache_name}}CacheManager extends CacheManager {
+            private lruCache: LRUCache;
+            private memoryCache: MemoryCache;
+            private diskCache: DiskCache;
+
+            constructor(config: CacheConfig) {
+                super(config);
+                this.lruCache = new LRUCache(config.lruSize);
+                this.memoryCache = new MemoryCache(config.memoryLimit);
+                this.diskCache = new DiskCache(config.diskPath);
+            }
+
+            async get(key: string): Promise<any> {
+                // Try LRU cache first
+                const lruResult = this.lruCache.get(key);
+                if (lruResult) return lruResult;
+
+                // Try memory cache
+                const memoryResult = await this.memoryCache.get(key);
+                if (memoryResult) {
+                    this.lruCache.set(key, memoryResult);
+                    return memoryResult;
+                }
+
+                // Try disk cache
+                const diskResult = await this.diskCache.get(key);
+                if (diskResult) {
+                    this.memoryCache.set(key, diskResult);
+                    this.lruCache.set(key, diskResult);
+                    return diskResult;
+                }
+
+                return null;
+            }
+
+            async set(key: string, value: any): Promise<void> {
+                await Promise.all([
+                    this.lruCache.set(key, value),
+                    this.memoryCache.set(key, value),
+                    this.diskCache.set(key, value)
+                ]);
+            }
+
+            async invalidate(key: string): Promise<void> {
+                await Promise.all([
+                    this.lruCache.delete(key),
+                    this.memoryCache.delete(key),
+                    this.diskCache.delete(key)
+                ]);
+            }
+        }
+
+    worker_manager:
+      name: "ADE Worker Manager Template"
+      description: "Template for ADE worker management with performance optimizations"
+      content: |
+        import { WorkerManager } from '@ade/core';
+        import { WorkerPool } from './worker_pool';
+        import { TaskQueue } from './task_queue';
+        import { LoadBalancer } from './load_balancer';
+
+        export class {{worker_name}}WorkerManager extends WorkerManager {
+            private workerPool: WorkerPool;
+            private taskQueue: TaskQueue;
+            private loadBalancer: LoadBalancer;
+
+            constructor(config: WorkerConfig) {
+                super(config);
+                this.workerPool = new WorkerPool(config.poolSize);
+                this.taskQueue = new TaskQueue(config.queueSize);
+                this.loadBalancer = new LoadBalancer(config.strategy);
+            }
+
+            async executeTask(task: Task): Promise<TaskResult> {
+                const worker = await this.loadBalancer.getWorker(this.workerPool);
+                return worker.execute(task);
+            }
+
+            async scheduleTask(task: Task): Promise<void> {
+                await this.taskQueue.enqueue(task);
+                this._processQueue();
+            }
+
+            private async _processQueue(): Promise<void> {
+                while (!this.taskQueue.isEmpty()) {
+                    const task = await this.taskQueue.dequeue();
+                    const worker = await this.loadBalancer.getWorker(this.workerPool);
+                    worker.execute(task).catch(error => {
+                        this.taskQueue.enqueue(task);
+                    });
+                }
+            }
+        }
+
+    profiler:
+      name: "ADE Profiler Template"
+      description: "Template for ADE performance profiling with optimizations"
+      content: |
+        import { Profiler } from '@ade/core';
+        import { MetricsCollector } from './metrics_collector';
+        import { PerformanceAnalyzer } from './performance_analyzer';
+        import { OptimizationSuggester } from './optimization_suggester';
+
+        export class {{profiler_name}}Profiler extends Profiler {
+            private metricsCollector: MetricsCollector;
+            private performanceAnalyzer: PerformanceAnalyzer;
+            private optimizationSuggester: OptimizationSuggester;
+
+            constructor(config: ProfilerConfig) {
+                super(config);
+                this.metricsCollector = new MetricsCollector();
+                this.performanceAnalyzer = new PerformanceAnalyzer();
+                this.optimizationSuggester = new OptimizationSuggester();
+            }
+
+            async profile(code: string): Promise<ProfileResult> {
+                const metrics = await this.metricsCollector.collect(code);
+                const analysis = await this.performanceAnalyzer.analyze(metrics);
+                const suggestions = await this.optimizationSuggester.suggest(analysis);
+
+                return {
+                    metrics,
+                    analysis,
+                    suggestions,
+                    recommendations: this._generateRecommendations(analysis)
+                };
+            }
+
+            private _generateRecommendations(analysis: PerformanceAnalysis): Recommendation[] {
+                return [
+                    ...this._getMemoryRecommendations(analysis.memory),
+                    ...this._getCPURecommendations(analysis.cpu),
+                    ...this._getIORecoMMendations(analysis.io)
+                ];
+            }
+        }
+
+    optimizer_chain:
+      name: "ADE Optimizer Chain Template"
+      description: "Template for ADE optimization chain with performance focus"
+      content: |
+        import { OptimizerChain } from '@ade/core';
+        import { ASTOptimizer } from './ast_optimizer';
+        import { MemoryOptimizer } from './memory_optimizer';
+        import { RuntimeOptimizer } from './runtime_optimizer';
+        import { CodeOptimizer } from './code_optimizer';
+
+        export class {{optimizer_name}}OptimizerChain extends OptimizerChain {
+            private astOptimizer: ASTOptimizer;
+            private memoryOptimizer: MemoryOptimizer;
+            private runtimeOptimizer: RuntimeOptimizer;
+            private codeOptimizer: CodeOptimizer;
+
+            constructor(config: OptimizerConfig) {
+                super(config);
+                this.astOptimizer = new ASTOptimizer();
+                this.memoryOptimizer = new MemoryOptimizer();
+                this.runtimeOptimizer = new RuntimeOptimizer();
+                this.codeOptimizer = new CodeOptimizer();
+            }
+
+            async optimize(code: string): Promise<OptimizedCode> {
+                // Parse and optimize AST
+                const ast = await this._parseCode(code);
+                const optimizedAst = await this.astOptimizer.optimize(ast);
+
+                // Optimize memory usage
+                const memoryOptimized = await this.memoryOptimizer.optimize(optimizedAst);
+
+                // Optimize runtime performance
+                const runtimeOptimized = await this.runtimeOptimizer.optimize(memoryOptimized);
+
+                // Optimize code structure
+                const codeOptimized = await this.codeOptimizer.optimize(runtimeOptimized);
+
+                return {
+                    code: await this._generateCode(codeOptimized),
+                    metrics: await this._calculateMetrics(codeOptimized)
+                };
+            }
+
+            private async _calculateMetrics(ast: AST): Promise<OptimizationMetrics> {
+                return {
+                    memoryUsage: this._calculateMemoryUsage(ast),
+                    runtimePerformance: this._calculateRuntimePerformance(ast),
+                    codeSize: this._calculateCodeSize(ast),
+                    optimizationScore: this._calculateOptimizationScore(ast)
+                };
+            }
+        } 

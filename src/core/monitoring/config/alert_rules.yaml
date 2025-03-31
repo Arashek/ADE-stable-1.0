@@ -1,0 +1,147 @@
+- name: "high_error_rate"
+  condition:
+    type: "threshold"
+    metric: "error_rate"
+    threshold: 0.05
+    operator: ">="
+  severity: "error"
+  channels:
+    - type: "email"
+      config:
+        from: "alerts@example.com"
+        to: "ops@example.com"
+        smtp_server: "smtp.example.com"
+        username: "alerts"
+        password: "secret"
+    - type: "slack"
+      config:
+        webhook_url: "https://hooks.slack.com/services/xxx/yyy/zzz"
+  description: "Error rate exceeds 5%"
+  tags: ["errors", "critical"]
+  cooldown_seconds: 300
+
+- name: "increasing_latency_trend"
+  condition:
+    type: "trend"
+    metric: "request_latency"
+    trend_direction: "increasing"
+    window_size: 10
+  severity: "warning"
+  channels:
+    - type: "email"
+      config:
+        from: "alerts@example.com"
+        to: "ops@example.com"
+        smtp_server: "smtp.example.com"
+        username: "alerts"
+        password: "secret"
+    - type: "teams"
+      config:
+        webhook_url: "https://webhook.office.com/webhookb2/xxx/yyy/zzz"
+  description: "Request latency shows increasing trend"
+  tags: ["performance", "latency"]
+  cooldown_seconds: 600
+
+- name: "anomalous_cpu_usage"
+  condition:
+    type: "anomaly"
+    metric: "cpu_usage"
+    anomaly_threshold: 3.0  # Number of standard deviations
+    window_size: 20
+  severity: "warning"
+  channels:
+    - type: "email"
+      config:
+        from: "alerts@example.com"
+        to: "ops@example.com"
+        smtp_server: "smtp.example.com"
+        username: "alerts"
+        password: "secret"
+    - type: "discord"
+      config:
+        webhook_url: "https://discord.com/api/webhooks/xxx/yyy/zzz"
+  description: "CPU usage shows anomalous pattern"
+  tags: ["performance", "cpu"]
+  cooldown_seconds: 300
+
+- name: "composite_service_health"
+  condition:
+    type: "composite"
+    composite_conditions:
+      - type: "threshold"
+        metric: "error_rate"
+        threshold: 0.05
+        operator: ">="
+      - type: "threshold"
+        metric: "request_latency_95th"
+        threshold: 1000
+        operator: ">="
+      - type: "threshold"
+        metric: "success_rate"
+        threshold: 0.95
+        operator: "<="
+  severity: "critical"
+  channels:
+    - type: "email"
+      config:
+        from: "alerts@example.com"
+        to: "ops@example.com"
+        smtp_server: "smtp.example.com"
+        username: "alerts"
+        password: "secret"
+    - type: "pagerduty"
+      config:
+        routing_key: "your-pagerduty-routing-key"
+        client_url: "https://monitoring.example.com"
+  description: "Multiple service health indicators show issues"
+  tags: ["reliability", "critical"]
+  cooldown_seconds: 300
+  escalation_policy: "critical_alerts"
+
+- name: "rapid_error_rate_change"
+  condition:
+    type: "rate_change"
+    metric: "error_rate"
+    rate_change_threshold: 0.1  # 10% change per minute
+    window_size: 5
+  severity: "error"
+  channels:
+    - type: "email"
+      config:
+        from: "alerts@example.com"
+        to: "ops@example.com"
+        smtp_server: "smtp.example.com"
+        username: "alerts"
+        password: "secret"
+    - type: "sms"
+      config:
+        from_number: "+1234567890"
+        to_number: "+1987654321"
+  description: "Error rate is changing rapidly"
+  tags: ["errors", "critical"]
+  cooldown_seconds: 300
+
+- name: "sustained_high_memory"
+  condition:
+    type: "window"
+    metric: "memory_usage"
+    threshold: 0.9  # 90% memory usage
+    operator: ">="
+    window_size: 15  # Must be high for 15 consecutive measurements
+  severity: "warning"
+  channels:
+    - type: "email"
+      config:
+        from: "alerts@example.com"
+        to: "ops@example.com"
+        smtp_server: "smtp.example.com"
+        username: "alerts"
+        password: "secret"
+    - type: "slack"
+      config:
+        webhook_url: "https://hooks.slack.com/services/xxx/yyy/zzz"
+  description: "Memory usage consistently high"
+  tags: ["performance", "memory"]
+  cooldown_seconds: 600
+  auto_resolve: true
+  resolution_delay: 300 

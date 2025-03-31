@@ -1,0 +1,294 @@
+name: openapi_spec
+description: Template for generating OpenAPI/Swagger specifications
+content: |
+  openapi: 3.0.0
+  info:
+    title: {{ title }}
+    version: {{ version }}
+    description: {{ description }}
+    contact:
+      name: {{ contact_name }}
+      email: {{ contact_email }}
+  
+  servers:
+    {% for server in servers %}
+    - url: {{ server.url }}
+      description: {{ server.description }}
+    {% endfor %}
+  
+  paths:
+    {% for path in paths %}
+    {{ path.path }}:
+      {% for method in path.methods %}
+      {{ method.method | lower }}:
+        summary: {{ method.summary }}
+        description: {{ method.description }}
+        {% if method.operation_id %}
+        operationId: {{ method.operation_id }}
+        {% endif %}
+        {% if method.tags %}
+        tags:
+          {% for tag in method.tags %}
+          - {{ tag }}
+          {% endfor %}
+        {% endif %}
+        {% if method.parameters %}
+        parameters:
+          {% for param in method.parameters %}
+          - name: {{ param.name }}
+            in: {{ param.in }}
+            description: {{ param.description }}
+            required: {{ param.required }}
+            schema:
+              type: {{ param.schema.type }}
+              {% if param.schema.format %}
+              format: {{ param.schema.format }}
+              {% endif %}
+              {% if param.schema.items %}
+              items:
+                type: {{ param.schema.items.type }}
+                {% if param.schema.items.format %}
+                format: {{ param.schema.items.format }}
+                {% endif %}
+              {% endif %}
+          {% endfor %}
+        {% endif %}
+        {% if method.request_body %}
+        requestBody:
+          required: {{ method.request_body.required }}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/{{ method.request_body.schema }}'
+        {% endif %}
+        responses:
+          {% for response in method.responses %}
+          {{ response.code }}:
+            description: {{ response.description }}
+            {% if response.content %}
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/{{ response.content.schema }}'
+            {% endif %}
+          {% endfor %}
+      {% endfor %}
+    {% endfor %}
+  
+  components:
+    schemas:
+      {% for schema in schemas %}
+      {{ schema.name }}:
+        type: {{ schema.type }}
+        {% if schema.description %}
+        description: {{ schema.description }}
+        {% endif %}
+        {% if schema.properties %}
+        properties:
+          {% for property in schema.properties %}
+          {{ property.name }}:
+            type: {{ property.type }}
+            {% if property.format %}
+            format: {{ property.format }}
+            {% endif %}
+            {% if property.description %}
+            description: {{ property.description }}
+            {% endif %}
+            {% if property.items %}
+            items:
+              type: {{ property.items.type }}
+              {% if property.items.format %}
+              format: {{ property.items.format }}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {% if schema.required %}
+        required:
+          {% for field in schema.required %}
+          - {{ field }}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+parameters:
+  title:
+    type: string
+    required: true
+    description: API title
+  version:
+    type: string
+    required: true
+    description: API version
+  description:
+    type: string
+    required: true
+    description: API description
+  contact_name:
+    type: string
+    required: true
+    description: Contact name
+  contact_email:
+    type: string
+    required: true
+    description: Contact email
+  servers:
+    type: array
+    required: false
+    description: List of API servers
+    items:
+      url:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+  paths:
+    type: array
+    required: false
+    description: List of API paths
+    items:
+      path:
+        type: string
+        required: true
+      methods:
+        type: array
+        required: true
+        description: List of HTTP methods
+        items:
+          method:
+            type: string
+            required: true
+          summary:
+            type: string
+            required: true
+          description:
+            type: string
+            required: false
+          operation_id:
+            type: string
+            required: false
+          tags:
+            type: array
+            required: false
+            description: List of operation tags
+          parameters:
+            type: array
+            required: false
+            description: List of operation parameters
+            items:
+              name:
+                type: string
+                required: true
+              in:
+                type: string
+                required: true
+              description:
+                type: string
+                required: false
+              required:
+                type: boolean
+                required: true
+              schema:
+                type: object
+                required: true
+                properties:
+                  type:
+                    type: string
+                    required: true
+                  format:
+                    type: string
+                    required: false
+                  items:
+                    type: object
+                    required: false
+                    properties:
+                      type:
+                        type: string
+                        required: true
+                      format:
+                        type: string
+                        required: false
+          request_body:
+            type: object
+            required: false
+            properties:
+              required:
+                type: boolean
+                required: true
+              schema:
+                type: string
+                required: true
+          responses:
+            type: array
+            required: true
+            description: List of operation responses
+            items:
+              code:
+                type: string
+                required: true
+              description:
+                type: string
+                required: true
+              content:
+                type: object
+                required: false
+                properties:
+                  schema:
+                    type: string
+                    required: true
+  schemas:
+    type: array
+    required: false
+    description: List of component schemas
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: false
+      properties:
+        type: array
+        required: false
+        description: List of schema properties
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+          format:
+            type: string
+            required: false
+          description:
+            type: string
+            required: false
+          items:
+            type: object
+            required: false
+            properties:
+              type:
+                type: string
+                required: true
+              format:
+                type: string
+                required: false
+      required:
+        type: array
+        required: false
+        description: List of required properties
+tags:
+  - openapi
+  - swagger
+  - api
+  - specification
+language: yaml
+category: specification
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

@@ -1,0 +1,184 @@
+# Compatibility rules configuration
+
+# System requirements
+system_requirements:
+  python:
+    min_version: "3.8"
+    recommended_version: "3.9"
+    max_version: "3.11"
+    
+  os:
+    supported:
+      - "Windows"
+      - "Linux"
+      - "Darwin"
+    recommended: "Linux"
+    
+  processor:
+    supported:
+      - "x86_64"
+      - "arm64"
+    recommended: "x86_64"
+    
+  memory:
+    min_ram: 4  # GB
+    recommended_ram: 8  # GB
+    max_ram: 32  # GB
+    
+  disk:
+    min_space: 10  # GB
+    recommended_space: 50  # GB
+    max_space: 500  # GB
+
+# Tool-specific requirements
+tool_requirements:
+  # Machine Learning Tools
+  ml_tools:
+    min_memory: 8  # GB
+    recommended_memory: 16  # GB
+    gpu_required: false
+    cuda_version: "11.0"  # if gpu_required is true
+    
+  # Data Processing Tools
+  data_tools:
+    min_memory: 4  # GB
+    recommended_memory: 8  # GB
+    disk_space_per_operation: 1  # GB
+    
+  # Web Tools
+  web_tools:
+    min_memory: 2  # GB
+    recommended_memory: 4  # GB
+    network_bandwidth: 10  # Mbps
+    
+  # File Processing Tools
+  file_tools:
+    min_memory: 2  # GB
+    recommended_memory: 4  # GB
+    max_file_size: 10  # GB
+    
+  # Database Tools
+  db_tools:
+    min_memory: 4  # GB
+    recommended_memory: 8  # GB
+    max_connections: 100
+    
+  # Security Tools
+  security_tools:
+    min_memory: 4  # GB
+    recommended_memory: 8  # GB
+    requires_root: false
+    
+  # Network Tools
+  network_tools:
+    min_memory: 2  # GB
+    recommended_memory: 4  # GB
+    requires_network: true
+    
+  # System Tools
+  system_tools:
+    min_memory: 2  # GB
+    recommended_memory: 4  # GB
+    requires_admin: false
+
+# Feature compatibility
+feature_compatibility:
+  # Python features
+  python_features:
+    f_strings:
+      min_version: "3.6"
+      recommended: true
+    type_hints:
+      min_version: "3.6"
+      recommended: true
+    walrus_operator:
+      min_version: "3.8"
+      recommended: false
+    dataclasses:
+      min_version: "3.7"
+      recommended: true
+    async_await:
+      min_version: "3.5"
+      recommended: true
+      
+  # Library features
+  library_features:
+    numpy:
+      min_version: "1.19.0"
+      recommended: true
+    pandas:
+      min_version: "1.2.0"
+      recommended: true
+    scikit_learn:
+      min_version: "0.24.0"
+      recommended: true
+    tensorflow:
+      min_version: "2.4.0"
+      recommended: true
+    pytorch:
+      min_version: "1.8.0"
+      recommended: true
+      
+  # System features
+  system_features:
+    multiprocessing:
+      recommended: true
+    threading:
+      recommended: true
+    gpu_support:
+      recommended: false
+    network_support:
+      recommended: true
+    file_system:
+      recommended: true
+
+# Performance thresholds
+performance_thresholds:
+  memory:
+    warning: 80  # percent
+    critical: 90  # percent
+    
+  cpu:
+    warning: 80  # percent
+    critical: 90  # percent
+    
+  disk:
+    warning: 80  # percent
+    critical: 90  # percent
+    
+  network:
+    warning: 80  # percent
+    critical: 90  # percent
+
+# Resource limits
+resource_limits:
+  memory:
+    per_tool: 2  # GB
+    total: 16  # GB
+    
+  cpu:
+    per_tool: 50  # percent
+    total: 80  # percent
+    
+  disk:
+    per_tool: 10  # GB
+    total: 100  # GB
+    
+  network:
+    per_tool: 10  # Mbps
+    total: 100  # Mbps
+
+# Error handling
+error_handling:
+  retry_attempts: 3
+  retry_delay: 1  # seconds
+  timeout: 30  # seconds
+  max_errors: 5
+  
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "compatibility.log"
+  max_size: 10  # MB
+  backup_count: 5 

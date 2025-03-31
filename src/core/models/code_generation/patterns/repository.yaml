@@ -1,0 +1,166 @@
+name: repository
+description: Repository pattern implementation for data access
+structure:
+  interface:
+    name: "{{ entity_name }}Repository"
+    methods:
+      - name: "getById"
+        return_type: "{{ entity_name }}"
+        parameters:
+          - name: "id"
+            type: "{{ id_type }}"
+      - name: "getAll"
+        return_type: "List[{{ entity_name }}]"
+      - name: "create"
+        return_type: "{{ entity_name }}"
+        parameters:
+          - name: "entity"
+            type: "{{ entity_name }}"
+      - name: "update"
+        return_type: "{{ entity_name }}"
+        parameters:
+          - name: "entity"
+            type: "{{ entity_name }}"
+      - name: "delete"
+        return_type: "void"
+        parameters:
+          - name: "id"
+            type: "{{ id_type }}"
+  entity:
+    name: "{{ entity_name }}"
+    fields:
+      {% for field in fields %}
+      - name: "{{ field.name }}"
+        type: "{{ field.type }}"
+        access: "{{ field.access }}"
+      {% endfor %}
+  concrete_repository:
+    name: "{{ concrete_repository }}"
+    implements: "{{ entity_name }}Repository"
+    dependencies:
+      - name: "db"
+        type: "Database"
+    methods:
+      - name: "getById"
+        return_type: "{{ entity_name }}"
+        parameters:
+          - name: "id"
+            type: "{{ id_type }}"
+        body: |
+          return self.db.query({{ entity_name }}).filter({{ entity_name }}.id == id).first()
+      - name: "getAll"
+        return_type: "List[{{ entity_name }}]"
+        body: |
+          return self.db.query({{ entity_name }}).all()
+      - name: "create"
+        return_type: "{{ entity_name }}"
+        parameters:
+          - name: "entity"
+            type: "{{ entity_name }}"
+        body: |
+          self.db.add(entity)
+          self.db.commit()
+          return entity
+      - name: "update"
+        return_type: "{{ entity_name }}"
+        parameters:
+          - name: "entity"
+            type: "{{ entity_name }}"
+        body: |
+          self.db.merge(entity)
+          self.db.commit()
+          return entity
+      - name: "delete"
+        return_type: "void"
+        parameters:
+          - name: "id"
+            type: "{{ id_type }}"
+        body: |
+          entity = self.getById(id)
+          if entity:
+            self.db.delete(entity)
+            self.db.commit()
+rules:
+  - pattern: "interface {{ entity_name }}Repository"
+    description: "Repository interface should be defined"
+  - pattern: "class {{ entity_name }}"
+    description: "Entity class should be defined"
+  - pattern: "class {{ concrete_repository }}"
+    description: "Concrete repository should be defined"
+  - pattern: "getById"
+    description: "getById method should exist"
+  - pattern: "getAll"
+    description: "getAll method should exist"
+  - pattern: "create"
+    description: "create method should exist"
+  - pattern: "update"
+    description: "update method should exist"
+  - pattern: "delete"
+    description: "delete method should exist"
+examples:
+  - |
+    interface UserRepository {
+      getUserById(id: string): User;
+      getAllUsers(): User[];
+      createUser(user: User): User;
+      updateUser(user: User): User;
+      deleteUser(id: string): void;
+    }
+    
+    class User {
+      id: string;
+      name: string;
+      email: string;
+      
+      constructor(id: string, name: string, email: string) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+      }
+    }
+    
+    class UserRepositoryImpl implements UserRepository {
+      constructor(private db: Database) {}
+      
+      getUserById(id: string): User {
+        return this.db.query(User).filter(User.id == id).first();
+      }
+      
+      getAllUsers(): User[] {
+        return this.db.query(User).all();
+      }
+      
+      createUser(user: User): User {
+        this.db.add(user);
+        this.db.commit();
+        return user;
+      }
+      
+      updateUser(user: User): User {
+        this.db.merge(user);
+        this.db.commit();
+        return user;
+      }
+      
+      deleteUser(id: string): void {
+        const user = this.getUserById(id);
+        if (user) {
+          this.db.delete(user);
+          this.db.commit();
+        }
+      }
+    }
+anti_patterns:
+  - "direct database access in business logic"
+  - "repository with business logic"
+  - "repository with complex queries"
+  - "repository without transaction management"
+best_practices:
+  - "Use interfaces for repositories"
+  - "Keep repositories focused on data access"
+  - "Use dependency injection for database access"
+  - "Implement proper transaction management"
+  - "Use query objects for complex queries"
+  - "Document the repository pattern usage"
+language: typescript
+category: design_pattern 

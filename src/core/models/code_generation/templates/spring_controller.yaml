@@ -1,0 +1,135 @@
+name: spring_controller
+description: Template for generating Spring Boot controllers
+content: |
+  package {{ package_name }};
+  
+  import org.springframework.web.bind.annotation.*;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.http.ResponseEntity;
+  {% for import in imports %}
+  import {{ import }};
+  {% endfor %}
+  
+  @RestController
+  @RequestMapping("{{ base_path }}")
+  {% for annotation in annotations %}
+  @{{ annotation }}
+  {% endfor %}
+  public class {{ controller_name }}Controller {
+      
+      private final {{ service_type }} {{ service_name }};
+      
+      @Autowired
+      public {{ controller_name }}Controller({{ service_type }} {{ service_name }}) {
+          this.{{ service_name }} = {{ service_name }};
+      }
+      
+      {% for endpoint in endpoints %}
+      @{{ endpoint.method }}Mapping("{{ endpoint.path }}")
+      {% for annotation in endpoint.annotations %}
+      @{{ annotation }}
+      {% endfor %}
+      public ResponseEntity<{{ endpoint.return_type }}> {{ endpoint.name }}(
+          {% for param in endpoint.parameters %}
+          @{{ param.annotation }} {{ param.type }} {{ param.name }}{% if not loop.last %}, {% endif %}
+          {% endfor %}
+      ) {
+          {% for operation in endpoint.operations %}
+          {{ operation }}
+          {% endfor %}
+          
+          {% if endpoint.return_statement %}
+          return {{ endpoint.return_statement }};
+          {% endif %}
+      }
+      {% endfor %}
+  }
+parameters:
+  package_name:
+    type: string
+    required: true
+    description: Package name for the controller
+  controller_name:
+    type: string
+    required: true
+    description: Name of the controller class
+  base_path:
+    type: string
+    required: true
+    description: Base request path
+  service_type:
+    type: string
+    required: true
+    description: Type of the service to inject
+  service_name:
+    type: string
+    required: true
+    description: Name of the service field
+  imports:
+    type: array
+    required: false
+    description: List of additional imports
+  annotations:
+    type: array
+    required: false
+    description: List of class-level annotations
+  endpoints:
+    type: array
+    required: false
+    description: List of controller endpoints
+    items:
+      name:
+        type: string
+        required: true
+      method:
+        type: string
+        required: true
+        description: HTTP method (GetMapping, PostMapping, etc.)
+      path:
+        type: string
+        required: true
+        description: Endpoint path
+      annotations:
+        type: array
+        required: false
+        description: List of method-level annotations
+      return_type:
+        type: string
+        required: true
+        description: Return type of the endpoint
+      parameters:
+        type: array
+        required: false
+        description: List of endpoint parameters
+        items:
+          annotation:
+            type: string
+            required: true
+            description: Parameter annotation
+          type:
+            type: string
+            required: true
+            description: Parameter type
+          name:
+            type: string
+            required: true
+            description: Parameter name
+      operations:
+        type: array
+        required: false
+        description: List of operations to perform
+      return_statement:
+        type: string
+        required: false
+        description: Return statement
+tags:
+  - java
+  - spring
+  - controller
+  - backend
+language: java
+category: controller
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

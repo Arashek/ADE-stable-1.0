@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+    <!-- Reuse the base layout from command_center.svg -->
+    <!-- Background -->
+    <rect width="1920" height="1080" fill="#1E1E1E"/>
+    
+    <!-- Grid Pattern -->
+    <defs>
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#2D2D2D" stroke-width="0.5"/>
+        </pattern>
+    </defs>
+    <rect width="1920" height="1080" fill="url(#grid)"/>
+    
+    <!-- Top Navigation Bar -->
+    <rect x="0" y="0" width="1920" height="60" fill="#252526"/>
+    <g fill="#FFFFFF">
+        <!-- Project Selector -->
+        <rect x="20" y="15" width="200" height="30" rx="4" fill="#3C3C3C"/>
+        <text x="30" y="37" font-family="Segoe UI" font-size="14">Project: ADE Platform</text>
+        
+        <!-- Global Search -->
+        <rect x="240" y="15" width="400" height="30" rx="4" fill="#3C3C3C"/>
+        <text x="250" y="37" font-family="Segoe UI" font-size="14" fill="#888888">Search tests...</text>
+        
+        <!-- Right Controls -->
+        <g transform="translate(1700, 15)">
+            <!-- Notification Bell -->
+            <circle cx="20" cy="15" r="12" fill="#3C3C3C"/>
+            <text x="20" y="20" text-anchor="middle" font-family="Segoe UI" font-size="12">3</text>
+            
+            <!-- User Profile -->
+            <circle cx="60" cy="15" r="12" fill="#3C3C3C"/>
+            <text x="60" y="20" text-anchor="middle" font-family="Segoe UI" font-size="12">JD</text>
+        </g>
+    </g>
+    
+    <!-- Left Sidebar - Test Explorer -->
+    <rect x="0" y="60" width="300" height="1020" fill="#252526"/>
+    <g fill="#FFFFFF">
+        <text x="20" y="90" font-family="Segoe UI" font-size="16" font-weight="bold">Test Explorer</text>
+        
+        <!-- Test Categories -->
+        <g transform="translate(20, 120)">
+            <!-- Unit Tests -->
+            <g transform="translate(0, 0)">
+                <rect width="260" height="30" rx="4" fill="#4CAF50"/>
+                <text x="10" y="20" font-family="Segoe UI" font-size="14">🧪 Unit Tests</text>
+            </g>
+            
+            <!-- Integration Tests -->
+            <g transform="translate(0, 40)">
+                <rect width="260" height="30" rx="4" fill="#3C3C3C"/>
+                <text x="10" y="20" font-family="Segoe UI" font-size="14">🔗 Integration Tests</text>
+            </g>
+            
+            <!-- E2E Tests -->
+            <g transform="translate(0, 80)">
+                <rect width="260" height="30" rx="4" fill="#3C3C3C"/>
+                <text x="10" y="20" font-family="Segoe UI" font-size="14">🌐 E2E Tests</text>
+            </g>
+            
+            <!-- Performance Tests -->
+            <g transform="translate(0, 120)">
+                <rect width="260" height="30" rx="4" fill="#3C3C3C"/>
+                <text x="10" y="20" font-family="Segoe UI" font-size="14">⚡ Performance Tests</text>
+            </g>
+        </g>
+        
+        <!-- Test Statistics -->
+        <g transform="translate(20, 200)">
+            <text x="0" y="0" font-family="Segoe UI" font-size="14" font-weight="bold">Statistics</text>
+            
+            <!-- Test Results -->
+            <g transform="translate(0, 30)">
+                <text font-family="Segoe UI" font-size="12">Total Tests: 156</text>
+                <text x="0" y="20" font-family="Segoe UI" font-size="12">Passed: 152</text>
+                <text x="0" y="40" font-family="Segoe UI" font-size="12">Failed: 4</text>
+                <text x="0" y="60" font-family="Segoe UI" font-size="12">Coverage: 92%</text>
+            </g>
+        </g>
+    </g>
+    
+    <!-- Main Workspace - Test Results -->
+    <rect x="300" y="60" width="1320" height="720" fill="#1E1E1E"/>
+    <g fill="#FFFFFF">
+        <!-- Tab Navigation -->
+        <g transform="translate(320, 80)">
+            <rect width="120" height="30" rx="4" fill="#3C3C3C"/>
+            <text x="20" y="20" font-family="Segoe UI" font-size="14">Plan View</text>
+            
+            <g transform="translate(130, 0)">
+                <rect width="120" height="30" rx="4" fill="#3C3C3C"/>
+                <text x="20" y="20" font-family="Segoe UI" font-size="14">Code Editor</text>
+            </g>
+            
+            <g transform="translate(260, 0)">
+                <rect width="120" height="30" rx="4" fill="#3C3C3C"/>
+                <text x="20" y="20" font-family="Segoe UI" font-size="14">Documentation</text>
+            </g>
+            
+            <g transform="translate(390, 0)">
+                <rect width="120" height="30" rx="4" fill="#4CAF50"/>
+                <text x="20" y="20" font-family="Segoe UI" font-size="14">Testing</text>
+            </g>
+            
+            <g transform="translate(520, 0)">
+                <rect width="120" height="30" rx="4" fill="#3C3C3C"/>
+                <text x="20" y="20" font-family="Segoe UI" font-size="14">Deployment</text>
+            </g>
+        </g>
+        
+        <!-- Test Results -->
+        <g transform="translate(320, 120)">
+            <!-- Test Suite Header -->
+            <text x="0" y="40" font-family="Segoe UI" font-size="24" font-weight="bold">Unit Tests</text>
+            
+            <!-- Test Cases -->
+            <g transform="translate(0, 60)">
+                <!-- Test Case 1 -->
+                <g transform="translate(0, 0)">
+                    <rect width="1280" height="100" rx="4" fill="#3C3C3C"/>
+                    <text x="20" y="30" font-family="Segoe UI" font-size="16">test_signup_validation</text>
+                    <text x="20" y="60" font-family="Segoe UI" font-size="14" fill="#888888">Tests email validation in signup endpoint</text>
+                    
+                    <!-- Test Status -->
+                    <g transform="translate(1180, 20)">
+                        <circle cx="20" cy="20" r="15" fill="#4CAF50"/>
+                        <text x="20" y="25" text-anchor="middle" font-family="Segoe UI" font-size="12">✓</text>
+                    </g>
+                    
+                    <!-- Test Duration -->
+                    <text x="20" y="90" font-family="Segoe UI" font-size="12" fill="#888888">Duration: 0.2s</text>
+                </g>
+                
+                <!-- Test Case 2 -->
+                <g transform="translate(0, 120)">
+                    <rect width="1280" height="100" rx="4" fill="#3C3C3C"/>
+                    <text x="20" y="30" font-family="Segoe UI" font-size="16">test_duplicate_signup</text>
+                    <text x="20" y="60" font-family="Segoe UI" font-size="14" fill="#888888">Tests handling of duplicate signup attempts</text>
+                    
+                    <!-- Test Status -->
+                    <g transform="translate(1180, 20)">
+                        <circle cx="20" cy="20" r="15" fill="#FF5722"/>
+                        <text x="20" y="25" text-anchor="middle" font-family="Segoe UI" font-size="12">✗</text>
+                    </g>
+                    
+                    <!-- Test Duration -->
+                    <text x="20" y="90" font-family="Segoe UI" font-size="12" fill="#888888">Duration: 0.3s</text>
+                </g>
+            </g>
+            
+            <!-- Test Coverage Chart -->
+            <g transform="translate(0, 300)">
+                <text x="0" y="0" font-family="Segoe UI" font-size="18" font-weight="bold">Code Coverage</text>
+                <rect x="0" y="20" width="1280" height="200" rx="4" fill="#3C3C3C"/>
+                
+                <!-- Coverage Bars -->
+                <g transform="translate(20, 40)">
+                    <!-- Core Module -->
+                    <g transform="translate(0, 0)">
+                        <text font-family="Segoe UI" font-size="12">core/</text>
+                        <rect x="0" y="20" width="200" height="10" fill="#3C3C3C"/>
+                        <rect x="0" y="20" width="180" height="10" fill="#4CAF50"/>
+                    </g>
+                    
+                    <!-- API Module -->
+                    <g transform="translate(0, 40)">
+                        <text font-family="Segoe UI" font-size="12">api/</text>
+                        <rect x="0" y="20" width="200" height="10" fill="#3C3C3C"/>
+                        <rect x="0" y="20" width="160" height="10" fill="#FFC107"/>
+                    </g>
+                    
+                    <!-- Web Module -->
+                    <g transform="translate(0, 80)">
+                        <text font-family="Segoe UI" font-size="12">web/</text>
+                        <rect x="0" y="20" width="200" height="10" fill="#3C3C3C"/>
+                        <rect x="0" y="20" width="140" height="10" fill="#FF5722"/>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+    
+    <!-- Right Sidebar - Context Panel -->
+    <rect x="1620" y="60" width="300" height="1020" fill="#252526"/>
+    <g fill="#FFFFFF">
+        <text x="20" y="90" font-family="Segoe UI" font-size="16" font-weight="bold">Context</text>
+        
+        <!-- Active Context -->
+        <g transform="translate(20, 120)">
+            <rect width="260" height="200" rx="4" fill="#3C3C3C"/>
+            <text x="10" y="30" font-family="Segoe UI" font-size="14">Current Test</text>
+            <text x="10" y="60" font-family="Segoe UI" font-size="12" fill="#888888">test_signup_validation</text>
+            
+            <text x="10" y="90" font-family="Segoe UI" font-size="14">Test File</text>
+            <text x="10" y="120" font-family="Segoe UI" font-size="12" fill="#888888">tests/test_early_access.py</text>
+            
+            <text x="10" y="150" font-family="Segoe UI" font-size="14">Previous Results</text>
+            <text x="10" y="180" font-family="Segoe UI" font-size="12" fill="#888888">Last run: 5m ago</text>
+        </g>
+        
+        <!-- Resource Meters -->
+        <g transform="translate(20, 340)">
+            <text x="0" y="0" font-family="Segoe UI" font-size="14">Resources</text>
+            
+            <!-- Test Runtime -->
+            <g transform="translate(0, 30)">
+                <text font-family="Segoe UI" font-size="12">Test Runtime</text>
+                <rect x="0" y="20" width="260" height="10" fill="#3C3C3C"/>
+                <rect x="0" y="20" width="180" height="10" fill="#4CAF50"/>
+            </g>
+            
+            <!-- Memory Usage -->
+            <g transform="translate(0, 60)">
+                <text font-family="Segoe UI" font-size="12">Memory Usage</text>
+                <rect x="0" y="20" width="260" height="10" fill="#3C3C3C"/>
+                <rect x="0" y="20" width="200" height="10" fill="#2196F3"/>
+            </g>
+            
+            <!-- CPU Usage -->
+            <g transform="translate(0, 90)">
+                <text font-family="Segoe UI" font-size="12">CPU Usage</text>
+                <rect x="0" y="20" width="260" height="10" fill="#3C3C3C"/>
+                <rect x="0" y="20" width="150" height="10" fill="#FFC107"/>
+            </g>
+        </g>
+    </g>
+    
+    <!-- Bottom Panel - Terminal -->
+    <rect x="300" y="780" width="1320" height="300" fill="#1E1E1E"/>
+    <g fill="#FFFFFF">
+        <!-- Terminal Output -->
+        <rect x="320" y="800" width="1280" height="200" rx="4" fill="#000000"/>
+        <text x="330" y="820" font-family="Consolas" font-size="12" fill="#00FF00">$ pytest tests/test_early_access.py -v</text>
+        <text x="330" y="840" font-family="Consolas" font-size="12" fill="#00FF00">============================= test session starts ==============================</text>
+        
+        <!-- Input Area -->
+        <g transform="translate(320, 920)">
+            <rect width="1080" height="40" rx="4" fill="#3C3C3C"/>
+            <text x="10" y="25" font-family="Segoe UI" font-size="14" fill="#888888">Enter command...</text>
+            
+            <!-- Voice Input Button -->
+            <circle cx="1040" cy="20" r="15" fill="#FF5722"/>
+            <text x="1040" y="25" text-anchor="middle" font-family="Segoe UI" font-size="12">🎤</text>
+            
+            <!-- Send Button -->
+            <rect x="1065" y="10" width="40" height="20" rx="4" fill="#4CAF50"/>
+            <text x="1085" y="25" text-anchor="middle" font-family="Segoe UI" font-size="12">Send</text>
+        </g>
+    </g>
+</svg> 

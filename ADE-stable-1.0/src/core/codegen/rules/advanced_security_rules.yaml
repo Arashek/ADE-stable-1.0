@@ -1,0 +1,169 @@
+authentication:
+  rules:
+    jwt:
+      - name: "JWT Expiration"
+        pattern: "exp:\\s*\\d+"
+        description: "Set JWT expiration time"
+        severity: "high"
+        fix: "Add expiration time to JWT"
+      - name: "JWT Refresh"
+        pattern: "refreshToken"
+        description: "Implement refresh token mechanism"
+        severity: "high"
+        fix: "Add refresh token functionality"
+    oauth:
+      - name: "OAuth State"
+        pattern: "state\\s*=\\s*[^&]+"
+        description: "Use state parameter in OAuth"
+        severity: "high"
+        fix: "Add state parameter to OAuth flow"
+      - name: "PKCE"
+        pattern: "code_verifier"
+        description: "Use PKCE for OAuth"
+        severity: "high"
+        fix: "Implement PKCE flow"
+
+authorization:
+  rules:
+    rbac:
+      - name: "Role Validation"
+        pattern: "hasRole\\([^)]+\\)"
+        description: "Validate user roles"
+        severity: "high"
+        fix: "Implement role validation"
+      - name: "Permission Check"
+        pattern: "can\\([^)]+\\)"
+        description: "Check user permissions"
+        severity: "high"
+        fix: "Implement permission checking"
+    session:
+      - name: "Session Timeout"
+        pattern: "session\\.expires"
+        description: "Set session timeout"
+        severity: "high"
+        fix: "Add session timeout"
+
+data_protection:
+  rules:
+    encryption:
+      - name: "Data Encryption"
+        pattern: "crypto\\.encrypt"
+        description: "Encrypt sensitive data"
+        severity: "high"
+        fix: "Implement data encryption"
+      - name: "Key Rotation"
+        pattern: "keyRotation"
+        description: "Implement key rotation"
+        severity: "high"
+        fix: "Add key rotation mechanism"
+    sanitization:
+      - name: "Input Sanitization"
+        pattern: "sanitize\\([^)]+\\)"
+        description: "Sanitize user input"
+        severity: "high"
+        fix: "Implement input sanitization"
+      - name: "Output Encoding"
+        pattern: "encodeURIComponent"
+        description: "Encode output data"
+        severity: "high"
+        fix: "Implement output encoding"
+
+api_security:
+  rules:
+    rate_limiting:
+      - name: "Rate Limiting"
+        pattern: "rateLimit\\([^)]+\\)"
+        description: "Implement rate limiting"
+        severity: "high"
+        fix: "Add rate limiting middleware"
+      - name: "Request Validation"
+        pattern: "validate\\([^)]+\\)"
+        description: "Validate API requests"
+        severity: "high"
+        fix: "Add request validation"
+    cors:
+      - name: "CORS Configuration"
+        pattern: "cors\\([^)]+\\)"
+        description: "Configure CORS properly"
+        severity: "high"
+        fix: "Set proper CORS configuration"
+      - name: "Preflight Handling"
+        pattern: "OPTIONS"
+        description: "Handle preflight requests"
+        severity: "medium"
+        fix: "Add preflight request handling"
+
+mobile_security:
+  rules:
+    storage:
+      - name: "Secure Storage"
+        pattern: "SecureStore"
+        description: "Use secure storage for sensitive data"
+        severity: "high"
+        fix: "Implement secure storage"
+      - name: "Keychain"
+        pattern: "Keychain"
+        description: "Use keychain for credentials"
+        severity: "high"
+        fix: "Use keychain for sensitive data"
+    network:
+      - name: "SSL Pinning"
+        pattern: "sslPinning"
+        description: "Implement SSL pinning"
+        severity: "high"
+        fix: "Add SSL pinning"
+      - name: "Certificate Validation"
+        pattern: "validateCertificate"
+        description: "Validate SSL certificates"
+        severity: "high"
+        fix: "Implement certificate validation"
+
+database_security:
+  rules:
+    queries:
+      - name: "Parameterized Queries"
+        pattern: "\\?|\\$\\d+"
+        description: "Use parameterized queries"
+        severity: "high"
+        fix: "Use parameterized queries"
+      - name: "Query Timeout"
+        pattern: "timeout"
+        description: "Set query timeout"
+        severity: "medium"
+        fix: "Add query timeout"
+    access:
+      - name: "Connection Encryption"
+        pattern: "ssl=true"
+        description: "Use encrypted connections"
+        severity: "high"
+        fix: "Enable SSL for database connections"
+      - name: "Access Control"
+        pattern: "GRANT|REVOKE"
+        description: "Implement proper access control"
+        severity: "high"
+        fix: "Set proper database permissions"
+
+logging:
+  rules:
+    sensitive_data:
+      - name: "PII Logging"
+        pattern: "console\\.log\\([^)]+\\)"
+        description: "Avoid logging sensitive data"
+        severity: "high"
+        fix: "Remove sensitive data from logs"
+      - name: "Log Sanitization"
+        pattern: "logger\\.info"
+        description: "Sanitize log data"
+        severity: "medium"
+        fix: "Implement log sanitization"
+    audit:
+      - name: "Audit Logging"
+        pattern: "audit\\.log"
+        description: "Implement audit logging"
+        severity: "high"
+        fix: "Add audit logging"
+      - name: "Log Rotation"
+        pattern: "rotate"
+        description: "Implement log rotation"
+        severity: "medium"
+        fix: "Add log rotation" 

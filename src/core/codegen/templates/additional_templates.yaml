@@ -1,0 +1,491 @@
+html:
+  templates:
+    semantic:
+      name: "Semantic HTML Template"
+      description: "HTML5 template with semantic elements and accessibility"
+      content: |
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="description" content="{{description}}">
+            <title>{{title}}</title>
+            <link rel="stylesheet" href="{{css_path}}">
+        </head>
+        <body>
+            <header role="banner">
+                <nav role="navigation" aria-label="Main navigation">
+                    {{navigation}}
+                </nav>
+            </header>
+            <main role="main">
+                <article>
+                    {{content}}
+                </article>
+            </main>
+            <aside role="complementary">
+                {{sidebar}}
+            </aside>
+            <footer role="contentinfo">
+                {{footer_content}}
+            </footer>
+            <script src="{{js_path}}"></script>
+        </body>
+        </html>
+
+css:
+  templates:
+    modern:
+      name: "Modern CSS Template"
+      description: "Modern CSS template with CSS Grid and Flexbox"
+      content: |
+        /* Modern CSS Template */
+        :root {
+            /* Colors */
+            --primary-color: {{primary_color}};
+            --secondary-color: {{secondary_color}};
+            --accent-color: {{accent_color}};
+            --text-color: {{text_color}};
+            --background-color: {{background_color}};
+            
+            /* Typography */
+            --font-family: {{font_family}};
+            --font-size-base: {{font_size_base}};
+            --line-height-base: {{line_height_base}};
+            
+            /* Spacing */
+            --spacing-unit: {{spacing_unit}};
+            --container-width: {{container_width}};
+            
+            /* Breakpoints */
+            --breakpoint-sm: {{breakpoint_sm}};
+            --breakpoint-md: {{breakpoint_md}};
+            --breakpoint-lg: {{breakpoint_lg}};
+        }
+
+        /* Base Styles */
+        body {
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-base);
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Layout */
+        .container {
+            width: 100%;
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--spacing-unit);
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-unit);
+        }
+
+        /* Flexbox Layout */
+        .flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-unit);
+        }
+
+        /* Responsive Design */
+        @media (min-width: var(--breakpoint-sm)) {
+            /* Tablet styles */
+        }
+
+        @media (min-width: var(--breakpoint-md)) {
+            /* Desktop styles */
+        }
+
+        @media (min-width: var(--breakpoint-lg)) {
+            /* Large desktop styles */
+        }
+
+react:
+  templates:
+    hooks:
+      name: "React Hooks Template"
+      description: "React component template with custom hooks"
+      content: |
+        import React, { useState, useEffect, useCallback, useMemo } from 'react';
+        import PropTypes from 'prop-types';
+
+        const use{{hook_name}} = ({{parameters}}) => {
+            const [state, setState] = useState({{initial_state}});
+            
+            useEffect(() => {
+                {{effect_code}}
+            }, [{{dependencies}}]);
+            
+            const handlers = useCallback(() => {
+                {{handlers}}
+            }, [{{dependencies}}]);
+            
+            const computed = useMemo(() => {
+                return {{computed_value}}
+            }, [{{dependencies}}]);
+            
+            return [state, handlers, computed];
+        };
+
+        const {{component_name}} = ({ {{props}} }) => {
+            const [state, handlers, computed] = use{{hook_name}}({{parameters}});
+            
+            return (
+                <div className="{{component_class}}">
+                    {{component_content}}
+                </div>
+            );
+        };
+
+        {{component_name}}.propTypes = {
+            {{prop_types}}
+        };
+
+        export default {{component_name}};
+
+vue:
+  templates:
+    composition:
+      name: "Vue Composition API Template"
+      description: "Vue 3 component template with Composition API"
+      content: |
+        <template>
+            <div class="{{component_class}}">
+                {{template_content}}
+            </div>
+        </template>
+
+        <script setup>
+        import { ref, computed, onMounted, watch } from 'vue';
+        import { useStore } from 'vuex';
+
+        const props = defineProps({
+            {{props}}
+        });
+
+        const emit = defineEmits(['{{events}}']);
+
+        const store = useStore();
+        const state = ref({{initial_state}});
+
+        const computed = computed(() => {
+            return {{computed_value}}
+        });
+
+        const methods = {
+            {{methods}}
+        };
+
+        onMounted(() => {
+            {{mounted_code}}
+        });
+
+        watch(() => props.someProp, (newValue) => {
+            {{watch_code}}
+        });
+        </script>
+
+        <style scoped>
+        {{styles}}
+        </style>
+
+angular:
+  templates:
+    service:
+      name: "Angular Service Template"
+      description: "Angular service template with dependency injection"
+      content: |
+        import { Injectable } from '@angular/core';
+        import { HttpClient } from '@angular/common/http';
+        import { Observable } from 'rxjs';
+        import { map } from 'rxjs/operators';
+
+        @Injectable({
+            providedIn: 'root'
+        })
+        export class {{service_name}}Service {
+            private apiUrl = '{{api_url}}';
+
+            constructor(
+                private http: HttpClient,
+                {{dependencies}}
+            ) {}
+
+            {{methods}}
+        }
+
+csharp:
+  templates:
+    controller:
+      name: "ASP.NET Core Controller Template"
+      description: "ASP.NET Core controller template with dependency injection"
+      content: |
+        using Microsoft.AspNetCore.Mvc;
+        using System.Threading.Tasks;
+        using {{namespace}}.Services;
+        using {{namespace}}.Models;
+
+        namespace {{namespace}}.Controllers
+        {
+            [ApiController]
+            [Route("api/[controller]")]
+            public class {{controller_name}}Controller : ControllerBase
+            {
+                private readonly {{service_type}} _service;
+                private readonly ILogger<{{controller_name}}Controller> _logger;
+
+                public {{controller_name}}Controller(
+                    {{service_type}} service,
+                    ILogger<{{controller_name}}Controller> logger)
+                {
+                    _service = service;
+                    _logger = logger;
+                }
+
+                [HttpGet]
+                public async Task<IActionResult> Get()
+                {
+                    try
+                    {
+                        var result = await _service.GetAsync();
+                        return Ok(result);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error getting data");
+                        return StatusCode(500, "Internal server error");
+                    }
+                }
+
+                {{actions}}
+            }
+        }
+
+go:
+  templates:
+    handler:
+      name: "Go HTTP Handler Template"
+      description: "Go HTTP handler template with middleware"
+      content: |
+        package {{package_name}}
+
+        import (
+            "net/http"
+            "github.com/gin-gonic/gin"
+            "{{import_path}}"
+        )
+
+        type {{handler_name}} struct {
+            {{dependencies}}
+        }
+
+        func New{{handler_name}}({{parameters}}) *{{handler_name}} {
+            return &{{handler_name}}{
+                {{initialization}}
+            }
+        }
+
+        func (h *{{handler_name}}) Middleware() gin.HandlerFunc {
+            return func(c *gin.Context) {
+                {{middleware_code}}
+                c.Next()
+            }
+        }
+
+        func (h *{{handler_name}}) Handle(c *gin.Context) {
+            {{implementation}}
+        }
+
+nodejs:
+  templates:
+    express:
+      name: "Express.js Route Template"
+      description: "Express.js route handler template with middleware"
+      content: |
+        const express = require('express');
+        const router = express.Router();
+        const {{service}} = require('../services/{{service}}');
+        const { validateRequest } = require('../middleware/validation');
+
+        // Middleware
+        router.use(validateRequest);
+
+        // Routes
+        router.get('/', async (req, res) => {
+            try {
+                {{implementation}}
+            } catch (error) {
+                res.status(500).json({ error: error.message });
+            }
+        });
+
+        module.exports = router;
+
+php:
+  templates:
+    controller:
+      name: "Laravel Controller Template"
+      description: "Laravel controller template with dependency injection"
+      content: |
+        <?php
+
+        namespace {{namespace}}\\Controllers;
+
+        use App\\Http\\Controllers\\Controller;
+        use Illuminate\\Http\\Request;
+        use {{namespace}}\\Services\\{{service_name}}Service;
+
+        class {{controller_name}}Controller extends Controller
+        {
+            private $service;
+
+            public function __construct({{service_name}}Service $service)
+            {
+                $this->service = $service;
+            }
+
+            public function index()
+            {
+                try {
+                    $result = $this->service->getAll();
+                    return response()->json($result);
+                } catch (\Exception $e) {
+                    return response()->json(['error' => $e->getMessage()], 500);
+                }
+            }
+
+            {{actions}}
+        }
+
+react-native:
+  templates:
+    screen:
+      name: "React Native Screen Template"
+      description: "React Native screen template with navigation"
+      content: |
+        import React from 'react';
+        import { View, StyleSheet } from 'react-native';
+        import { useNavigation } from '@react-navigation/native';
+        import { useTheme } from '@react-navigation/native';
+
+        const {{screen_name}} = () => {
+            const navigation = useNavigation();
+            const { colors } = useTheme();
+            
+            return (
+                <View style={[styles.container, { backgroundColor: colors.background }]}>
+                    {{screen_content}}
+                </View>
+            );
+        };
+
+        const styles = StyleSheet.create({
+            container: {
+                flex: 1,
+                {{styles}}
+            }
+        });
+
+        export default {{screen_name}};
+
+flutter:
+  templates:
+    widget:
+      name: "Flutter Widget Template"
+      description: "Flutter widget template with state management"
+      content: |
+        import 'package:flutter/material.dart';
+        import 'package:provider/provider.dart';
+
+        class {{widget_name}} extends StatelessWidget {
+            const {{widget_name}}({Key? key}) : super(key: key);
+            
+            @override
+            Widget build(BuildContext context) {
+                return Consumer<{{provider_name}}>(
+                    builder: (context, provider, child) {
+                        return {{widget_tree}};
+                    },
+                );
+            }
+        }
+
+nosql:
+  templates:
+    schema:
+      name: "MongoDB Schema Template"
+      description: "MongoDB schema template with validation"
+      content: |
+        const mongoose = require('mongoose');
+
+        const {{schema_name}}Schema = new mongoose.Schema({
+            {{fields}}
+        }, {
+            timestamps: true,
+            versionKey: false
+        });
+
+        // Indexes
+        {{schema_name}}Schema.index({ {{index_fields}} });
+
+        // Methods
+        {{schema_name}}Schema.methods.{{method_name}} = function() {
+            {{method_implementation}}
+        };
+
+        // Statics
+        {{schema_name}}Schema.statics.{{static_name}} = function() {
+            {{static_implementation}}
+        };
+
+        module.exports = mongoose.model('{{model_name}}', {{schema_name}}Schema);
+
+rest:
+  templates:
+    endpoint:
+      name: "REST API Endpoint Template"
+      description: "REST API endpoint template with validation"
+      content: |
+        /{{path}}:
+            {{methods}}:
+                summary: {{summary}}
+                description: {{description}}
+                tags:
+                    - {{tag}}
+                security:
+                    - BearerAuth: []
+                parameters:
+                    {{parameters}}
+                requestBody:
+                    required: {{required}}
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/{{schema_name}}'
+                responses:
+                    '200':
+                        description: {{success_description}}
+                        content:
+                            application/json:
+                                schema:
+                                    $ref: '#/components/schemas/{{response_schema}}'
+                    '400':
+                        description: Bad Request
+                    '401':
+                        description: Unauthorized
+                    '403':
+                        description: Forbidden
+                    '404':
+                        description: Not Found
+                    '500':
+                        description: Internal Server Error 

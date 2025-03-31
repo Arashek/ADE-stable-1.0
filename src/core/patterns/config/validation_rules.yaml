@@ -1,0 +1,247 @@
+# Pattern Validation Rules Configuration
+
+# General validation rules
+general:
+  - type: "syntax"
+    parameters:
+      python_version: ">=3.8"
+      max_line_length: 100
+      max_complexity: 10
+      
+  - type: "security"
+    parameters:
+      vulnerabilities:
+        - regex: "eval\s*\("
+          description: "Use of eval() function"
+          suggestion: "Use safer alternatives like ast.literal_eval()"
+        - regex: "exec\s*\("
+          description: "Use of exec() function"
+          suggestion: "Use safer alternatives or validate input"
+        - regex: "os\.system\s*\("
+          description: "Use of os.system()"
+          suggestion: "Use subprocess module instead"
+        - regex: "pickle\.loads\s*\("
+          description: "Use of pickle.loads()"
+          suggestion: "Use safer serialization formats like JSON"
+          
+  - type: "performance"
+    parameters:
+      anti_patterns:
+        - regex: "for\s+.*\s+in\s+range\(len\(.*\)\)"
+          description: "Inefficient loop with range(len())"
+          suggestion: "Use enumerate() instead"
+        - regex: "\.append\(.*\)\s+in\s+loop"
+          description: "List append in loop"
+          suggestion: "Use list comprehension"
+        - regex: "global\s+.*\s+in\s+function"
+          description: "Use of global variables"
+          suggestion: "Pass variables as parameters"
+          
+# Design pattern validation rules
+design_patterns:
+  singleton:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "private_constructor"
+          - "instance_variable"
+          - "get_instance_method"
+        relationships:
+          - "constructor_private"
+          - "instance_lazy_initialization"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "single_instance"
+          - "thread_safety"
+          - "lazy_initialization"
+          
+  factory:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "abstract_product"
+          - "concrete_products"
+          - "creator"
+          - "concrete_creators"
+        relationships:
+          - "product_inheritance"
+          - "creator_dependency"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "product_creation"
+          - "extensibility"
+          - "dependency_inversion"
+          
+  observer:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "subject"
+          - "observer"
+          - "update_method"
+        relationships:
+          - "subject_observer_registration"
+          - "observer_notification"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "loose_coupling"
+          - "notification_mechanism"
+          - "state_consistency"
+          
+# Code pattern validation rules
+code_patterns:
+  error_handling:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "try_block"
+          - "except_block"
+          - "finally_block"
+        relationships:
+          - "exception_hierarchy"
+          - "resource_cleanup"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "specific_exceptions"
+          - "proper_cleanup"
+          - "error_logging"
+          
+  resource_management:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "resource_acquisition"
+          - "resource_release"
+          - "error_handling"
+        relationships:
+          - "context_manager"
+          - "cleanup_guarantee"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "resource_leak_prevention"
+          - "cleanup_reliability"
+          - "exception_safety"
+          
+# Performance pattern validation rules
+performance_patterns:
+  caching:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "cache_storage"
+          - "cache_lookup"
+          - "cache_update"
+        relationships:
+          - "cache_invalidation"
+          - "cache_eviction"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "cache_hit_rate"
+          - "memory_usage"
+          - "consistency"
+          
+  batching:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "batch_collection"
+          - "batch_processing"
+          - "result_aggregation"
+        relationships:
+          - "batch_size_control"
+          - "processing_efficiency"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "batch_size_optimization"
+          - "processing_overhead"
+          - "result_accuracy"
+          
+# Security pattern validation rules
+security_patterns:
+  authentication:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "credential_validation"
+          - "session_management"
+          - "access_control"
+        relationships:
+          - "secure_storage"
+          - "token_validation"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "password_security"
+          - "session_protection"
+          - "access_authorization"
+          
+  encryption:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "key_management"
+          - "encryption_operation"
+          - "decryption_operation"
+        relationships:
+          - "secure_key_storage"
+          - "algorithm_selection"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "key_security"
+          - "algorithm_strength"
+          - "data_protection"
+          
+# Architecture pattern validation rules
+architecture_patterns:
+  mvc:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "model"
+          - "view"
+          - "controller"
+        relationships:
+          - "model_view_separation"
+          - "controller_mediation"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "separation_of_concerns"
+          - "data_flow"
+          - "user_interaction"
+          
+  repository:
+    - type: "structure"
+      parameters:
+        required_components:
+          - "data_source"
+          - "repository_interface"
+          - "repository_implementation"
+        relationships:
+          - "data_abstraction"
+          - "query_encapsulation"
+          
+    - type: "semantics"
+      parameters:
+        checks:
+          - "data_access_abstraction"
+          - "query_optimization"
+          - "caching_strategy" 

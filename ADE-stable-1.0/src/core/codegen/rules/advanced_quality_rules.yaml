@@ -1,0 +1,164 @@
+complexity:
+  rules:
+    cyclomatic:
+      - name: "Complex Function"
+        pattern: "if|else|for|while|switch|catch"
+        description: "Reduce cyclomatic complexity"
+        severity: "high"
+        fix: "Break down complex functions"
+      - name: "Nested Conditionals"
+        pattern: "if\\s*\\([^)]+\\)\\s*{[^}]*if\\s*\\([^)]+\\)"
+        description: "Avoid deeply nested conditionals"
+        severity: "medium"
+        fix: "Use early returns or guard clauses"
+    cognitive:
+      - name: "Long Function"
+        pattern: "function\\s+\\w+\\s*\\([^)]*\\)\\s*{[^}]{100,}}"
+        description: "Reduce function length"
+        severity: "medium"
+        fix: "Break down long functions"
+
+maintainability:
+  rules:
+    cohesion:
+      - name: "Single Responsibility"
+        pattern: "class\\s+\\w+\\s*{[^}]{200,}}"
+        description: "Follow single responsibility principle"
+        severity: "high"
+        fix: "Split classes into smaller ones"
+      - name: "High Coupling"
+        pattern: "import\\s+\\w+\\s+from\\s+'[^']+';"
+        description: "Reduce module coupling"
+        severity: "medium"
+        fix: "Use dependency injection"
+    duplication:
+      - name: "Code Duplication"
+        pattern: "\\w+\\s*=\\s*[^;]+;[^;]*\\w+\\s*=\\s*[^;]+;"
+        description: "Avoid code duplication"
+        severity: "medium"
+        fix: "Extract common code into functions"
+
+reliability:
+  rules:
+    error_handling:
+      - name: "Unhandled Errors"
+        pattern: "try\\s*{[^}]*}\\s*catch\\s*\\([^)]*\\)\\s*{[^}]*}"
+        description: "Handle all errors"
+        severity: "high"
+        fix: "Add proper error handling"
+      - name: "Async Error Handling"
+        pattern: "async\\s+function\\s+\\w+\\s*\\([^)]*\\)\\s*{[^}]*}"
+        description: "Handle async errors"
+        severity: "high"
+        fix: "Add try-catch for async functions"
+    null_safety:
+      - name: "Null Checks"
+        pattern: "\\w+\\?\\."
+        description: "Add null checks"
+        severity: "high"
+        fix: "Implement null safety"
+      - name: "Optional Chaining"
+        pattern: "\\w+\\.\\w+\\.\\w+"
+        description: "Use optional chaining"
+        severity: "medium"
+        fix: "Add optional chaining"
+
+performance:
+  rules:
+    memory:
+      - name: "Memory Leaks"
+        pattern: "addEventListener\\([^)]+\\)"
+        description: "Clean up event listeners"
+        severity: "high"
+        fix: "Remove event listeners"
+      - name: "Large Objects"
+        pattern: "const\\s+\\w+\\s*=\\s*{[^}]{100,}}"
+        description: "Optimize large objects"
+        severity: "medium"
+        fix: "Split large objects"
+    optimization:
+      - name: "Loop Optimization"
+        pattern: "for\\s*\\([^)]+\\)\\s*{[^}]*}"
+        description: "Optimize loops"
+        severity: "medium"
+        fix: "Use efficient loop patterns"
+      - name: "Caching"
+        pattern: "\\w+\\([^)]+\\)\\s*{[^}]*}"
+        description: "Implement caching"
+        severity: "medium"
+        fix: "Add result caching"
+
+testability:
+  rules:
+    unit_tests:
+      - name: "Test Coverage"
+        pattern: "describe\\([^)]+\\)"
+        description: "Add unit tests"
+        severity: "high"
+        fix: "Write unit tests"
+      - name: "Test Isolation"
+        pattern: "beforeEach\\([^)]+\\)"
+        description: "Isolate tests"
+        severity: "medium"
+        fix: "Add test isolation"
+    mocking:
+      - name: "Dependency Injection"
+        pattern: "new\\s+\\w+\\([^)]+\\)"
+        description: "Use dependency injection"
+        severity: "medium"
+        fix: "Implement dependency injection"
+      - name: "Mock Dependencies"
+        pattern: "jest\\.mock\\([^)]+\\)"
+        description: "Mock external dependencies"
+        severity: "medium"
+        fix: "Add proper mocking"
+
+reusability:
+  rules:
+    components:
+      - name: "Component Reuse"
+        pattern: "export\\s+default\\s+\\w+"
+        description: "Make components reusable"
+        severity: "medium"
+        fix: "Extract reusable components"
+      - name: "Props Interface"
+        pattern: "interface\\s+\\w+Props"
+        description: "Define prop interfaces"
+        severity: "medium"
+        fix: "Add prop interfaces"
+    functions:
+      - name: "Pure Functions"
+        pattern: "function\\s+\\w+\\s*\\([^)]*\\)\\s*{"
+        description: "Use pure functions"
+        severity: "medium"
+        fix: "Make functions pure"
+      - name: "Function Composition"
+        pattern: "\\w+\\(\\w+\\([^)]+\\)\\)"
+        description: "Use function composition"
+        severity: "medium"
+        fix: "Implement function composition"
+
+readability:
+  rules:
+    naming:
+      - name: "Descriptive Names"
+        pattern: "const\\s+[a-z]+\\s*="
+        description: "Use descriptive names"
+        severity: "medium"
+        fix: "Improve variable names"
+      - name: "Consistent Naming"
+        pattern: "camelCase|snake_case"
+        description: "Use consistent naming"
+        severity: "medium"
+        fix: "Follow naming convention"
+    documentation:
+      - name: "Code Comments"
+        pattern: "//[^\\n]*"
+        description: "Add code comments"
+        severity: "medium"
+        fix: "Add meaningful comments"
+      - name: "JSDoc"
+        pattern: "/\\*\\*[^*]*\\*+([^/*][^*]*\\*+)*/"
+        description: "Use JSDoc"
+        severity: "medium"
+        fix: "Add JSDoc comments" 

@@ -1,0 +1,115 @@
+name: graphql_resolver
+description: Template for generating GraphQL resolvers
+content: |
+  import { {{ service_type }} } from '../services';
+  {% for import in imports %}
+  import { {{ import }} } from '../types';
+  {% endfor %}
+  
+  export class {{ resolver_name }}Resolver {
+    constructor(private readonly {{ service_name }}: {{ service_type }}) {}
+    
+    {% for resolver in resolvers %}
+    /**
+     * {{ resolver.docstring }}
+     */
+    async {{ resolver.name }}(
+      parent: {{ resolver.parent_type }},
+      args: {{ resolver.args_type }},
+      context: {{ resolver.context_type }},
+      info: GraphQLResolveInfo
+    ): Promise<{{ resolver.return_type }}> {
+      try {
+        {% for validation in resolver.validations %}
+        {{ validation }}
+        {% endfor %}
+        
+        {% for operation in resolver.operations %}
+        {{ operation }}
+        {% endfor %}
+        
+        {% if resolver.return_statement %}
+        return {{ resolver.return_statement }};
+        {% endif %}
+      } catch (error) {
+        {% if resolver.error_handler %}
+        {{ resolver.error_handler }}
+        {% else %}
+        throw new GraphQLError(error.message);
+        {% endif %}
+      }
+    }
+    {% endfor %}
+  }
+parameters:
+  resolver_name:
+    type: string
+    required: true
+    description: Name of the resolver class
+  service_type:
+    type: string
+    required: true
+    description: Type of the service to inject
+  service_name:
+    type: string
+    required: true
+    description: Name of the service field
+  imports:
+    type: array
+    required: false
+    description: List of additional imports
+  resolvers:
+    type: array
+    required: false
+    description: List of resolver methods
+    items:
+      name:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: false
+        description: JSDoc description
+      parent_type:
+        type: string
+        required: true
+        description: Type of the parent object
+      args_type:
+        type: string
+        required: true
+        description: Type of the arguments
+      context_type:
+        type: string
+        required: true
+        description: Type of the context object
+      return_type:
+        type: string
+        required: true
+        description: Return type of the resolver
+      validations:
+        type: array
+        required: false
+        description: List of validation statements
+      operations:
+        type: array
+        required: false
+        description: List of operations to perform
+      return_statement:
+        type: string
+        required: false
+        description: Return statement
+      error_handler:
+        type: string
+        required: false
+        description: Custom error handling code
+tags:
+  - typescript
+  - graphql
+  - resolver
+  - backend
+language: typescript
+category: resolver
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

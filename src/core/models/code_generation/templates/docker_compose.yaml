@@ -1,0 +1,255 @@
+name: docker_compose
+description: Template for generating Docker Compose configurations
+content: |
+  version: '{{ version }}'
+  
+  services:
+    {% for service in services %}
+    {{ service.name }}:
+      build:
+        context: {{ service.build.context }}
+        dockerfile: {{ service.build.dockerfile }}
+      image: {{ service.image }}
+      {% if service.container_name %}
+      container_name: {{ service.container_name }}
+      {% endif %}
+      {% if service.command %}
+      command: {{ service.command }}
+      {% endif %}
+      {% if service.ports %}
+      ports:
+        {% for port in service.ports %}
+        - "{{ port.host }}:{{ port.container }}"
+        {% endfor %}
+      {% endif %}
+      {% if service.volumes %}
+      volumes:
+        {% for volume in service.volumes %}
+        - {{ volume.host }}:{{ volume.container }}
+        {% endfor %}
+      {% endif %}
+      {% if service.environment %}
+      environment:
+        {% for env in service.environment %}
+        - {{ env.key }}={{ env.value }}
+        {% endfor %}
+      {% endif %}
+      {% if service.env_file %}
+      env_file:
+        {% for file in service.env_file %}
+        - {{ file }}
+        {% endfor %}
+      {% endif %}
+      {% if service.depends_on %}
+      depends_on:
+        {% for dependency in service.depends_on %}
+        - {{ dependency }}
+        {% endfor %}
+      {% endif %}
+      {% if service.networks %}
+      networks:
+        {% for network in service.networks %}
+        - {{ network }}
+        {% endfor %}
+      {% endif %}
+      {% if service.healthcheck %}
+      healthcheck:
+        test: {{ service.healthcheck.test }}
+        interval: {{ service.healthcheck.interval }}
+        timeout: {{ service.healthcheck.timeout }}
+        retries: {{ service.healthcheck.retries }}
+      {% endif %}
+      {% if service.restart %}
+      restart: {{ service.restart }}
+      {% endif %}
+    {% endfor %}
+  
+  {% if networks %}
+  networks:
+    {% for network in networks %}
+    {{ network.name }}:
+      driver: {{ network.driver }}
+      {% if network.ipam %}
+      ipam:
+        driver: {{ network.ipam.driver }}
+        config:
+          {% for config in network.ipam.config %}
+          - subnet: {{ config.subnet }}
+            {% if config.gateway %}
+            gateway: {{ config.gateway }}
+            {% endif %}
+          {% endfor %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  
+  {% if volumes %}
+  volumes:
+    {% for volume in volumes %}
+    {{ volume.name }}:
+      driver: {{ volume.driver }}
+      {% if volume.driver_opts %}
+      driver_opts:
+        {% for opt in volume.driver_opts %}
+        {{ opt.key }}: {{ opt.value }}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+parameters:
+  version:
+    type: string
+    required: true
+    description: Docker Compose version
+  services:
+    type: array
+    required: true
+    description: List of services
+    items:
+      name:
+        type: string
+        required: true
+      build:
+        type: object
+        required: true
+        properties:
+          context:
+            type: string
+            required: true
+          dockerfile:
+            type: string
+            required: true
+      image:
+        type: string
+        required: true
+      container_name:
+        type: string
+        required: false
+      command:
+        type: string
+        required: false
+      ports:
+        type: array
+        required: false
+        description: List of port mappings
+        items:
+          host:
+            type: string
+            required: true
+          container:
+            type: string
+            required: true
+      volumes:
+        type: array
+        required: false
+        description: List of volume mappings
+        items:
+          host:
+            type: string
+            required: true
+          container:
+            type: string
+            required: true
+      environment:
+        type: array
+        required: false
+        description: List of environment variables
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+      env_file:
+        type: array
+        required: false
+        description: List of environment files
+      depends_on:
+        type: array
+        required: false
+        description: List of service dependencies
+      networks:
+        type: array
+        required: false
+        description: List of networks
+      healthcheck:
+        type: object
+        required: false
+        properties:
+          test:
+            type: string
+            required: true
+          interval:
+            type: string
+            required: true
+          timeout:
+            type: string
+            required: true
+          retries:
+            type: integer
+            required: true
+      restart:
+        type: string
+        required: false
+  networks:
+    type: array
+    required: false
+    description: List of networks
+    items:
+      name:
+        type: string
+        required: true
+      driver:
+        type: string
+        required: true
+      ipam:
+        type: object
+        required: false
+        properties:
+          driver:
+            type: string
+            required: true
+          config:
+            type: array
+            required: true
+            items:
+              subnet:
+                type: string
+                required: true
+              gateway:
+                type: string
+                required: false
+  volumes:
+    type: array
+    required: false
+    description: List of volumes
+    items:
+      name:
+        type: string
+        required: true
+      driver:
+        type: string
+        required: true
+      driver_opts:
+        type: array
+        required: false
+        description: List of driver options
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+tags:
+  - docker
+  - compose
+  - container
+  - deployment
+language: yaml
+category: configuration
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

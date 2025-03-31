@@ -1,0 +1,379 @@
+name: observer
+description: Observer design pattern for implementing event handling and notification systems
+category: behavioral
+language: python
+template: |
+  from abc import ABC, abstractmethod
+  from typing import Dict, List, Any, Optional
+  from dataclasses import dataclass
+  from datetime import datetime
+  
+  @dataclass
+  class {{ event_class }}:
+      """Event data class"""
+      type: str
+      data: Dict[str, Any]
+      timestamp: datetime = datetime.now()
+  
+  class {{ observer_interface }}(ABC):
+      """Abstract base class for observers"""
+      
+      @abstractmethod
+      def {{ update_method }}(self, event: {{ event_class }}) -> None:
+          """
+          Handle event updates
+          
+          Args:
+              event: The event to handle
+          """
+          pass
+          
+      {% for method in observer_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  class {{ subject_class }}:
+      """Subject class that maintains a list of observers"""
+      
+      def __init__(self{% for arg in subject_init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in subject_init_body %}
+          {{ init }}
+          {% endfor %}
+          self._observers: List[{{ observer_interface }}] = []
+          
+      def attach(self, observer: {{ observer_interface }}) -> None:
+          """
+          Attach an observer to the subject
+          
+          Args:
+              observer: The observer to attach
+          """
+          if observer not in self._observers:
+              self._observers.append(observer)
+              
+      def detach(self, observer: {{ observer_interface }}) -> None:
+          """
+          Detach an observer from the subject
+          
+          Args:
+              observer: The observer to detach
+          """
+          if observer in self._observers:
+              self._observers.remove(observer)
+              
+      def notify(self, event: {{ event_class }}) -> None:
+          """
+          Notify all observers of an event
+          
+          Args:
+              event: The event to notify observers about
+          """
+          for observer in self._observers:
+              observer.{{ update_method }}(event)
+              
+      {% for method in subject_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  {% for observer in concrete_observers %}
+  class {{ observer.name }}({{ observer_interface }}):
+      """Concrete observer implementation"""
+      
+      def __init__(self{% for arg in observer.init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in observer.init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ update_method }}(self, event: {{ event_class }}) -> None:
+          """
+          Handle event updates for this observer
+          """
+          {{ observer.update_implementation }}
+          
+      {% for method in observer.methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  {% endfor %}
+parameters:
+  event_class:
+    type: string
+    required: true
+    description: Name of the event data class
+  observer_interface:
+    type: string
+    required: true
+    description: Name of the observer interface class
+  update_method:
+    type: string
+    required: true
+    description: Name of the update method for handling events
+  observer_methods:
+    type: array
+    required: false
+    description: Additional methods for the observer interface
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  subject_class:
+    type: string
+    required: true
+    description: Name of the subject class
+  subject_init_args:
+    type: array
+    required: false
+    description: Arguments for the subject's __init__ method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  subject_init_body:
+    type: array
+    required: false
+    description: Body statements for the subject's __init__ method
+    items:
+      type: string
+  subject_methods:
+    type: array
+    required: false
+    description: Additional methods for the subject class
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  concrete_observers:
+    type: array
+    required: false
+    description: List of concrete observer implementations
+    items:
+      name:
+        type: string
+        required: true
+      init_args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      init_body:
+        type: array
+        required: false
+        items:
+          type: string
+      update_implementation:
+        type: string
+        required: true
+      methods:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          args:
+            type: array
+            required: false
+            items:
+              name:
+                type: string
+                required: true
+              type:
+                type: string
+                required: true
+          return_type:
+            type: string
+            required: true
+          docstring:
+            type: string
+            required: true
+          body:
+            type: string
+            required: true
+examples:
+  - name: weather_station
+    description: Weather station example using the observer pattern
+    parameters:
+      event_class: WeatherEvent
+      observer_interface: WeatherObserver
+      update_method: update
+      subject_class: WeatherStation
+      concrete_observers:
+        - name: WeatherDisplay
+          init_args:
+            - name: name
+              type: str
+          init_body:
+            - self.name = name
+          update_implementation: |
+            print(f"{self.name} received weather update:")
+            print(f"Temperature: {event.data['temperature']}°C")
+            print(f"Humidity: {event.data['humidity']}%")
+        - name: WeatherLogger
+          init_args:
+            - name: log_file
+              type: str
+          init_body:
+            - self.log_file = log_file
+          update_implementation: |
+            with open(self.log_file, 'a') as f:
+                f.write(f"{event.timestamp}: Temperature={event.data['temperature']}°C, Humidity={event.data['humidity']}%\n")
+    code: |
+      from abc import ABC, abstractmethod
+      from typing import Dict, List, Any
+      from dataclasses import dataclass
+      from datetime import datetime
+      
+      @dataclass
+      class WeatherEvent:
+          """Event data class for weather updates"""
+          type: str
+          data: Dict[str, Any]
+          timestamp: datetime = datetime.now()
+      
+      class WeatherObserver(ABC):
+          """Abstract base class for weather observers"""
+          
+          @abstractmethod
+          def update(self, event: WeatherEvent) -> None:
+              """
+              Handle weather event updates
+              
+              Args:
+                  event: The weather event to handle
+              """
+              pass
+      
+      class WeatherStation:
+          """Subject class that maintains a list of weather observers"""
+          
+          def __init__(self):
+              self._observers: List[WeatherObserver] = []
+              
+          def attach(self, observer: WeatherObserver) -> None:
+              """
+              Attach an observer to the weather station
+              
+              Args:
+                  observer: The observer to attach
+              """
+              if observer not in self._observers:
+                  self._observers.append(observer)
+                  
+          def detach(self, observer: WeatherObserver) -> None:
+              """
+              Detach an observer from the weather station
+              
+              Args:
+                  observer: The observer to detach
+              """
+              if observer in self._observers:
+                  self._observers.remove(observer)
+                  
+          def notify(self, event: WeatherEvent) -> None:
+              """
+              Notify all observers of a weather event
+              
+              Args:
+                  event: The weather event to notify observers about
+              """
+              for observer in self._observers:
+                  observer.update(event)
+      
+      class WeatherDisplay(WeatherObserver):
+          """Concrete observer implementation for displaying weather"""
+          
+          def __init__(self, name: str):
+              self.name = name
+              
+          def update(self, event: WeatherEvent) -> None:
+              """
+              Handle weather event updates for display
+              """
+              print(f"{self.name} received weather update:")
+              print(f"Temperature: {event.data['temperature']}°C")
+              print(f"Humidity: {event.data['humidity']}%")
+      
+      class WeatherLogger(WeatherObserver):
+          """Concrete observer implementation for logging weather"""
+          
+          def __init__(self, log_file: str):
+              self.log_file = log_file
+              
+          def update(self, event: WeatherEvent) -> None:
+              """
+              Handle weather event updates for logging
+              """
+              with open(self.log_file, 'a') as f:
+                  f.write(f"{event.timestamp}: Temperature={event.data['temperature']}°C, Humidity={event.data['humidity']}%\n")
+best_practices:
+  - Use the observer pattern when you need to implement event handling or notification systems
+  - Keep observers loosely coupled with the subject
+  - Use abstract base classes to define the observer interface
+  - Consider using event queues for asynchronous notifications
+  - Document the observer pattern usage and event types
+  - Handle observer registration and unregistration properly
+anti_patterns:
+  - Creating too many observers for simple events
+  - Not properly managing observer lifecycle
+  - Mixing business logic with event handling
+  - Not handling observer errors
+  - Not documenting the observer pattern usage
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

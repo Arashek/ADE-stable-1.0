@@ -1,0 +1,204 @@
+html:
+  patterns:
+    semantic:
+      - name: "Semantic Elements"
+        pattern: "<(header|nav|main|article|section|aside|footer)>"
+        description: "Use semantic HTML elements for better accessibility"
+      - name: "ARIA Attributes"
+        pattern: "aria-[a-z]+|role=\"[a-z]+\""
+        description: "Include ARIA attributes for accessibility"
+      - name: "Meta Tags"
+        pattern: "<meta[^>]+>"
+        description: "Include proper meta tags for SEO"
+    responsive:
+      - name: "Media Queries"
+        pattern: "@media\\s*\\([^)]+\\)\\s*{"
+        description: "Use media queries for responsive design"
+      - name: "Viewport Meta"
+        pattern: "<meta\\s+name=\"viewport\"[^>]+>"
+        description: "Include viewport meta tag for mobile responsiveness"
+
+css:
+  patterns:
+    modern:
+      - name: "CSS Variables"
+        pattern: "--[a-zA-Z0-9-]+:"
+        description: "Use CSS custom properties for theming"
+      - name: "Flexbox"
+        pattern: "display:\\s*flex"
+        description: "Use Flexbox for layout"
+      - name: "Grid"
+        pattern: "display:\\s*grid"
+        description: "Use CSS Grid for complex layouts"
+    responsive:
+      - name: "Media Queries"
+        pattern: "@media\\s*\\([^)]+\\)\\s*{"
+        description: "Use media queries for responsive design"
+      - name: "Mobile First"
+        pattern: "@media\\s*\\(min-width:\\s*\\d+px\\)"
+        description: "Follow mobile-first approach"
+
+react:
+  patterns:
+    hooks:
+      - name: "Custom Hooks"
+        pattern: "use[A-Z]\\w+"
+        description: "Use custom hooks for reusable logic"
+      - name: "useEffect"
+        pattern: "useEffect\\s*\\([^)]+\\)"
+        description: "Use useEffect for side effects"
+      - name: "useState"
+        pattern: "useState\\s*\\([^)]+\\)"
+        description: "Use useState for local state"
+    components:
+      - name: "Functional Components"
+        pattern: "const\\s+\\w+\\s*=\\s*\\([^)]*\\)\\s*=>"
+        description: "Use functional components with hooks"
+      - name: "PropTypes"
+        pattern: "\\w+\\.propTypes\\s*=\\s*{"
+        description: "Define PropTypes for type checking"
+
+vue:
+  patterns:
+    composition:
+      - name: "Composition API"
+        pattern: "import\\s*{\\s*ref|computed|onMounted"
+        description: "Use Composition API for better organization"
+      - name: "defineProps"
+        pattern: "defineProps\\s*\\([^)]*\\)"
+        description: "Use defineProps for component props"
+      - name: "defineEmits"
+        pattern: "defineEmits\\s*\\([^)]*\\)"
+        description: "Use defineEmits for component events"
+    components:
+      - name: "Single File Components"
+        pattern: "<template>.*?</template>"
+        description: "Use single file components"
+
+angular:
+  patterns:
+    decorators:
+      - name: "Component Decorator"
+        pattern: "@Component\\s*\\([^)]*\\)"
+        description: "Use component decorator"
+      - name: "Injectable Decorator"
+        pattern: "@Injectable\\s*\\([^)]*\\)"
+        description: "Use injectable decorator for services"
+      - name: "Input/Output Decorators"
+        pattern: "@Input\\(\\)|@Output\\(\\)"
+        description: "Use input/output decorators for component communication"
+
+csharp:
+  patterns:
+    attributes:
+      - name: "Controller Attributes"
+        pattern: "\\[ApiController\\]|\\[Route\\([^)]+\\)\\]"
+        description: "Use proper controller attributes"
+      - name: "Action Attributes"
+        pattern: "\\[HttpGet\\]|\\[HttpPost\\]|\\[HttpPut\\]|\\[HttpDelete\\]"
+        description: "Use proper action attributes"
+    dependency:
+      - name: "Dependency Injection"
+        pattern: "public\\s+\\w+\\s*\\([^)]+\\)"
+        description: "Use constructor injection"
+
+go:
+  patterns:
+    handlers:
+      - name: "HTTP Handlers"
+        pattern: "func\\s*\\([^)]*\\)\\s+Handle\\s*\\([^)]*\\)"
+        description: "Use proper HTTP handlers"
+      - name: "Middleware"
+        pattern: "func\\s*\\([^)]*\\)\\s+Middleware\\s*\\([^)]*\\)"
+        description: "Use middleware for request processing"
+    structs:
+      - name: "Struct Definitions"
+        pattern: "type\\s+\\w+\\s+struct\\s*{"
+        description: "Use structs for data organization"
+
+nodejs:
+  patterns:
+    routes:
+      - name: "Express Routes"
+        pattern: "router\\.(get|post|put|delete)\\s*\\([^)]+\\)"
+        description: "Use proper route handlers"
+      - name: "Middleware"
+        pattern: "router\\.use\\([^)]+\\)"
+        description: "Use middleware for request processing"
+    async:
+      - name: "Async/Await"
+        pattern: "async\\s+function\\s+\\w+\\s*\\([^)]*\\)"
+        description: "Use async/await for asynchronous operations"
+
+php:
+  patterns:
+    classes:
+      - name: "Class Definitions"
+        pattern: "class\\s+\\w+\\s+extends\\s+\\w+"
+        description: "Use proper class inheritance"
+      - name: "Methods"
+        pattern: "public\\s+function\\s+\\w+\\s*\\([^)]*\\)"
+        description: "Use proper method definitions"
+    dependency:
+      - name: "Dependency Injection"
+        pattern: "public\\s+function\\s+__construct\\([^)]*\\)"
+        description: "Use constructor injection"
+
+react-native:
+  patterns:
+    components:
+      - name: "Functional Components"
+        pattern: "const\\s+\\w+\\s*=\\s*\\([^)]*\\)\\s*=>"
+        description: "Use functional components"
+      - name: "StyleSheet"
+        pattern: "StyleSheet\\.create\\([^)]*\\)"
+        description: "Use StyleSheet for styles"
+    navigation:
+      - name: "Navigation Hooks"
+        pattern: "useNavigation\\(\\)"
+        description: "Use navigation hooks"
+
+flutter:
+  patterns:
+    widgets:
+      - name: "Stateless Widgets"
+        pattern: "class\\s+\\w+\\s+extends\\s+StatelessWidget"
+        description: "Use stateless widgets when possible"
+      - name: "Stateful Widgets"
+        pattern: "class\\s+\\w+\\s+extends\\s+StatefulWidget"
+        description: "Use stateful widgets when needed"
+    state:
+      - name: "Provider"
+        pattern: "Consumer<\\w+>"
+        description: "Use Provider for state management"
+
+nosql:
+  patterns:
+    schemas:
+      - name: "Schema Definitions"
+        pattern: "new\\s+mongoose\\.Schema\\([^)]*\\)"
+        description: "Use proper schema definitions"
+      - name: "Indexes"
+        pattern: "\\w+Schema\\.index\\([^)]*\\)"
+        description: "Define proper indexes"
+    queries:
+      - name: "MongoDB Queries"
+        pattern: "\\.find\\([^)]*\\)"
+        description: "Use proper query methods"
+
+rest:
+  patterns:
+    endpoints:
+      - name: "API Endpoints"
+        pattern: "/[a-zA-Z0-9/{}]+:"
+        description: "Define proper API endpoints"
+      - name: "HTTP Methods"
+        pattern: "(get|post|put|delete):"
+        description: "Use proper HTTP methods"
+    schemas:
+      - name: "Request Schemas"
+        pattern: "\\$ref:\\s*'#/components/schemas/\\w+'"
+        description: "Define request schemas"
+      - name: "Response Schemas"
+        pattern: "\\$ref:\\s*'#/components/schemas/\\w+'"
+        description: "Define response schemas" 

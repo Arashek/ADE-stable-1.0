@@ -1,0 +1,95 @@
+name: go_handler
+description: Template for generating Go HTTP handlers
+content: |
+  package {{ package_name }}
+  
+  import (
+      "encoding/json"
+      "net/http"
+      {% for import in imports %}
+      "{{ import }}"
+      {% endfor %}
+  )
+  
+  type {{ handler_name }} struct {
+      {{ service_name }} {{ service_type }}
+  }
+  
+  func New{{ handler_name }}({{ service_name }} {{ service_type }}) *{{ handler_name }} {
+      return &{{ handler_name }}{
+          {{ service_name }}: {{ service_name }},
+      }
+  }
+  
+  {% for handler in handlers %}
+  // {{ handler.docstring }}
+  func (h *{{ handler_name }}) {{ handler.name }}(w http.ResponseWriter, r *http.Request) {
+      {% for validation in handler.validations %}
+      {{ validation }}
+      {% endfor %}
+      
+      {% for operation in handler.operations %}
+      {{ operation }}
+      {% endfor %}
+      
+      {% if handler.response %}
+      {{ handler.response }}
+      {% endif %}
+  }
+  {% endfor %}
+parameters:
+  package_name:
+    type: string
+    required: true
+    description: Package name for the handler
+  handler_name:
+    type: string
+    required: true
+    description: Name of the handler struct
+  service_type:
+    type: string
+    required: true
+    description: Type of the service to inject
+  service_name:
+    type: string
+    required: true
+    description: Name of the service field
+  imports:
+    type: array
+    required: false
+    description: List of additional imports
+  handlers:
+    type: array
+    required: false
+    description: List of HTTP handlers
+    items:
+      name:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: false
+        description: Go doc comment
+      validations:
+        type: array
+        required: false
+        description: List of validation statements
+      operations:
+        type: array
+        required: false
+        description: List of operations to perform
+      response:
+        type: string
+        required: false
+        description: Response handling code
+tags:
+  - go
+  - http
+  - handler
+  - backend
+language: go
+category: handler
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

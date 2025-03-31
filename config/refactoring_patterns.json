@@ -1,0 +1,114 @@
+{
+    "optimization": [
+        {
+            "name": "nested_loop",
+            "description": "Deeply nested loops that could be optimized",
+            "regex": "(?:for|while)\\s+[^:]+:\\s*[^\\n]*\\n(?:[^\\n]*\\n)*?(?:for|while)\\s+[^:]+:\\s*[^\\n]*\\n(?:[^\\n]*\\n)*?(?:for|while)\\s+[^:]+:",
+            "suggestion": "Consider using vectorized operations or list comprehensions to optimize nested loops",
+            "impact": "high",
+            "effort": "medium",
+            "confidence": 0.9,
+            "metadata": {
+                "performance_impact": "high",
+                "optimization_type": "algorithm"
+            }
+        },
+        {
+            "name": "repeated_calculation",
+            "description": "Repeated calculations that could be cached",
+            "regex": "\\w+\\s*=\\s*\\w+\\s*\\*\\s*\\w+\\s*\\n(?:[^\\n]*\\n)*?\\w+\\s*=\\s*\\w+\\s*\\*\\s*\\w+",
+            "suggestion": "Cache the result of repeated calculations in a variable",
+            "impact": "medium",
+            "effort": "low",
+            "confidence": 0.8,
+            "metadata": {
+                "performance_impact": "medium",
+                "optimization_type": "caching"
+            }
+        }
+    ],
+    "simplification": [
+        {
+            "name": "complex_condition",
+            "description": "Complex conditional logic that could be simplified",
+            "regex": "if\\s+\\([^)]{100,}\\)",
+            "suggestion": "Break down complex conditions into smaller, more readable parts using intermediate variables",
+            "impact": "medium",
+            "effort": "low",
+            "confidence": 0.8,
+            "metadata": {
+                "readability_impact": "high",
+                "maintainability_impact": "high"
+            }
+        },
+        {
+            "name": "redundant_code",
+            "description": "Redundant code blocks that could be consolidated",
+            "keywords": ["copy", "paste", "duplicate", "similar"],
+            "suggestion": "Extract common code into a reusable function or class",
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.7,
+            "metadata": {
+                "maintainability_impact": "high",
+                "code_quality_impact": "high"
+            }
+        }
+    ],
+    "maintainability": [
+        {
+            "name": "magic_numbers",
+            "description": "Magic numbers in code that should be constants",
+            "regex": "\\b\\d{3,}\\b",
+            "suggestion": "Define magic numbers as named constants with descriptive names",
+            "impact": "low",
+            "effort": "low",
+            "confidence": 0.9,
+            "metadata": {
+                "maintainability_impact": "high",
+                "readability_impact": "high"
+            }
+        },
+        {
+            "name": "long_function",
+            "description": "Function is too long and should be split",
+            "regex": "def\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*[^\\n]*\\n(?:[^\\n]*\\n){50,}",
+            "suggestion": "Split this function into smaller, more focused functions",
+            "impact": "high",
+            "effort": "medium",
+            "confidence": 0.9,
+            "metadata": {
+                "maintainability_impact": "high",
+                "testability_impact": "high"
+            }
+        }
+    ],
+    "readability": [
+        {
+            "name": "poor_naming",
+            "description": "Poorly named variables or functions",
+            "regex": "(?:var|tmp|temp|data|stuff|thing)\\d*",
+            "suggestion": "Use more descriptive names that clearly indicate purpose",
+            "impact": "low",
+            "effort": "low",
+            "confidence": 0.8,
+            "metadata": {
+                "readability_impact": "high",
+                "maintainability_impact": "medium"
+            }
+        },
+        {
+            "name": "missing_comments",
+            "description": "Complex code without explanatory comments",
+            "regex": "(?:def|class)\\s+\\w+\\s*(?:\\([^)]*\\))?\\s*:\\s*\\n(?:[^\\n]*\\n){10,}(?!#)",
+            "suggestion": "Add comments explaining complex logic or important decisions",
+            "impact": "low",
+            "effort": "low",
+            "confidence": 0.7,
+            "metadata": {
+                "readability_impact": "high",
+                "documentation_impact": "high"
+            }
+        }
+    ]
+} 

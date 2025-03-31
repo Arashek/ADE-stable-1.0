@@ -1,0 +1,141 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - type: volume
+        source: ade_data
+        target: /app/data
+    environment:
+      - REDIS_URI=redis://redis:6379/0
+      - MONGODB_URI=mongodb://mongodb:27017/ade
+      - MONGODB_USER=admin
+      - MONGODB_PASSWORD=@R1359962ad
+      - MONGODB_DATABASE=ade
+      - REDIS_PASSWORD=@R1359962ad
+      - JWT_SECRET=468db577936ee71cccac99fc8f4498e3f22ec1ffcbbc289a74391ca135e2453217d1711754b5849c92d26240749e222de685decb11570735a67a52f443fa89a09ace22c32be905e237a752b8d1988fe348f27e89ba5a5b8c273970dc09387647f110afb427a068d7620f87cab31beba677f4275c4e621c1888c129960662ba0ae86ce8ca07bbf268f7eecebadc1f38bad2daabdf999a18dff6e398215d64c1f04d69c73b33390d8ea1c853f6d42f208480320aa8d8fdf20c462f6db3215cfd10c02e1f483e7cacaa6da1fcaf2a3b41312c6994def12834e2b8b5eb79b4cc4be0d4c25d4382a78eb5ab893fdc8128fe159ca2097a9ef4163845cedfc7a245443d
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRATION=3600
+      - OPENAI_API_KEY=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
+      - ANTHROPIC_API_KEY=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
+      - GOOGLE_API_KEY=AIzaSyCwbgArXr23U6badP9RV9-MgSzIlusWF6c
+      - DEEPSEEK_API_KEY=sk-bf1ad81bf6504af2bea46a869ae2746f
+      - GROQ_API_KEY=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
+      - MISTRAL_API_KEY=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
+      - DEFAULT_OPENAI_MODEL=gpt-4
+      - DEFAULT_ANTHROPIC_MODEL=claude-3-opus-20240229
+      - DEFAULT_GOOGLE_MODEL=gemini-pro
+      - DEFAULT_PROVIDER_TIER=standard
+      - OLLAMA_SERVER_URL=http://ollama:11434
+      - RATE_LIMIT_REQUESTS=100
+      - RATE_LIMIT_PERIOD=60
+      - ENABLE_METRICS=true
+      - PROMETHEUS_PORT=9090
+      - GRAFANA_PORT=3000
+      - PROMETHEUS_MULTIPROC_DIR=/tmp
+      - ENCRYPTION_KEY=7zwFrH6OvayAA1VwzCO2LklIIiVRuJ-4-Nf0ayjc-LQ=
+      - API_KEY_HEADER=X-API-Key
+      - ADE_PROJECT_DIR=projects
+      - USAGE_RETENTION_DAYS=90
+      - USAGE_CLEANUP_INTERVAL=3600
+      - MODEL_SELECTION_STRATEGY=balanced
+      - GRAFANA_ADMIN_PASSWORD=@R1359962ad
+      - DEFAULT_MODEL=llama2
+      - MAX_TOKENS=1000
+      - TEMPERATURE=0.7
+      - TOP_P=0.9
+      - GITHUB_CLIENT_ID=Ov23liz2SyKJ0M6afA6j
+      - GITHUB_CLIENT_SECRET=dd6824535b33cfd8aa5c858e680bc55a2bb72044
+      - GITHUB_CALLBACK_URL=http://localhost:8000/auth/github/callback
+      - ENABLE_EMAIL_NOTIFICATIONS=False
+      - ENABLE_WAITLIST=True
+      - ENABLE_INVITATION_CODES=True
+      - SKIP_AUTHENTICATION=False
+      - ALLOW_CORS=True
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:8000
+      - MAX_MEMORY_USAGE=0.8
+      - GPU_MEMORY_FRACTION=0.8
+      - NUM_WORKERS=2
+      - NODE_ENV=undefined
+      - DOCKER_REGISTRY=ghcr.io
+      - DOCKER_IMAGE_NAME=ade-platform
+      - DOCKER_IMAGE_TAG=dev
+    depends_on:
+      - redis
+      - mongodb
+      - prometheus
+      - grafana
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - type: volume
+        source: redis_data
+        target: /data
+    command: redis-server --requirepass @R1359962ad
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=@R1359962ad
+    volumes:
+      - type: volume
+        source: mongodb_data
+        target: /data/db
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - type: volume
+        source: prometheus_data
+        target: /prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=@R1359962ad
+    volumes:
+      - type: volume
+        source: grafana_data
+        target: /var/lib/grafana
+    depends_on:
+      - prometheus
+
+volumes:
+  ade_data:
+  redis_data:
+  mongodb_data:
+  prometheus_data:
+  grafana_data:

@@ -1,0 +1,395 @@
+name: factory
+description: Factory design pattern for creating objects without exposing creation logic
+category: creational
+language: python
+template: |
+  from abc import ABC, abstractmethod
+  from typing import Dict, Type, Any
+  from enum import Enum
+  
+  class {{ product_type }}Type(Enum):
+      """Enumeration of available {{ product_type }} types"""
+      {% for type in product_types %}
+      {{ type.name }} = "{{ type.value }}"
+      {% endfor %}
+  
+  class {{ product_type }}(ABC):
+      """Abstract base class for {{ product_type }}"""
+      
+      @abstractmethod
+      def {{ operation }}(self{% for arg in operation_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ operation_return_type }}:
+          """Abstract method that must be implemented by concrete classes"""
+          pass
+          
+      {% for method in common_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  {% for type in product_types %}
+  class {{ type.class_name }}({{ product_type }}):
+      """Concrete implementation of {{ product_type }} type {{ type.name }}"""
+      
+      def __init__(self{% for arg in type.init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in type.init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ operation }}(self{% for arg in operation_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ operation_return_type }}:
+          """
+          Implementation of {{ operation }} for {{ type.name }}
+          """
+          {{ type.operation_implementation }}
+          
+      {% for method in type.methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  {% endfor %}
+  
+  class {{ factory_name }}:
+      """Factory class for creating {{ product_type }} instances"""
+      
+      _creators: Dict[{{ product_type }}Type, Type[{{ product_type }}]] = {
+          {% for type in product_types %}
+          {{ product_type }}Type.{{ type.name }}: {{ type.class_name }},
+          {% endfor %}
+      }
+      
+      @classmethod
+      def create(cls, type: {{ product_type }}Type{% for arg in factory_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ product_type }}:
+          """
+          Create a {{ product_type }} instance of the specified type
+          
+          Args:
+              type: The type of {{ product_type }} to create
+              {% for arg in factory_args %}
+              {{ arg.name }}: {{ arg.description }}
+              {% endfor %}
+              
+          Returns:
+              A new instance of the specified {{ product_type }} type
+              
+          Raises:
+              ValueError: If the specified type is not supported
+          """
+          creator = cls._creators.get(type)
+          if not creator:
+              raise ValueError(f"Unsupported {{ product_type }} type: {type}")
+          return creator({{ factory_args | map(attribute='name') | join(', ') }})
+          
+      {% for method in factory_methods %}
+      @classmethod
+      def {{ method.name }}(cls{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+parameters:
+  product_type:
+    type: string
+    required: true
+    description: Name of the product type (e.g., Document, Payment)
+  product_types:
+    type: array
+    required: true
+    description: List of product types to support
+    items:
+      name:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+      class_name:
+        type: string
+        required: true
+      init_args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      init_body:
+        type: array
+        required: false
+        items:
+          type: string
+      operation_implementation:
+        type: string
+        required: true
+      methods:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          args:
+            type: array
+            required: false
+            items:
+              name:
+                type: string
+                required: true
+              type:
+                type: string
+                required: true
+          return_type:
+            type: string
+            required: true
+          docstring:
+            type: string
+            required: true
+          body:
+            type: string
+            required: true
+  operation:
+    type: string
+    required: true
+    description: Name of the main operation method
+  operation_args:
+    type: array
+    required: false
+    description: Arguments for the main operation method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  operation_return_type:
+    type: string
+    required: true
+    description: Return type of the main operation method
+  common_methods:
+    type: array
+    required: false
+    description: Common methods shared by all product types
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  factory_name:
+    type: string
+    required: true
+    description: Name of the factory class
+  factory_args:
+    type: array
+    required: false
+    description: Arguments for the factory create method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+  factory_methods:
+    type: array
+    required: false
+    description: Additional factory methods
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+examples:
+  - name: document_factory
+    description: Factory pattern for creating different types of documents
+    parameters:
+      product_type: Document
+      product_types:
+        - name: PDF
+          value: pdf
+          class_name: PDFDocument
+          init_args:
+            - name: file_path
+              type: str
+          init_body:
+            - self.file_path = file_path
+          operation_implementation: |
+            # PDF-specific processing
+            return f"Processing PDF document: {self.file_path}"
+          methods:
+            - name: get_file_size
+              return_type: int
+              docstring: Get the size of the PDF file in bytes
+              body: return os.path.getsize(self.file_path)
+        - name: DOCX
+          value: docx
+          class_name: DOCXDocument
+          init_args:
+            - name: file_path
+              type: str
+          init_body:
+            - self.file_path = file_path
+          operation_implementation: |
+            # DOCX-specific processing
+            return f"Processing DOCX document: {self.file_path}"
+          methods:
+            - name: get_word_count
+              return_type: int
+              docstring: Get the word count of the document
+              body: return len(self.content.split())
+      operation: process
+      operation_args:
+        - name: content
+          type: str
+      operation_return_type: str
+      factory_name: DocumentFactory
+      factory_args:
+        - name: file_path
+          type: str
+          description: Path to the document file
+    code: |
+      from abc import ABC, abstractmethod
+      from typing import Dict, Type
+      from enum import Enum
+      import os
+      
+      class DocumentType(Enum):
+          """Enumeration of available document types"""
+          PDF = "pdf"
+          DOCX = "docx"
+      
+      class Document(ABC):
+          """Abstract base class for Document"""
+          
+          @abstractmethod
+          def process(self, content: str) -> str:
+              """Abstract method that must be implemented by concrete classes"""
+              pass
+      
+      class PDFDocument(Document):
+          """Concrete implementation of Document type PDF"""
+          
+          def __init__(self, file_path: str):
+              self.file_path = file_path
+              
+          def process(self, content: str) -> str:
+              """
+              Implementation of process for PDF
+              """
+              # PDF-specific processing
+              return f"Processing PDF document: {self.file_path}"
+              
+          def get_file_size(self) -> int:
+              """
+              Get the size of the PDF file in bytes
+              """
+              return os.path.getsize(self.file_path)
+      
+      class DOCXDocument(Document):
+          """Concrete implementation of Document type DOCX"""
+          
+          def __init__(self, file_path: str):
+              self.file_path = file_path
+              
+          def process(self, content: str) -> str:
+              """
+              Implementation of process for DOCX
+              """
+              # DOCX-specific processing
+              return f"Processing DOCX document: {self.file_path}"
+              
+          def get_word_count(self) -> int:
+              """
+              Get the word count of the document
+              """
+              return len(self.content.split())
+      
+      class DocumentFactory:
+          """Factory class for creating Document instances"""
+          
+          _creators: Dict[DocumentType, Type[Document]] = {
+              DocumentType.PDF: PDFDocument,
+              DocumentType.DOCX: DOCXDocument,
+          }
+          
+          @classmethod
+          def create(cls, type: DocumentType, file_path: str) -> Document:
+              """
+              Create a Document instance of the specified type
+              
+              Args:
+                  type: The type of Document to create
+                  file_path: Path to the document file
+                  
+              Returns:
+                  A new instance of the specified Document type
+                  
+              Raises:
+                  ValueError: If the specified type is not supported
+              """
+              creator = cls._creators.get(type)
+              if not creator:
+                  raise ValueError(f"Unsupported Document type: {type}")
+              return creator(file_path)
+best_practices:
+  - Use the factory pattern when you need to create objects without exposing creation logic
+  - Keep the factory class focused on object creation
+  - Use abstract base classes to define the interface
+  - Consider using dependency injection for better testability
+  - Document the factory pattern usage and supported types
+  - Handle errors gracefully when creating objects
+anti_patterns:
+  - Creating objects directly instead of using the factory
+  - Mixing business logic with object creation
+  - Not handling all possible object types
+  - Creating complex object hierarchies without proper abstraction
+  - Not documenting the factory pattern usage
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

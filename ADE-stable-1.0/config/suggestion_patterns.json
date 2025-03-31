@@ -1,0 +1,382 @@
+{
+    "code_quality": [
+        {
+            "name": "long_function",
+            "description": "Function is too long and should be split into smaller functions",
+            "regex": "def\\s+\\w+\\s*\\([^)]*\\)\\s*:\\s*[^\\n]*\\n(?:[^\\n]*\\n){50,}",
+            "suggestion": "Split this function into smaller, more focused functions",
+            "priority": 2,
+            "impact": "high",
+            "effort": "medium",
+            "confidence": 0.9
+        },
+        {
+            "name": "complex_condition",
+            "description": "Complex conditional logic that could be simplified",
+            "regex": "if\\s+\\([^)]{100,}\\)",
+            "suggestion": "Break down complex conditions into smaller, more readable parts",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "low",
+            "confidence": 0.8
+        }
+    ],
+    "performance": [
+        {
+            "name": "nested_loop",
+            "description": "Deeply nested loops that could impact performance",
+            "regex": "(?:for|while)\\s+[^:]+:\\s*[^\\n]*\\n(?:[^\\n]*\\n)*?(?:for|while)\\s+[^:]+:\\s*[^\\n]*\\n(?:[^\\n]*\\n)*?(?:for|while)\\s+[^:]+:",
+            "suggestion": "Consider optimizing nested loops or using vectorized operations",
+            "priority": 3,
+            "impact": "high",
+            "effort": "high",
+            "confidence": 0.9
+        },
+        {
+            "name": "large_list_operation",
+            "description": "Operations on large lists that could be optimized",
+            "regex": "\\w+\\.(?:append|extend|insert)\\s*\\([^)]+\\)\\s*\\n(?:[^\\n]*\\n){100,}",
+            "suggestion": "Consider using more efficient data structures or batch operations",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.8
+        }
+    ],
+    "security": [
+        {
+            "name": "hardcoded_secret",
+            "description": "Potential hardcoded secret or sensitive information",
+            "regex": "(?:password|secret|key|token)\\s*=\\s*['\"][^'\"]+['\"]",
+            "suggestion": "Move sensitive information to environment variables or secure configuration",
+            "priority": 4,
+            "impact": "critical",
+            "effort": "low",
+            "confidence": 0.9
+        },
+        {
+            "name": "unsafe_eval",
+            "description": "Use of eval() or similar unsafe functions",
+            "regex": "eval\\s*\\(|exec\\s*\\(|compile\\s*\\(",
+            "suggestion": "Avoid using eval() or similar functions that can execute arbitrary code",
+            "priority": 4,
+            "impact": "critical",
+            "effort": "medium",
+            "confidence": 0.95
+        }
+    ],
+    "maintainability": [
+        {
+            "name": "magic_numbers",
+            "description": "Magic numbers in code that should be constants",
+            "regex": "\\b\\d{3,}\\b",
+            "suggestion": "Define magic numbers as named constants with descriptive names",
+            "priority": 1,
+            "impact": "low",
+            "effort": "low",
+            "confidence": 0.8
+        },
+        {
+            "name": "duplicate_code",
+            "description": "Similar code blocks that could be refactored",
+            "keywords": ["copy", "paste", "duplicate", "similar"],
+            "suggestion": "Extract common code into reusable functions or classes",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.7
+        }
+    ],
+    "documentation": [
+        {
+            "name": "missing_docstring",
+            "description": "Function or class missing docstring",
+            "regex": "(?:def|class)\\s+\\w+\\s*(?:\\([^)]*\\))?\\s*:\\s*\\n(?!\\s*[\"'])",
+            "suggestion": "Add a docstring explaining the purpose and usage",
+            "priority": 1,
+            "impact": "low",
+            "effort": "low",
+            "confidence": 0.9
+        },
+        {
+            "name": "complex_docstring",
+            "description": "Overly complex or unclear docstring",
+            "regex": "[\"']{3}[^\"']{200,}[\"']{3}",
+            "suggestion": "Simplify and clarify the documentation",
+            "priority": 1,
+            "impact": "low",
+            "effort": "low",
+            "confidence": 0.7
+        }
+    ],
+    "architecture": [
+        {
+            "name": "circular_import",
+            "description": "Potential circular import dependency",
+            "regex": "from\\s+\\w+\\s+import\\s+\\w+\\s*\\n(?:[^\\n]*\\n)*?from\\s+\\w+\\s+import\\s+\\w+",
+            "suggestion": "Restructure imports to avoid circular dependencies",
+            "priority": 3,
+            "impact": "high",
+            "effort": "high",
+            "confidence": 0.8
+        },
+        {
+            "name": "tight_coupling",
+            "description": "Signs of tight coupling between components",
+            "keywords": ["import", "from", "global", "nonlocal"],
+            "suggestion": "Consider using dependency injection or interfaces to reduce coupling",
+            "priority": 3,
+            "impact": "high",
+            "effort": "high",
+            "confidence": 0.7
+        }
+    ],
+    "best_practices": [
+        {
+            "name": "mutable_default",
+            "description": "Mutable default argument in function definition",
+            "regex": "def\\s+\\w+\\s*\\([^)]*=\\s*\\[|\\{|True|False|None\\}",
+            "suggestion": "Use immutable default arguments or None with docstring",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "low",
+            "confidence": 0.9
+        },
+        {
+            "name": "bare_except",
+            "description": "Bare except clause that catches all exceptions",
+            "regex": "try:\\s*[^\\n]*\\n\\s*except:",
+            "suggestion": "Specify the exceptions to catch instead of using bare except",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "low",
+            "confidence": 0.9
+        }
+    ],
+    "accessibility": [
+        {
+            "name": "missing_alt_text",
+            "description": "Image missing alt text for accessibility",
+            "regex": "<img[^>]*>",
+            "suggestion": "Add alt text to images for screen readers",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "low",
+            "confidence": 0.9,
+            "metadata": {
+                "user_impact": "high",
+                "accessibility_standard": "WCAG 2.1"
+            }
+        },
+        {
+            "name": "color_contrast",
+            "description": "Text color may not meet contrast requirements",
+            "regex": "color:\\s*#[0-9a-fA-F]{3,6}",
+            "suggestion": "Ensure text color meets WCAG contrast requirements",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.8,
+            "metadata": {
+                "user_impact": "high",
+                "accessibility_standard": "WCAG 2.1"
+            }
+        }
+    ],
+    "internationalization": [
+        {
+            "name": "hardcoded_string",
+            "description": "Hardcoded text that should be internationalized",
+            "regex": "['\"][^'\"]+['\"]",
+            "suggestion": "Move text to i18n resource files",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.7,
+            "metadata": {
+                "i18n_standard": "gettext"
+            }
+        },
+        {
+            "name": "date_format",
+            "description": "Non-standardized date format",
+            "regex": "\\d{1,2}/\\d{1,2}/\\d{2,4}",
+            "suggestion": "Use locale-aware date formatting",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "low",
+            "confidence": 0.8,
+            "metadata": {
+                "i18n_standard": "ICU"
+            }
+        }
+    ],
+    "error_handling": [
+        {
+            "name": "empty_catch",
+            "description": "Empty catch block that swallows exceptions",
+            "regex": "catch\\s*\\([^)]*\\)\\s*\\{\\s*\\}",
+            "suggestion": "Add proper error handling or logging",
+            "priority": 3,
+            "impact": "high",
+            "effort": "low",
+            "confidence": 0.9,
+            "metadata": {
+                "risk_level": "high"
+            }
+        },
+        {
+            "name": "generic_exception",
+            "description": "Catching generic Exception type",
+            "regex": "catch\\s*\\(\\s*Exception\\s*\\)",
+            "suggestion": "Catch specific exceptions instead of generic Exception",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "low",
+            "confidence": 0.8,
+            "metadata": {
+                "risk_level": "medium"
+            }
+        }
+    ],
+    "api_design": [
+        {
+            "name": "inconsistent_naming",
+            "description": "Inconsistent API endpoint naming",
+            "regex": "(?:/api/v\\d+/[a-z]+|/api/[a-z]+)",
+            "suggestion": "Follow consistent API naming conventions",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.7,
+            "metadata": {
+                "api_standard": "REST"
+            }
+        },
+        {
+            "name": "missing_version",
+            "description": "API endpoint missing version",
+            "regex": "/api/[^/]+",
+            "suggestion": "Add API version to endpoint",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.8,
+            "metadata": {
+                "api_standard": "REST"
+            }
+        }
+    ],
+    "database": [
+        {
+            "name": "missing_index",
+            "description": "Potential missing database index",
+            "regex": "WHERE\\s+[^=]+\\s*=",
+            "suggestion": "Add appropriate database index",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.7,
+            "metadata": {
+                "performance_impact": "high"
+            }
+        },
+        {
+            "name": "n_plus_one",
+            "description": "Potential N+1 query issue",
+            "regex": "for\\s+[^:]+:\\s*[^\\n]*\\n\\s*\\w+\\.query\\(",
+            "suggestion": "Use eager loading or batch queries",
+            "priority": 3,
+            "impact": "high",
+            "effort": "high",
+            "confidence": 0.8,
+            "metadata": {
+                "performance_impact": "high"
+            }
+        }
+    ],
+    "caching": [
+        {
+            "name": "missing_cache",
+            "description": "Expensive operation without caching",
+            "regex": "(?:SELECT|JOIN|GROUP BY|ORDER BY)\\s+[^;]+;",
+            "suggestion": "Implement caching for expensive database operations",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.7,
+            "metadata": {
+                "performance_impact": "high"
+            }
+        },
+        {
+            "name": "cache_invalidation",
+            "description": "Missing cache invalidation",
+            "regex": "cache\\.set\\(",
+            "suggestion": "Add proper cache invalidation",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.8,
+            "metadata": {
+                "performance_impact": "high"
+            }
+        }
+    ],
+    "logging": [
+        {
+            "name": "missing_logging",
+            "description": "Critical operation without logging",
+            "regex": "(?:try|catch|finally)\\s*\\{",
+            "suggestion": "Add appropriate logging for error handling",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "low",
+            "confidence": 0.8,
+            "metadata": {
+                "debugging_impact": "high"
+            }
+        },
+        {
+            "name": "sensitive_data",
+            "description": "Logging of sensitive information",
+            "regex": "logger\\.(?:info|debug|error)\\s*\\([^)]*(?:password|token|key)[^)]*\\)",
+            "suggestion": "Remove sensitive data from logs",
+            "priority": 3,
+            "impact": "high",
+            "effort": "low",
+            "confidence": 0.9,
+            "metadata": {
+                "security_impact": "high"
+            }
+        }
+    ],
+    "testing": [
+        {
+            "name": "missing_test",
+            "description": "Function without corresponding test",
+            "regex": "def\\s+\\w+\\s*\\([^)]*\\)\\s*:",
+            "suggestion": "Add unit tests for function",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "high",
+            "confidence": 0.7,
+            "metadata": {
+                "test_coverage": "low"
+            }
+        },
+        {
+            "name": "flaky_test",
+            "description": "Potential flaky test with time dependency",
+            "regex": "time\\.sleep\\(",
+            "suggestion": "Use test timeouts or mock time",
+            "priority": 2,
+            "impact": "medium",
+            "effort": "medium",
+            "confidence": 0.8,
+            "metadata": {
+                "test_reliability": "low"
+            }
+        }
+    ]
+} 

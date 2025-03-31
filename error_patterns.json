@@ -1,0 +1,340 @@
+{
+    "patterns": [
+        {
+            "id": "name_error",
+            "name": "NameError",
+            "description": "Variable or function name not defined",
+            "pattern": "name '(?P<name>[^']+)' is not defined",
+            "severity": "ERROR",
+            "category": "syntax",
+            "suggested_fixes": [
+                "Check if the variable is defined before use",
+                "Check for typos in variable names",
+                "Ensure all required imports are present"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Missing import statement",
+                    "Typo in variable name",
+                    "Variable defined in wrong scope"
+                ]
+            }
+        },
+        {
+            "id": "type_error",
+            "name": "TypeError",
+            "description": "Operation or function applied to object of inappropriate type",
+            "pattern": "unsupported operand type\\(s\\) for (?P<operation>[^:]+): '(?P<type1>[^']+)' and '(?P<type2>[^']+)'",
+            "severity": "ERROR",
+            "category": "type",
+            "suggested_fixes": [
+                "Check the types of operands before operation",
+                "Convert operands to compatible types",
+                "Use appropriate type conversion functions"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Mixing incompatible data types",
+                    "Missing type conversion",
+                    "Incorrect function arguments"
+                ]
+            }
+        },
+        {
+            "id": "index_error",
+            "name": "IndexError",
+            "description": "Sequence subscript out of range",
+            "pattern": "list index out of range",
+            "severity": "ERROR",
+            "category": "index",
+            "suggested_fixes": [
+                "Check if index is within valid range",
+                "Verify list is not empty before indexing",
+                "Use len() to check list size"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Accessing empty list",
+                    "Index greater than list length",
+                    "Negative index out of range"
+                ]
+            }
+        },
+        {
+            "id": "key_error",
+            "name": "KeyError",
+            "description": "Dictionary key not found",
+            "pattern": "'(?P<key>[^']+)'",
+            "severity": "ERROR",
+            "category": "dictionary",
+            "suggested_fixes": [
+                "Check if key exists before access",
+                "Use dict.get() with default value",
+                "Verify dictionary initialization"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Missing dictionary key",
+                    "Case sensitivity issues",
+                    "Incorrect key name"
+                ]
+            }
+        },
+        {
+            "id": "attribute_error",
+            "name": "AttributeError",
+            "description": "Object has no attribute",
+            "pattern": "'(?P<type>[^']+)' object has no attribute '(?P<attribute>[^']+)'",
+            "severity": "ERROR",
+            "category": "attribute",
+            "suggested_fixes": [
+                "Check if attribute exists",
+                "Verify object type",
+                "Check for typos in attribute name"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Missing method or property",
+                    "Incorrect object type",
+                    "Typo in attribute name"
+                ]
+            }
+        },
+        {
+            "id": "import_error",
+            "name": "ImportError",
+            "description": "Failed to import module",
+            "pattern": "No module named '(?P<module>[^']+)'",
+            "severity": "ERROR",
+            "category": "import",
+            "suggested_fixes": [
+                "Check if module is installed",
+                "Verify module name spelling",
+                "Check PYTHONPATH"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Missing package installation",
+                    "Incorrect module name",
+                    "Python path issues"
+                ]
+            }
+        },
+        {
+            "id": "syntax_error",
+            "name": "SyntaxError",
+            "description": "Invalid syntax",
+            "pattern": "invalid syntax",
+            "severity": "ERROR",
+            "category": "syntax",
+            "suggested_fixes": [
+                "Check for missing parentheses",
+                "Verify indentation",
+                "Check for missing colons"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Missing parentheses",
+                    "Incorrect indentation",
+                    "Missing colons"
+                ]
+            }
+        },
+        {
+            "id": "indentation_error",
+            "name": "IndentationError",
+            "description": "Incorrect indentation",
+            "pattern": "unexpected indent",
+            "severity": "ERROR",
+            "category": "syntax",
+            "suggested_fixes": [
+                "Check indentation levels",
+                "Use consistent indentation",
+                "Verify tab vs space usage"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Mixed tabs and spaces",
+                    "Inconsistent indentation",
+                    "Missing indentation"
+                ]
+            }
+        },
+        {
+            "id": "memory_error",
+            "name": "MemoryError",
+            "description": "Out of memory error",
+            "pattern": "Memory limit exceeded: (?P<memory_usage>[0-9.]+)MB",
+            "severity": "CRITICAL",
+            "category": "resource",
+            "suggested_fixes": [
+                "Optimize memory usage",
+                "Increase memory limit",
+                "Use memory-efficient data structures",
+                "Implement garbage collection"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Memory leak",
+                    "Large data structures",
+                    "Infinite recursion",
+                    "Resource not properly released"
+                ]
+            }
+        },
+        {
+            "id": "timeout_error",
+            "name": "TimeoutError",
+            "description": "Operation timed out",
+            "pattern": "Execution timed out after (?P<timeout>[0-9.]+) seconds",
+            "severity": "ERROR",
+            "category": "resource",
+            "suggested_fixes": [
+                "Optimize code performance",
+                "Increase timeout limit",
+                "Implement progress monitoring",
+                "Break down long operations"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Infinite loop",
+                    "Inefficient algorithms",
+                    "Resource contention",
+                    "Network latency"
+                ]
+            }
+        },
+        {
+            "id": "recursion_error",
+            "name": "RecursionError",
+            "description": "Maximum recursion depth exceeded",
+            "pattern": "maximum recursion depth exceeded",
+            "severity": "ERROR",
+            "category": "runtime",
+            "suggested_fixes": [
+                "Implement iteration instead of recursion",
+                "Increase recursion limit",
+                "Add base case to recursive function",
+                "Use tail recursion optimization"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Missing base case",
+                    "Deep recursive calls",
+                    "Circular dependencies",
+                    "Infinite recursion"
+                ]
+            }
+        },
+        {
+            "id": "io_error",
+            "name": "IOError",
+            "description": "Input/Output operation failed",
+            "pattern": "I/O operation on closed file|No such file or directory: '(?P<file>[^']+)'",
+            "severity": "ERROR",
+            "category": "io",
+            "suggested_fixes": [
+                "Check if file exists",
+                "Ensure file is not closed",
+                "Use proper file handling with context managers",
+                "Verify file permissions"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "File not found",
+                    "Permission denied",
+                    "File already closed",
+                    "Disk full"
+                ]
+            }
+        },
+        {
+            "id": "value_error",
+            "name": "ValueError",
+            "description": "Invalid value provided",
+            "pattern": "invalid literal for (?P<type>[^:]+): '(?P<value>[^']+)'",
+            "severity": "ERROR",
+            "category": "validation",
+            "suggested_fixes": [
+                "Validate input before conversion",
+                "Handle edge cases",
+                "Provide meaningful error messages",
+                "Use appropriate data types"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Invalid input format",
+                    "Out of range values",
+                    "Incorrect data type",
+                    "Missing required fields"
+                ]
+            }
+        },
+        {
+            "id": "assertion_error",
+            "name": "AssertionError",
+            "description": "Assertion failed",
+            "pattern": "AssertionError",
+            "severity": "ERROR",
+            "category": "testing",
+            "suggested_fixes": [
+                "Review assertion conditions",
+                "Add debug logging",
+                "Check input data",
+                "Update test cases"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Test failure",
+                    "Invalid assumptions",
+                    "Data inconsistency",
+                    "State violation"
+                ]
+            }
+        },
+        {
+            "id": "keyboard_interrupt",
+            "name": "KeyboardInterrupt",
+            "description": "Program interrupted by user",
+            "pattern": "KeyboardInterrupt",
+            "severity": "INFO",
+            "category": "user",
+            "suggested_fixes": [
+                "Implement graceful shutdown",
+                "Save state before exit",
+                "Clean up resources",
+                "Handle interruption signals"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "User pressed Ctrl+C",
+                    "System shutdown",
+                    "Process termination",
+                    "Signal handling"
+                ]
+            }
+        },
+        {
+            "id": "runtime_warning",
+            "name": "RuntimeWarning",
+            "description": "Runtime warning occurred",
+            "pattern": "RuntimeWarning: (?P<message>[^\\n]+)",
+            "severity": "WARNING",
+            "category": "runtime",
+            "suggested_fixes": [
+                "Address deprecated feature usage",
+                "Update to newer API",
+                "Handle warnings appropriately",
+                "Suppress known warnings"
+            ],
+            "metadata": {
+                "common_causes": [
+                    "Deprecated feature usage",
+                    "Resource cleanup",
+                    "Performance issues",
+                    "API changes"
+                ]
+            }
+        }
+    ]
+} 

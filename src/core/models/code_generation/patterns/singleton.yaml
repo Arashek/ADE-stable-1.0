@@ -1,0 +1,230 @@
+name: singleton
+description: Singleton design pattern for ensuring a class has only one instance
+category: creational
+language: python
+template: |
+  class {{ class_name }}:
+      """
+      Singleton class that ensures only one instance exists.
+      
+      Usage:
+          instance = {{ class_name }}.get_instance()
+      """
+      
+      _instance = None
+      
+      def __new__(cls):
+          if cls._instance is None:
+              cls._instance = super().__new__(cls)
+          return cls._instance
+          
+      @classmethod
+      def get_instance(cls):
+          """Get the singleton instance"""
+          if cls._instance is None:
+              cls._instance = cls()
+          return cls._instance
+          
+      def __init__(self):
+          """Initialize the singleton instance"""
+          if not hasattr(self, '_initialized'):
+              self._initialized = True
+              {% for initialization in initializations %}
+              {{ initialization }}
+              {% endfor %}
+              
+      {% for method in methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+      
+      {% for property in properties %}
+      @property
+      def {{ property.name }}(self) -> {{ property.type }}:
+          """
+          {{ property.docstring }}
+          """
+          return self._{{ property.name }}
+          
+      @{{ property.name }}.setter
+      def {{ property.name }}(self, value: {{ property.type }}) -> None:
+          self._{{ property.name }} = value
+      {% endfor %}
+parameters:
+  class_name:
+    type: string
+    required: true
+    description: Name of the singleton class
+  initializations:
+    type: array
+    required: false
+    description: List of initialization statements
+    items:
+      type: string
+  methods:
+    type: array
+    required: false
+    description: List of methods to add to the class
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  properties:
+    type: array
+    required: false
+    description: List of properties to add to the class
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+examples:
+  - name: basic_singleton
+    description: Basic singleton class with no additional methods
+    parameters:
+      class_name: DatabaseConnection
+    code: |
+      class DatabaseConnection:
+          """
+          Singleton class that ensures only one instance exists.
+          
+          Usage:
+              instance = DatabaseConnection.get_instance()
+          """
+          
+          _instance = None
+          
+          def __new__(cls):
+              if cls._instance is None:
+                  cls._instance = super().__new__(cls)
+              return cls._instance
+              
+          @classmethod
+          def get_instance(cls):
+              """Get the singleton instance"""
+              if cls._instance is None:
+                  cls._instance = cls()
+              return cls._instance
+              
+          def __init__(self):
+              """Initialize the singleton instance"""
+              if not hasattr(self, '_initialized'):
+                  self._initialized = True
+  - name: singleton_with_methods
+    description: Singleton class with additional methods
+    parameters:
+      class_name: ConfigurationManager
+      methods:
+        - name: get_config
+          args:
+            - name: key
+              type: str
+          return_type: Any
+          docstring: Get configuration value by key
+          body: return self._config.get(key)
+        - name: set_config
+          args:
+            - name: key
+              type: str
+            - name: value
+              type: Any
+          return_type: None
+          docstring: Set configuration value for key
+          body: self._config[key] = value
+      properties:
+        - name: config
+          type: Dict[str, Any]
+          docstring: Get the entire configuration dictionary
+    code: |
+      class ConfigurationManager:
+          """
+          Singleton class that ensures only one instance exists.
+          
+          Usage:
+              instance = ConfigurationManager.get_instance()
+          """
+          
+          _instance = None
+          
+          def __new__(cls):
+              if cls._instance is None:
+                  cls._instance = super().__new__(cls)
+              return cls._instance
+              
+          @classmethod
+          def get_instance(cls):
+              """Get the singleton instance"""
+              if cls._instance is None:
+                  cls._instance = cls()
+              return cls._instance
+              
+          def __init__(self):
+              """Initialize the singleton instance"""
+              if not hasattr(self, '_initialized'):
+                  self._initialized = True
+                  self._config = {}
+                  
+          def get_config(self, key: str) -> Any:
+              """
+              Get configuration value by key
+              """
+              return self._config.get(key)
+              
+          def set_config(self, key: str, value: Any) -> None:
+              """
+              Set configuration value for key
+              """
+              self._config[key] = value
+              
+          @property
+          def config(self) -> Dict[str, Any]:
+              """
+              Get the entire configuration dictionary
+              """
+              return self._config
+              
+          @config.setter
+          def config(self, value: Dict[str, Any]) -> None:
+              self._config = value
+best_practices:
+  - Use the singleton pattern only when you need to ensure a class has exactly one instance
+  - Make the constructor private to prevent direct instantiation
+  - Use a class method to get the instance
+  - Consider thread safety in multi-threaded environments
+  - Be careful with global state and mutable data
+  - Document the singleton nature of the class
+anti_patterns:
+  - Creating multiple instances through reflection or serialization
+  - Using global variables instead of proper singleton implementation
+  - Not handling thread safety in multi-threaded environments
+  - Making the singleton instance mutable without proper synchronization
+  - Using singleton for classes that should have multiple instances
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

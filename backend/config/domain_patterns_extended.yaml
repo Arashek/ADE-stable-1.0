@@ -1,0 +1,191 @@
+gaming:
+  - name: game_engine
+    description: "Game engine and real-time systems"
+    code_patterns:
+      - "game_loop"
+      - "entity_component_system"
+      - "physics_engine"
+    best_practices:
+      - "Delta time for updates"
+      - "Frame rate optimization"
+      - "Memory pooling"
+    performance_requirements:
+      - "60+ FPS"
+      - "< 16ms frame time"
+      - "Efficient collision detection"
+    security_requirements:
+      - "Anti-cheat measures"
+      - "Secure multiplayer"
+      - "State validation"
+    metrics:
+      frame_time: "< 16ms"
+      memory_usage: "< 1GB"
+      network_latency: "< 50ms"
+
+blockchain:
+  - name: smart_contracts
+    description: "Blockchain and smart contract systems"
+    code_patterns:
+      - "consensus_mechanism"
+      - "merkle_tree"
+      - "transaction_validation"
+    best_practices:
+      - "Gas optimization"
+      - "Security patterns"
+      - "State management"
+    security_requirements:
+      - "Reentrancy protection"
+      - "Integer overflow checks"
+      - "Access control"
+    performance_requirements:
+      - "Efficient gas usage"
+      - "Quick state updates"
+      - "Optimized storage"
+    metrics:
+      gas_cost: "< 100000"
+      transaction_time: "< 5s"
+      state_size: "optimized"
+
+ai_ml:
+  - name: machine_learning
+    description: "AI and Machine Learning systems"
+    code_patterns:
+      - "model_training"
+      - "data_pipeline"
+      - "inference_engine"
+    best_practices:
+      - "Data validation"
+      - "Model versioning"
+      - "Resource management"
+    performance_requirements:
+      - "Efficient training"
+      - "Quick inference"
+      - "Memory optimization"
+    security_requirements:
+      - "Data privacy"
+      - "Model protection"
+      - "Access control"
+    metrics:
+      inference_time: "< 100ms"
+      memory_usage: "optimized"
+      accuracy: "> 95%"
+
+iot:
+  - name: embedded_systems
+    description: "IoT and embedded systems"
+    code_patterns:
+      - "sensor_integration"
+      - "data_collection"
+      - "device_management"
+    best_practices:
+      - "Power optimization"
+      - "Memory management"
+      - "Error handling"
+    security_requirements:
+      - "Device authentication"
+      - "Secure communication"
+      - "Firmware security"
+    performance_requirements:
+      - "Low latency"
+      - "Power efficiency"
+      - "Memory efficiency"
+    metrics:
+      power_usage: "optimized"
+      response_time: "< 50ms"
+      uptime: "> 99.9%"
+
+cybersecurity:
+  - name: security_tools
+    description: "Cybersecurity and penetration testing"
+    code_patterns:
+      - "vulnerability_scanning"
+      - "threat_detection"
+      - "incident_response"
+    best_practices:
+      - "Safe testing"
+      - "Logging"
+      - "Isolation"
+    security_requirements:
+      - "Secure communications"
+      - "Access control"
+      - "Data protection"
+    performance_requirements:
+      - "Quick scanning"
+      - "Real-time detection"
+      - "Efficient logging"
+    metrics:
+      scan_time: "optimized"
+      detection_rate: "> 95%"
+      false_positive: "< 5%"
+
+data_science:
+  - name: data_analytics
+    description: "Data science and analytics"
+    code_patterns:
+      - "data_processing"
+      - "statistical_analysis"
+      - "visualization"
+    best_practices:
+      - "Data validation"
+      - "Performance optimization"
+      - "Memory management"
+    security_requirements:
+      - "Data privacy"
+      - "Access control"
+      - "Secure storage"
+    performance_requirements:
+      - "Quick processing"
+      - "Memory efficiency"
+      - "Scalability"
+    metrics:
+      processing_time: "optimized"
+      memory_usage: "efficient"
+      accuracy: "> 95%"
+
+ar_vr:
+  - name: extended_reality
+    description: "AR/VR applications"
+    code_patterns:
+      - "3d_rendering"
+      - "spatial_tracking"
+      - "interaction_system"
+    best_practices:
+      - "Performance optimization"
+      - "Motion handling"
+      - "User comfort"
+    security_requirements:
+      - "Privacy protection"
+      - "Secure tracking"
+      - "Data protection"
+    performance_requirements:
+      - "90+ FPS"
+      - "Low latency"
+      - "Efficient rendering"
+    metrics:
+      frame_rate: "> 90fps"
+      latency: "< 20ms"
+      tracking_accuracy: "high"
+
+quantum:
+  - name: quantum_computing
+    description: "Quantum computing applications"
+    code_patterns:
+      - "quantum_circuits"
+      - "qubit_operations"
+      - "error_correction"
+    best_practices:
+      - "Quantum error correction"
+      - "Circuit optimization"
+      - "Noise handling"
+    security_requirements:
+      - "Quantum cryptography"
+      - "Secure key distribution"
+      - "Access control"
+    performance_requirements:
+      - "Circuit depth optimization"
+      - "Error rate minimization"
+      - "Qubit efficiency"
+    metrics:
+      error_rate: "minimized"
+      circuit_depth: "optimized"
+      coherence_time: "maximized"

@@ -1,0 +1,167 @@
+code_optimization:
+  strategies:
+    dead_code:
+      - name: "Dead Code Elimination"
+        pattern: "unused\\s+\\w+"
+        description: "Remove unused code"
+        severity: "high"
+        fix: "Implement dead code elimination"
+      - name: "Constant Propagation"
+        pattern: "const\\s+\\w+\\s*=\\s*\\d+"
+        description: "Propagate constant values"
+        severity: "medium"
+        fix: "Implement constant propagation"
+
+    loop_optimization:
+      - name: "Loop Unrolling"
+        pattern: "for\\s*\\([^)]+\\)\\s*{[^}]*}"
+        description: "Unroll small loops"
+        severity: "high"
+        fix: "Implement loop unrolling"
+      - name: "Loop Fusion"
+        pattern: "for\\s*\\([^)]+\\)\\s*{[^}]*}\\s*for\\s*\\([^)]+\\)\\s*{[^}]*}"
+        description: "Fuse adjacent loops"
+        severity: "medium"
+        fix: "Implement loop fusion"
+
+    branch_optimization:
+      - name: "Branch Prediction"
+        pattern: "if\\s*\\([^)]+\\)\\s*{[^}]*}"
+        description: "Optimize branch prediction"
+        severity: "high"
+        fix: "Implement branch prediction"
+      - name: "Conditional Elimination"
+        pattern: "if\\s*\\([^)]+\\)\\s*return\\s+true"
+        description: "Eliminate unnecessary conditions"
+        severity: "medium"
+        fix: "Implement conditional elimination"
+
+memory_optimization:
+  strategies:
+    allocation:
+      - name: "Stack Allocation"
+        pattern: "new\\s+\\w+\\([^)]+\\)"
+        description: "Use stack allocation when possible"
+        severity: "high"
+        fix: "Implement stack allocation"
+      - name: "Array Pooling"
+        pattern: "new\\s+Array\\([^)]+\\)"
+        description: "Reuse array instances"
+        severity: "medium"
+        fix: "Implement array pooling"
+
+    layout:
+      - name: "Memory Alignment"
+        pattern: "struct\\s+\\w+\\s*{[^}]*}"
+        description: "Optimize memory layout"
+        severity: "high"
+        fix: "Implement memory alignment"
+      - name: "Cache Line Optimization"
+        pattern: "class\\s+\\w+\\s*{[^}]*}"
+        description: "Optimize for cache lines"
+        severity: "medium"
+        fix: "Implement cache line optimization"
+
+concurrency_optimization:
+  strategies:
+    synchronization:
+      - name: "Lock-Free Algorithms"
+        pattern: "synchronized\\s*\\([^)]+\\)"
+        description: "Use lock-free algorithms"
+        severity: "high"
+        fix: "Implement lock-free algorithms"
+      - name: "Fine-Grained Locking"
+        pattern: "lock\\([^)]+\\)"
+        description: "Use fine-grained locking"
+        severity: "medium"
+        fix: "Implement fine-grained locking"
+
+    thread_management:
+      - name: "Thread Pool Optimization"
+        pattern: "new\\s+Thread\\([^)]+\\)"
+        description: "Optimize thread pool usage"
+        severity: "high"
+        fix: "Implement thread pool optimization"
+      - name: "Thread Affinity"
+        pattern: "thread\\.start\\([^)]+\\)"
+        description: "Set thread affinity"
+        severity: "medium"
+        fix: "Implement thread affinity"
+
+io_optimization:
+  strategies:
+    buffering:
+      - name: "Buffer Pooling"
+        pattern: "new\\s+Buffer\\([^)]+\\)"
+        description: "Reuse buffer instances"
+        severity: "high"
+        fix: "Implement buffer pooling"
+      - name: "Adaptive Buffering"
+        pattern: "read\\([^)]+\\)"
+        description: "Use adaptive buffer sizes"
+        severity: "medium"
+        fix: "Implement adaptive buffering"
+
+    async_io:
+      - name: "Asynchronous IO"
+        pattern: "readFile\\([^)]+\\)"
+        description: "Use asynchronous IO"
+        severity: "high"
+        fix: "Implement asynchronous IO"
+      - name: "IO Batching"
+        pattern: "write\\([^)]+\\)"
+        description: "Batch IO operations"
+        severity: "medium"
+        fix: "Implement IO batching"
+
+network_optimization:
+  strategies:
+    connection:
+      - name: "Connection Pooling"
+        pattern: "new\\s+Connection\\([^)]+\\)"
+        description: "Reuse network connections"
+        severity: "high"
+        fix: "Implement connection pooling"
+      - name: "Keep-Alive Optimization"
+        pattern: "http\\.request\\([^)]+\\)"
+        description: "Optimize keep-alive connections"
+        severity: "medium"
+        fix: "Implement keep-alive optimization"
+
+    protocol:
+      - name: "Protocol Buffers"
+        pattern: "JSON\\.stringify\\([^)]+\\)"
+        description: "Use protocol buffers"
+        severity: "high"
+        fix: "Implement protocol buffers"
+      - name: "Compression"
+        pattern: "send\\([^)]+\\)"
+        description: "Use compression"
+        severity: "medium"
+        fix: "Implement compression"
+
+database_optimization:
+  strategies:
+    query:
+      - name: "Query Optimization"
+        pattern: "SELECT\\s+[^;]+"
+        description: "Optimize database queries"
+        severity: "high"
+        fix: "Implement query optimization"
+      - name: "Batch Operations"
+        pattern: "INSERT\\s+INTO\\s+[^;]+"
+        description: "Use batch operations"
+        severity: "medium"
+        fix: "Implement batch operations"
+
+    caching:
+      - name: "Query Cache"
+        pattern: "executeQuery\\([^)]+\\)"
+        description: "Cache query results"
+        severity: "high"
+        fix: "Implement query caching"
+      - name: "Result Set Optimization"
+        pattern: "ResultSet\\.next\\([^)]+\\)"
+        description: "Optimize result set handling"
+        severity: "medium"
+        fix: "Implement result set optimization" 

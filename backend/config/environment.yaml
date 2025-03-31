@@ -1,0 +1,86 @@
+development:
+  # API Configuration
+  api:
+    host: 0.0.0.0
+    port: 8000
+    reload: true
+    debug: true
+
+  # Database Configuration
+  mongodb:
+    uri: mongodb://mongodb:27017/ade
+    user: admin
+    password: "@R1359962ad"
+
+  # Redis Configuration
+  redis:
+    uri: redis://redis:6379/0
+    password: "@R1359962ad"
+
+  # Model Providers
+  providers:
+    anthropic:
+      api_key: "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"
+      default_model: "claude-3-opus-20240229"
+      
+    openai:
+      api_key: "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"
+      default_model: "gpt-4"
+      
+    google:
+      api_key: "AIzaSyCwbgArXr23U6badP9RV9-MgSzIlusWF6c"
+      default_model: "gemini-pro"
+      
+    groq:
+      api_key: "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"
+      default_model: "mixtral-8x7b"
+      
+    deepseek:
+      api_key: "sk-bf1ad81bf6504af2bea46a869ae2746f"
+      
+    ollama:
+      server_url: "http://ollama:11434"
+      models:
+        - "deepseek-coder-33b"
+        - "codellama-70b"
+        - "mixtral-8x7b"
+        - "llama2-70b"
+
+  # Authentication
+  auth:
+    jwt_secret: "468db577936ee71cccac99fc8f4498e3f22ec1ffcbbc289a74391ca135e2453217d1711754b5849c92d26240749e222de685decb11570735a67a52f443fa89a09ace22c32be905e237a752b8d1988fe348f27e89ba5a5b8c273970dc09387647f110afb427a068d7620f87cab31beba677f4275c4e621c1888c129960662ba0ae86ce8ca07bbf268f7eecebadc1f38bad2daabdf999a18dff6e398215d64c1f04d69c73b33390d8ea1c853f6d42f208480320aa8d8fdf20c462f6db3215cfd10c02e1f483e7cacaa6da1fcaf2a3b41312c6994def12834e2b8b5eb79b4cc4be0d4c25d4382a78eb5ab893fdc8128fe159ca2097a9ef4163845cedfc7a245443d"
+    jwt_algorithm: "HS256"
+    jwt_expiration: 3600
+
+  # GitHub Integration
+  github:
+    client_id: "Ov23liz2SyKJ0M6afA6j"
+    client_secret: "dd6824535b33cfd8aa5c858e680bc55a2bb72044"
+    callback_url: "http://localhost:8000/auth/github/callback"
+
+  # Monitoring
+  monitoring:
+    prometheus:
+      enabled: true
+      port: 9090
+      multiproc_dir: "/tmp"
+    grafana:
+      enabled: true
+      port: 3000
+      admin_password: "@R1359962ad"
+
+  # Rate Limiting
+  rate_limiting:
+    requests: 100
+    period: 60
+
+  # Performance
+  performance:
+    max_concurrent_tasks: 10
+    task_timeout: 3600
+    model_selection_strategy: "balanced"
+
+  # Security
+  security:
+    encryption_key: "7zwFrH6OvayAA1VwzCO2LklIIiVRuJ-4-Nf0ayjc-LQ="
+    api_key_header: "X-API-Key"

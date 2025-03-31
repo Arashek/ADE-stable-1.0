@@ -1,0 +1,160 @@
+caching:
+  metrics:
+    hit_rates:
+      - name: "LRU Cache Hit Rate"
+        pattern: "lru\\.hit\\([^)]+\\)"
+        description: "Monitor LRU cache hit rate"
+        threshold: "85%"
+        fix: "Optimize LRU cache size"
+      - name: "Memory Cache Hit Rate"
+        pattern: "memory\\.hit\\([^)]+\\)"
+        description: "Monitor memory cache hit rate"
+        threshold: "75%"
+        fix: "Optimize memory cache size"
+      - name: "Disk Cache Hit Rate"
+        pattern: "disk\\.hit\\([^)]+\\)"
+        description: "Monitor disk cache hit rate"
+        threshold: "60%"
+        fix: "Optimize disk cache size"
+
+    performance:
+      - name: "Cache Access Time"
+        pattern: "cache\\.access\\([^)]+\\)"
+        description: "Measure cache access time"
+        threshold: "5ms"
+        fix: "Optimize cache access"
+      - name: "Cache Write Time"
+        pattern: "cache\\.write\\([^)]+\\)"
+        description: "Measure cache write time"
+        threshold: "10ms"
+        fix: "Optimize cache writes"
+
+parallelization:
+  metrics:
+    worker_utilization:
+      - name: "Worker CPU Usage"
+        pattern: "worker\\.cpu\\([^)]+\\)"
+        description: "Monitor worker CPU usage"
+        threshold: "80%"
+        fix: "Optimize worker allocation"
+      - name: "Worker Memory Usage"
+        pattern: "worker\\.memory\\([^)]+\\)"
+        description: "Monitor worker memory usage"
+        threshold: "500MB"
+        fix: "Optimize worker memory"
+
+    task_processing:
+      - name: "Task Queue Length"
+        pattern: "queue\\.length\\([^)]+\\)"
+        description: "Monitor task queue length"
+        threshold: "1000"
+        fix: "Optimize task processing"
+      - name: "Task Processing Time"
+        pattern: "task\\.process\\([^)]+\\)"
+        description: "Measure task processing time"
+        threshold: "50ms"
+        fix: "Optimize task processing"
+
+memory:
+  metrics:
+    allocation:
+      - name: "Memory Allocation Rate"
+        pattern: "memory\\.allocate\\([^)]+\\)"
+        description: "Monitor memory allocation rate"
+        threshold: "100MB/s"
+        fix: "Optimize memory allocation"
+      - name: "Object Creation Rate"
+        pattern: "object\\.create\\([^)]+\\)"
+        description: "Monitor object creation rate"
+        threshold: "1000/s"
+        fix: "Optimize object creation"
+
+    garbage_collection:
+      - name: "GC Frequency"
+        pattern: "gc\\.frequency\\([^)]+\\)"
+        description: "Monitor garbage collection frequency"
+        threshold: "1/s"
+        fix: "Optimize garbage collection"
+      - name: "GC Duration"
+        pattern: "gc\\.duration\\([^)]+\\)"
+        description: "Measure garbage collection duration"
+        threshold: "100ms"
+        fix: "Optimize garbage collection"
+
+compilation:
+  metrics:
+    jit:
+      - name: "JIT Compilation Time"
+        pattern: "jit\\.compile\\([^)]+\\)"
+        description: "Measure JIT compilation time"
+        threshold: "50ms"
+        fix: "Optimize JIT compilation"
+      - name: "JIT Cache Size"
+        pattern: "jit\\.cache\\([^)]+\\)"
+        description: "Monitor JIT cache size"
+        threshold: "100MB"
+        fix: "Optimize JIT cache"
+
+    code_generation:
+      - name: "Code Generation Time"
+        pattern: "generate\\([^)]+\\)"
+        description: "Measure code generation time"
+        threshold: "100ms"
+        fix: "Optimize code generation"
+      - name: "Generated Code Size"
+        pattern: "code\\.size\\([^)]+\\)"
+        description: "Monitor generated code size"
+        threshold: "1MB"
+        fix: "Optimize code size"
+
+analysis:
+  metrics:
+    performance:
+      - name: "Analysis Time"
+        pattern: "analyze\\([^)]+\\)"
+        description: "Measure analysis time"
+        threshold: "200ms"
+        fix: "Optimize analysis"
+      - name: "Analysis Memory Usage"
+        pattern: "analysis\\.memory\\([^)]+\\)"
+        description: "Monitor analysis memory usage"
+        threshold: "200MB"
+        fix: "Optimize analysis memory"
+
+    accuracy:
+      - name: "Analysis Accuracy"
+        pattern: "accuracy\\([^)]+\\)"
+        description: "Monitor analysis accuracy"
+        threshold: "95%"
+        fix: "Improve analysis accuracy"
+      - name: "False Positive Rate"
+        pattern: "falsePositive\\([^)]+\\)"
+        description: "Monitor false positive rate"
+        threshold: "5%"
+        fix: "Reduce false positives"
+
+validation:
+  metrics:
+    performance:
+      - name: "Validation Time"
+        pattern: "validate\\([^)]+\\)"
+        description: "Measure validation time"
+        threshold: "150ms"
+        fix: "Optimize validation"
+      - name: "Validation Memory Usage"
+        pattern: "validation\\.memory\\([^)]+\\)"
+        description: "Monitor validation memory usage"
+        threshold: "150MB"
+        fix: "Optimize validation memory"
+
+    coverage:
+      - name: "Validation Coverage"
+        pattern: "coverage\\([^)]+\\)"
+        description: "Monitor validation coverage"
+        threshold: "90%"
+        fix: "Improve validation coverage"
+      - name: "Error Detection Rate"
+        pattern: "error\\.detect\\([^)]+\\)"
+        description: "Monitor error detection rate"
+        threshold: "95%"
+        fix: "Improve error detection" 

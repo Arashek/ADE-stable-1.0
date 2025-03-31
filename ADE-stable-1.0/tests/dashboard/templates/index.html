@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADE Platform Test Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ADE Platform Test Dashboard</h1>
+            <div class="time-range">
+                <label for="days">Time Range:</label>
+                <select id="days" onchange="updateDashboard()">
+                    <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+                    <option value="14" {% if days == 14 %}selected{% endif %}>Last 14 days</option>
+                    <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+                </select>
+            </div>
+        </header>
+
+        <section class="summary-cards">
+            <div class="card">
+                <h3>Overall Status</h3>
+                <div class="metric">
+                    <span class="value">{{ "%.1f"|format(summary.success_rate) }}%</span>
+                    <span class="label">Success Rate</span>
+                </div>
+                <div class="details">
+                    <div class="stat">
+                        <span class="label">Total Tests:</span>
+                        <span class="value">{{ summary.total_tests }}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Passed:</span>
+                        <span class="value success">{{ summary.passed }}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Failed:</span>
+                        <span class="value failure">{{ summary.failed }}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Skipped:</span>
+                        <span class="value skipped">{{ summary.skipped }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Performance</h3>
+                <div class="metric">
+                    <span class="value">{{ "%.2f"|format(performance.avg_duration) }}s</span>
+                    <span class="label">Average Duration</span>
+                </div>
+                <div class="details">
+                    <div class="stat">
+                        <span class="label">Min:</span>
+                        <span class="value">{{ "%.2f"|format(performance.min_duration) }}s</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Max:</span>
+                        <span class="value">{{ "%.2f"|format(performance.max_duration) }}s</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">P95:</span>
+                        <span class="value">{{ "%.2f"|format(performance.p95_duration) }}s</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="charts">
+            <div class="chart-container">
+                <h3>Test Results Trend</h3>
+                <canvas id="trendChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>Category Performance</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </section>
+
+        <section class="failures">
+            <h3>Recent Failures</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Category</th>
+                            <th>Failures</th>
+                            <th>Latest Failure</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for failure in failures %}
+                        <tr>
+                            <td>{{ failure.test_name }}</td>
+                            <td>{{ failure.category }}</td>
+                            <td class="failure-count">{{ failure.total_failures }}</td>
+                            <td>{{ failure.latest_failure }}</td>
+                            <td>
+                                <button onclick="showFailureDetails('{{ failure.test_name }}')">Details</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="slow-tests">
+            <h3>Slow Tests</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Category</th>
+                            <th>Duration</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for test in performance.slow_tests %}
+                        <tr>
+                            <td>{{ test.test_name }}</td>
+                            <td>{{ test.category }}</td>
+                            <td>{{ "%.2f"|format(test.duration) }}s</td>
+                            <td>{{ test.timestamp }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Failure Details Modal -->
+    <div id="failureModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Failure Details</h2>
+            <div id="failureDetails"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html> 

@@ -1,0 +1,130 @@
+name: react_component
+description: Template for generating React components with TypeScript
+content: |
+  import React, { FC, useState, useEffect } from 'react';
+  import { {{ imports | join(', ') }} } from '{{ import_path }}';
+  
+  interface {{ component_name }}Props {
+    {% for prop in props %}
+    {{ prop.name }}: {{ prop.type }}{% if not prop.required %}?{% endif %};
+    {% endfor %}
+  }
+  
+  export const {{ component_name }}: FC<{{ component_name }}Props> = ({
+    {% for prop in props %}
+    {{ prop.name }}{% if not prop.required %} = {{ prop.default }}{% endif %},
+    {% endfor %}
+  }) => {
+    {% for state in state_vars %}
+    const [{{ state.name }}, set{{ state.name | title }}] = useState<{{ state.type }}>({{ state.default }});
+    {% endfor %}
+    
+    {% for effect in effects %}
+    useEffect(() => {
+      {{ effect.code }}
+    }, [{{ effect.dependencies | join(', ') }}]);
+    {% endfor %}
+    
+    {% for handler in handlers %}
+    const handle{{ handler.name | title }} = {{ handler.type }}(() => {
+      {{ handler.code }}
+    });
+    {% endfor %}
+    
+    return (
+      <div className="{{ component_name | lower }}-container">
+        {% for child in children %}
+        {{ child }}
+        {% endfor %}
+      </div>
+    );
+  };
+  
+  export default {{ component_name }};
+parameters:
+  component_name:
+    type: string
+    required: true
+    description: Name of the React component
+  imports:
+    type: array
+    required: false
+    description: List of imports from the import path
+  import_path:
+    type: string
+    required: false
+    description: Path to import from
+  props:
+    type: array
+    required: false
+    description: List of component props
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      required:
+        type: boolean
+        required: false
+        default: true
+      default:
+        type: string
+        required: false
+  state_vars:
+    type: array
+    required: false
+    description: List of state variables
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      default:
+        type: string
+        required: true
+  effects:
+    type: array
+    required: false
+    description: List of useEffect hooks
+    items:
+      code:
+        type: string
+        required: true
+      dependencies:
+        type: array
+        required: false
+        default: []
+  handlers:
+    type: array
+    required: false
+    description: List of event handlers
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+        default: "() =>"
+      code:
+        type: string
+        required: true
+  children:
+    type: array
+    required: false
+    description: List of child components
+tags:
+  - react
+  - typescript
+  - frontend
+  - component
+language: typescript
+category: component
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

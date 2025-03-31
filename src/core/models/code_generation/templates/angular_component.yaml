@@ -1,0 +1,160 @@
+name: angular_component
+description: Template for generating Angular components with TypeScript
+content: |
+  import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+  import { {{ imports | join(', ') }} } from '{{ import_path }}';
+  
+  @Component({
+    selector: '{{ selector }}',
+    templateUrl: './{{ component_name | lower }}.component.html',
+    styleUrls: ['./{{ component_name | lower }}.component.scss']
+  })
+  export class {{ component_name }}Component implements OnInit, OnDestroy {
+    {% for input in inputs %}
+    @Input() {{ input.name }}: {{ input.type }} = {{ input.default }};
+    {% endfor %}
+    
+    {% for output in outputs %}
+    @Output() {{ output.name }} = new EventEmitter<{{ output.type }}>();
+    {% endfor %}
+    
+    {% for property in properties %}
+    {{ property.access }} {{ property.name }}: {{ property.type }} = {{ property.default }};
+    {% endfor %}
+    
+    constructor(
+      {% for dependency in dependencies %}
+      private {{ dependency.name }}: {{ dependency.type }}{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ) {}
+    
+    ngOnInit(): void {
+      {% for init in init_code %}
+      {{ init }}
+      {% endfor %}
+    }
+    
+    ngOnDestroy(): void {
+      {% for cleanup in cleanup_code %}
+      {{ cleanup }}
+      {% endfor %}
+    }
+    
+    {% for method in methods %}
+    {{ method.access }} {{ method.name }}({{ method.parameters }}): {{ method.return_type }} {
+      {{ method.body }}
+    }
+    {% endfor %}
+  }
+parameters:
+  component_name:
+    type: string
+    required: true
+    description: Name of the Angular component
+  selector:
+    type: string
+    required: true
+    description: Component selector
+  imports:
+    type: array
+    required: false
+    description: List of imports from the import path
+  import_path:
+    type: string
+    required: false
+    description: Path to import from
+  inputs:
+    type: array
+    required: false
+    description: List of input properties
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      default:
+        type: string
+        required: false
+  outputs:
+    type: array
+    required: false
+    description: List of output event emitters
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  properties:
+    type: array
+    required: false
+    description: List of component properties
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      access:
+        type: string
+        required: false
+        default: "public"
+      default:
+        type: string
+        required: false
+  dependencies:
+    type: array
+    required: false
+    description: List of constructor dependencies
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  init_code:
+    type: array
+    required: false
+    description: List of initialization code statements
+  cleanup_code:
+    type: array
+    required: false
+    description: List of cleanup code statements
+  methods:
+    type: array
+    required: false
+    description: List of component methods
+    items:
+      name:
+        type: string
+        required: true
+      access:
+        type: string
+        required: false
+        default: "public"
+      parameters:
+        type: string
+        required: false
+      return_type:
+        type: string
+        required: false
+        default: "void"
+      body:
+        type: string
+        required: true
+tags:
+  - angular
+  - typescript
+  - frontend
+  - component
+language: typescript
+category: component
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

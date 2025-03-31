@@ -1,0 +1,245 @@
+name: vue_component
+description: Template for generating Vue.js components with TypeScript
+content: |
+  <template>
+    <div class="{{ component_name | lower }}-container">
+      {% for slot in slots %}
+      <slot name="{{ slot.name }}" {% if slot.props %}v-bind="{{ slot.props }}"{% endif %}>
+        {{ slot.default_content }}
+      </slot>
+      {% endfor %}
+    </div>
+  </template>
+  
+  <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+  import { {{ imports | join(', ') }} } from '{{ import_path }}';
+  
+  export default defineComponent({
+    name: '{{ component_name }}',
+    
+    components: {
+      {% for component in components %}
+      {{ component.name }}: {{ component.import }},
+      {% endfor %}
+    },
+    
+    props: {
+      {% for prop in props %}
+      {{ prop.name }}: {
+        type: {{ prop.type }} as PropType<{{ prop.type }}>,
+        required: {{ prop.required | lower }}{% if prop.default %},
+        default: {{ prop.default }}{% endif %}
+      },
+      {% endfor %}
+    },
+    
+    emits: [
+      {% for emit in emits %}
+      '{{ emit }}',
+      {% endfor %}
+    ],
+    
+    setup(props, { emit }) {
+      {% for ref in refs %}
+      const {{ ref.name }} = ref<{{ ref.type }}>({{ ref.default }});
+      {% endfor %}
+      
+      {% for computed in computed_properties %}
+      const {{ computed.name }} = computed(() => {
+        {{ computed.body }}
+      });
+      {% endfor %}
+      
+      {% for method in methods %}
+      const {{ method.name }} = {{ method.type }}(() => {
+        {{ method.body }}
+      });
+      {% endfor %}
+      
+      {% for watch in watchers %}
+      watch(
+        () => {{ watch.target }},
+        (newValue, oldValue) => {
+          {{ watch.body }}
+        },
+        { {{ watch.options }} }
+      );
+      {% endfor %}
+      
+      {% for lifecycle in lifecycle_hooks %}
+      on{{ lifecycle.name }}(() => {
+        {{ lifecycle.body }}
+      });
+      {% endfor %}
+      
+      return {
+        {% for ref in refs %}
+        {{ ref.name }},
+        {% endfor %}
+        {% for computed in computed_properties %}
+        {{ computed.name }},
+        {% endfor %}
+        {% for method in methods %}
+        {{ method.name }},
+        {% endfor %}
+      };
+    }
+  });
+  </script>
+  
+  <style scoped>
+  .{{ component_name | lower }}-container {
+    {% for style in styles %}
+    {{ style.property }}: {{ style.value }};
+    {% endfor %}
+  }
+  </style>
+parameters:
+  component_name:
+    type: string
+    required: true
+    description: Name of the Vue component
+  imports:
+    type: array
+    required: false
+    description: List of imports from the import path
+  import_path:
+    type: string
+    required: false
+    description: Path to import from
+  components:
+    type: array
+    required: false
+    description: List of child components
+    items:
+      name:
+        type: string
+        required: true
+      import:
+        type: string
+        required: true
+  props:
+    type: array
+    required: false
+    description: List of component props
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      required:
+        type: boolean
+        required: false
+        default: false
+      default:
+        type: string
+        required: false
+  emits:
+    type: array
+    required: false
+    description: List of emitted events
+  slots:
+    type: array
+    required: false
+    description: List of component slots
+    items:
+      name:
+        type: string
+        required: true
+      props:
+        type: object
+        required: false
+      default_content:
+        type: string
+        required: false
+  refs:
+    type: array
+    required: false
+    description: List of reactive references
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      default:
+        type: string
+        required: true
+  computed_properties:
+    type: array
+    required: false
+    description: List of computed properties
+    items:
+      name:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  methods:
+    type: array
+    required: false
+    description: List of component methods
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+        default: "() =>"
+      body:
+        type: string
+        required: true
+  watchers:
+    type: array
+    required: false
+    description: List of watchers
+    items:
+      target:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+      options:
+        type: string
+        required: false
+        default: "{}"
+  lifecycle_hooks:
+    type: array
+    required: false
+    description: List of lifecycle hooks
+    items:
+      name:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  styles:
+    type: array
+    required: false
+    description: List of CSS styles
+    items:
+      property:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+tags:
+  - vue
+  - typescript
+  - frontend
+  - component
+language: typescript
+category: component
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

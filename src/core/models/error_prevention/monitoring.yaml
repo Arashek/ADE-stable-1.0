@@ -1,0 +1,206 @@
+# Error Prevention Monitoring Configuration
+# This file defines monitoring and alerting settings
+
+monitoring:
+  # General monitoring settings
+  general:
+    enabled: true
+    log_level: "INFO"
+    retention_period: 90  # days
+    compression: true
+    backup_frequency: "daily"
+    max_log_size: "1GB"
+
+  # Metrics collection
+  metrics:
+    collection_interval: 60  # seconds
+    batch_size: 1000
+    timeout: 30  # seconds
+    retry_attempts: 3
+    backoff_factor: 2
+    max_retry_delay: 300  # seconds
+
+  # Resource monitoring
+  resources:
+    cpu:
+      sampling_rate: 1  # seconds
+      aggregation: "avg"
+      window_size: 300  # seconds
+    memory:
+      sampling_rate: 1  # seconds
+      aggregation: "avg"
+      window_size: 300  # seconds
+    disk:
+      sampling_rate: 60  # seconds
+      aggregation: "avg"
+      window_size: 3600  # seconds
+    network:
+      sampling_rate: 1  # seconds
+      aggregation: "sum"
+      window_size: 300  # seconds
+
+  # Performance monitoring
+  performance:
+    response_time:
+      sampling_rate: 1  # seconds
+      aggregation: "p95"
+      window_size: 300  # seconds
+    throughput:
+      sampling_rate: 1  # seconds
+      aggregation: "sum"
+      window_size: 300  # seconds
+    error_rate:
+      sampling_rate: 1  # seconds
+      aggregation: "rate"
+      window_size: 300  # seconds
+
+  # Error tracking
+  error_tracking:
+    enabled: true
+    max_errors_per_minute: 1000
+    deduplication_window: 3600  # seconds
+    stack_trace_depth: 10
+    context_variables:
+      - "request_id"
+      - "user_id"
+      - "session_id"
+      - "environment"
+
+  # Alerting configuration
+  alerts:
+    # Alert channels
+    channels:
+      email:
+        enabled: true
+        smtp_server: "smtp.example.com"
+        smtp_port: 587
+        from_address: "alerts@example.com"
+        recipients:
+          - "team@example.com"
+          - "ops@example.com"
+        template: "email_template.html"
+
+      slack:
+        enabled: true
+        webhook_url: "https://hooks.slack.com/services/xxx/yyy/zzz"
+        channel: "#alerts"
+        username: "Error Prevention Bot"
+        icon_emoji: ":warning:"
+
+      sms:
+        enabled: true
+        provider: "twilio"
+        account_sid: "ACxxx"
+        auth_token: "yyy"
+        from_number: "+1234567890"
+        recipients:
+          - "+1987654321"
+
+    # Alert rules
+    rules:
+      error_rate:
+        threshold: 0.05  # 5%
+        window: 300  # seconds
+        min_occurrences: 3
+        cooldown: 3600  # seconds
+
+      response_time:
+        threshold: 2000  # ms
+        window: 300  # seconds
+        min_occurrences: 5
+        cooldown: 1800  # seconds
+
+      resource_usage:
+        threshold: 85  # percentage
+        window: 300  # seconds
+        min_occurrences: 3
+        cooldown: 1800  # seconds
+
+    # Alert escalation
+    escalation:
+      levels:
+        - name: "Level 1"
+          delay: 300  # seconds
+          channels: ["slack"]
+          recipients: ["team_lead"]
+
+        - name: "Level 2"
+          delay: 900  # seconds
+          channels: ["email", "slack"]
+          recipients: ["system_admin", "team_lead"]
+
+        - name: "Level 3"
+          delay: 3600  # seconds
+          channels: ["email", "slack", "sms"]
+          recipients: ["security_team", "system_admin", "team_lead"]
+
+  # Dashboard configuration
+  dashboards:
+    main:
+      refresh_interval: 60  # seconds
+      panels:
+        - name: "Error Rate"
+          type: "graph"
+          metrics: ["error_rate"]
+          window: 3600  # seconds
+
+        - name: "Response Time"
+          type: "graph"
+          metrics: ["response_time"]
+          window: 3600  # seconds
+
+        - name: "Resource Usage"
+          type: "graph"
+          metrics: ["cpu_usage", "memory_usage", "disk_usage"]
+          window: 3600  # seconds
+
+    alerts:
+      refresh_interval: 30  # seconds
+      panels:
+        - name: "Active Alerts"
+          type: "table"
+          columns:
+            - "timestamp"
+            - "severity"
+            - "description"
+            - "status"
+
+        - name: "Alert History"
+          type: "graph"
+          metrics: ["alert_count"]
+          window: 86400  # seconds
+
+  # Reporting configuration
+  reporting:
+    daily:
+      enabled: true
+      schedule: "0 0 * * *"  # Daily at midnight
+      format: "pdf"
+      metrics:
+        - "error_rate"
+        - "response_time"
+        - "resource_usage"
+        - "alert_count"
+
+    weekly:
+      enabled: true
+      schedule: "0 0 * * 0"  # Weekly on Sunday
+      format: "pdf"
+      metrics:
+        - "error_rate"
+        - "response_time"
+        - "resource_usage"
+        - "alert_count"
+        - "trend_analysis"
+
+    monthly:
+      enabled: true
+      schedule: "0 0 1 * *"  # Monthly on 1st
+      format: "pdf"
+      metrics:
+        - "error_rate"
+        - "response_time"
+        - "resource_usage"
+        - "alert_count"
+        - "trend_analysis"
+        - "cost_analysis" 

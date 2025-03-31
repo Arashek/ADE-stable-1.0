@@ -1,0 +1,74 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Rule files to load
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # FastAPI application metrics
+  - job_name: 'ade-api'
+    static_configs:
+      - targets: ['api:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    scrape_timeout: 4s
+    honor_labels: true
+
+  # MongoDB metrics
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongodb:27017']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Redis metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+# Metric relabeling
+metric_relabel_configs:
+  - source_labels: [__name__]
+    regex: '^http_.*'
+    action: keep
+
+# Service discovery
+service_discovery:
+  dns:
+    refresh_interval: 30s
+    type: A
+    port: 9090
+
+# Storage configuration
+storage:
+  tsdb:
+    path: /prometheus
+    retention.time: 15d
+    retention.size: 50GB
+    max-block-duration: 2h
+    min-block-duration: 1h
+    wal-compression: true
+    max-block-chunk-segment-size: 512MB
+    max-block-index-size: 1GB 

@@ -1,0 +1,131 @@
+# Tool Manager Configuration
+
+# Resource Management
+resources:
+  limits:
+    max_total_memory: 1GB
+    max_total_cpu: 80%
+    max_concurrent_tools: 10
+    max_memory_per_tool: 100MB
+    max_cpu_per_tool: 50%
+  monitoring:
+    interval: 1  # seconds
+    thresholds:
+      memory:
+        warning: 70%
+        critical: 90%
+      cpu:
+        warning: 60%
+        critical: 80%
+    cleanup:
+      enabled: true
+      interval: 60  # seconds
+      threshold: 80%  # memory usage
+
+# Execution Settings
+execution:
+  timeout: 30  # seconds
+  retry:
+    max_attempts: 3
+    delay: 1  # seconds
+    backoff_factor: 2
+  cleanup:
+    enabled: true
+    force: false
+    timeout: 5  # seconds
+
+# Performance Monitoring
+performance:
+  metrics:
+    - execution_time
+    - memory_usage
+    - cpu_usage
+    - network_io
+    - disk_io
+  thresholds:
+    execution_time:
+      warning: 1.0  # seconds
+      error: 5.0  # seconds
+    memory_usage:
+      warning: 100MB
+      error: 500MB
+    cpu_usage:
+      warning: 50%
+      error: 80%
+    network_io:
+      warning: 1MB/s
+      error: 10MB/s
+    disk_io:
+      warning: 100KB/s
+      error: 1MB/s
+
+# Error Handling
+error_handling:
+  max_errors: 5  # errors per minute
+  recovery_strategies:
+    - restart_tool
+    - clear_cache
+    - release_resources
+  logging:
+    level: WARNING
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    handlers:
+      - type: file
+        path: logs/tool_manager.log
+        max_size: 10MB
+        backup_count: 5
+      - type: console
+        level: INFO
+
+# Pattern Learning Integration
+pattern_learning:
+  enabled: true
+  update_interval: 300  # seconds
+  metrics_to_track:
+    - execution_patterns
+    - resource_usage_patterns
+    - error_patterns
+  learning_threshold: 100  # samples
+  optimization:
+    enabled: true
+    interval: 3600  # seconds
+    min_samples: 50
+
+# LLM Integration
+llm_integration:
+  enabled: true
+  model: gpt-4
+  max_tokens: 1000
+  temperature: 0.7
+  tasks:
+    - tool_optimization
+    - pattern_analysis
+    - error_diagnosis
+  caching:
+    enabled: true
+    ttl: 3600  # seconds
+    max_size: 1000  # entries
+
+# Security
+security:
+  validation:
+    enabled: true
+    strict: true
+  permissions:
+    enabled: true
+    default_level: medium
+  logging:
+    sensitive_data: false
+    audit_trail: true
+
+# Dependencies
+dependencies:
+  check_interval: 60  # seconds
+  auto_resolve: true
+  required_packages:
+    - psutil>=5.8.0
+    - pyyaml>=5.4.1
+    - aiohttp>=3.8.0
+  version_constraints:
+    python: ">=3.8"
+    pip: ">=20.0.0" 

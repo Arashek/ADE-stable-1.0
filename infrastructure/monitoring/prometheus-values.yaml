@@ -1,0 +1,73 @@
+server:
+  retention: 15d
+  persistentVolume:
+    size: 50Gi
+    storageClass: gp2
+
+alertmanager:
+  enabled: true
+  persistentVolume:
+    size: 10Gi
+    storageClass: gp2
+
+pushgateway:
+  enabled: true
+  persistentVolume:
+    size: 5Gi
+    storageClass: gp2
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
+
+grafana:
+  enabled: true
+  adminPassword: ${GRAFANA_ADMIN_PASSWORD}
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: gp2
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards
+  dashboards:
+    default:
+      kubernetes-cluster:
+        gnetId: 7249
+        revision: 1
+        datasource: Prometheus
+      kubernetes-pods:
+        gnetId: 6417
+        revision: 1
+        datasource: Prometheus
+      kubernetes-resources:
+        gnetId: 7242
+        revision: 1
+        datasource: Prometheus
+      kubernetes-system-api-server:
+        gnetId: 7243
+        revision: 1
+        datasource: Prometheus
+      kubernetes-workload-total:
+        gnetId: 7250
+        revision: 1
+        datasource: Prometheus
+      node-exporter:
+        gnetId: 1860
+        revision: 21
+        datasource: Prometheus
+      prometheus:
+        gnetId: 3662
+        revision: 1
+        datasource: Prometheus 

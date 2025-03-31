@@ -1,0 +1,60 @@
+id: python-development
+name: Python Development Container
+projectType: microservice
+baseImage: python:3.11-slim
+defaultResources:
+  cpu:
+    limit: 2
+    reservation: 1
+  memory:
+    limit: 4g
+    reservation: 2g
+  disk:
+    limit: 20g
+    reservation: 10g
+defaultEnvironment:
+  - name: PYTHONUNBUFFERED
+    value: "1"
+  - name: PYTHONDONTWRITEBYTECODE
+    value: "1"
+  - name: PYTHONPATH
+    value: /app
+defaultPorts:
+  - hostPort: 8000
+    containerPort: 8000
+    protocol: tcp
+  - hostPort: 5678
+    containerPort: 5678
+    protocol: tcp
+defaultVolumes:
+  - source: ./src
+    target: /app/src
+    type: bind
+  - source: ./tests
+    target: /app/tests
+    type: bind
+  - source: ./requirements.txt
+    target: /app/requirements.txt
+    type: bind
+  - source: python-cache
+    target: /root/.cache/pip
+    type: volume
+defaultNetworks:
+  - name: python-network
+    driver: bridge
+defaultHealthCheck:
+  test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  startPeriod: 40s
+defaultCommand: ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+defaultWorkingDir: /app
+defaultUser: root
+description: Container template for Python development with FastAPI
+tags:
+  - python
+  - fastapi
+  - development
+  - backend
+  - microservice 

@@ -1,0 +1,48 @@
+{
+  "region": "us-east-1",
+  "access_key": null,
+  "secret_key": null,
+  "session_token": null,
+  "profile_name": "ade-platform",
+  "s3_bucket": "ade-platform-models",
+  "sagemaker_role": "ade-platform-sagemaker-role",
+  "endpoint_name": "ade-platform-endpoint",
+  "instance_type": "ml.m5.xlarge",
+  "instance_count": 1,
+  "volume_size": 100,
+  "max_concurrent_transforms": 4,
+  "max_payload": 6,
+  "environment": {
+    "SAGEMAKER_MODEL_SERVER_TIMEOUT": "3600",
+    "SAGEMAKER_MODEL_SERVER_WORKERS": "4",
+    "SAGEMAKER_HTTP_PORT": "8080",
+    "SAGEMAKER_BIND_TO_PORT": "8080",
+    "SAGEMAKER_SAFE_PORT_RANGE": "9000-9999"
+  },
+  "tags": [
+    {
+      "Key": "Project",
+      "Value": "ADE Platform"
+    },
+    {
+      "Key": "Environment",
+      "Value": "Production"
+    }
+  ],
+  "vpc_config": {
+    "SecurityGroupIds": ["sg-xxxxxxxx"],
+    "Subnets": ["subnet-xxxxxxxx"]
+  },
+  "enable_network_isolation": true,
+  "enable_cloudwatch_metrics": true,
+  "cloudwatch_metrics_config": {
+    "metrics": [
+      "Invocation4XXErrors",
+      "Invocation5XXErrors",
+      "Invocations",
+      "ModelLatency",
+      "OverheadLatency"
+    ],
+    "period": 60
+  }
+} 

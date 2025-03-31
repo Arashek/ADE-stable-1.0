@@ -1,0 +1,155 @@
+caching:
+  optimizations:
+    multi_level:
+      - name: "Multi-Level Cache"
+        pattern: "cache\\.get\\([^)]+\\)"
+        description: "Implement multi-level caching"
+        severity: "high"
+        fix: "Use LRU, memory, and disk caching"
+      - name: "Cache Preloading"
+        pattern: "preload\\([^)]+\\)"
+        description: "Preload frequently used data"
+        severity: "medium"
+        fix: "Implement cache preloading"
+
+    cache_invalidation:
+      - name: "Smart Invalidation"
+        pattern: "invalidate\\([^)]+\\)"
+        description: "Use smart cache invalidation"
+        severity: "high"
+        fix: "Implement selective cache invalidation"
+      - name: "Cache Warming"
+        pattern: "warm\\([^)]+\\)"
+        description: "Warm up cache on startup"
+        severity: "medium"
+        fix: "Implement cache warming"
+
+parallelization:
+  optimizations:
+    task_distribution:
+      - name: "Dynamic Load Balancing"
+        pattern: "loadBalance\\([^)]+\\)"
+        description: "Use dynamic load balancing"
+        severity: "high"
+        fix: "Implement dynamic load balancing"
+      - name: "Task Prioritization"
+        pattern: "prioritize\\([^)]+\\)"
+        description: "Prioritize tasks based on importance"
+        severity: "medium"
+        fix: "Implement task prioritization"
+
+    worker_management:
+      - name: "Worker Pool Optimization"
+        pattern: "workerPool\\.get\\([^)]+\\)"
+        description: "Optimize worker pool usage"
+        severity: "high"
+        fix: "Implement worker pool optimization"
+      - name: "Worker Recycling"
+        pattern: "recycle\\([^)]+\\)"
+        description: "Recycle workers efficiently"
+        severity: "medium"
+        fix: "Implement worker recycling"
+
+memory:
+  optimizations:
+    allocation:
+      - name: "Memory Pool"
+        pattern: "allocate\\([^)]+\\)"
+        description: "Use memory pooling"
+        severity: "high"
+        fix: "Implement memory pooling"
+      - name: "Object Reuse"
+        pattern: "new\\s+\\w+\\([^)]+\\)"
+        description: "Reuse objects instead of creating new ones"
+        severity: "medium"
+        fix: "Implement object reuse"
+
+    garbage_collection:
+      - name: "GC Optimization"
+        pattern: "gc\\([^)]+\\)"
+        description: "Optimize garbage collection"
+        severity: "high"
+        fix: "Implement GC optimization"
+      - name: "Memory Leak Prevention"
+        pattern: "cleanup\\([^)]+\\)"
+        description: "Prevent memory leaks"
+        severity: "high"
+        fix: "Implement memory leak prevention"
+
+compilation:
+  optimizations:
+    jit:
+      - name: "JIT Compilation"
+        pattern: "compile\\([^)]+\\)"
+        description: "Use JIT compilation"
+        severity: "high"
+        fix: "Implement JIT compilation"
+      - name: "Hot Path Detection"
+        pattern: "hotPath\\([^)]+\\)"
+        description: "Detect and optimize hot paths"
+        severity: "medium"
+        fix: "Implement hot path detection"
+
+    code_generation:
+      - name: "Optimized Code Generation"
+        pattern: "generate\\([^)]+\\)"
+        description: "Optimize code generation"
+        severity: "high"
+        fix: "Implement optimized code generation"
+      - name: "Code Specialization"
+        pattern: "specialize\\([^)]+\\)"
+        description: "Specialize code for specific cases"
+        severity: "medium"
+        fix: "Implement code specialization"
+
+analysis:
+  optimizations:
+    incremental:
+      - name: "Incremental Analysis"
+        pattern: "analyze\\([^)]+\\)"
+        description: "Use incremental analysis"
+        severity: "high"
+        fix: "Implement incremental analysis"
+      - name: "Analysis Caching"
+        pattern: "cacheAnalysis\\([^)]+\\)"
+        description: "Cache analysis results"
+        severity: "medium"
+        fix: "Implement analysis caching"
+
+    parallel:
+      - name: "Parallel Analysis"
+        pattern: "parallelAnalyze\\([^)]+\\)"
+        description: "Use parallel analysis"
+        severity: "high"
+        fix: "Implement parallel analysis"
+      - name: "Analysis Distribution"
+        pattern: "distributeAnalysis\\([^)]+\\)"
+        description: "Distribute analysis across workers"
+        severity: "medium"
+        fix: "Implement analysis distribution"
+
+validation:
+  optimizations:
+    incremental:
+      - name: "Incremental Validation"
+        pattern: "validate\\([^)]+\\)"
+        description: "Use incremental validation"
+        severity: "high"
+        fix: "Implement incremental validation"
+      - name: "Validation Caching"
+        pattern: "cacheValidation\\([^)]+\\)"
+        description: "Cache validation results"
+        severity: "medium"
+        fix: "Implement validation caching"
+
+    parallel:
+      - name: "Parallel Validation"
+        pattern: "parallelValidate\\([^)]+\\)"
+        description: "Use parallel validation"
+        severity: "high"
+        fix: "Implement parallel validation"
+      - name: "Validation Distribution"
+        pattern: "distributeValidation\\([^)]+\\)"
+        description: "Distribute validation across workers"
+        severity: "medium"
+        fix: "Implement validation distribution" 

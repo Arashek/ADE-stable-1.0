@@ -1,0 +1,161 @@
+# Error Prevention Severity Levels Configuration
+# This file defines severity levels and their associated thresholds
+
+severity_levels:
+  critical:
+    description: "Errors that can cause system failure or data loss"
+    thresholds:
+      resource_usage: 95  # Percentage
+      error_rate: 0.1     # 10% of operations
+      response_time: 5000 # Milliseconds
+      memory_leak: 100    # MB per hour
+      cpu_usage: 95       # Percentage
+      disk_usage: 95      # Percentage
+    actions:
+      - "immediate_notification"
+      - "emergency_shutdown"
+      - "data_backup"
+      - "system_rollback"
+    monitoring:
+      frequency: 30  # Seconds
+      retention: 7   # Days
+    alerts:
+      channels:
+        - "email"
+        - "sms"
+        - "slack"
+      escalation:
+        - "team_lead"
+        - "system_admin"
+        - "security_team"
+
+  high:
+    description: "Errors that significantly impact system performance or reliability"
+    thresholds:
+      resource_usage: 85  # Percentage
+      error_rate: 0.05    # 5% of operations
+      response_time: 2000 # Milliseconds
+      memory_leak: 50     # MB per hour
+      cpu_usage: 85       # Percentage
+      disk_usage: 85      # Percentage
+    actions:
+      - "alert_team"
+      - "increase_monitoring"
+      - "optimize_resources"
+      - "schedule_maintenance"
+    monitoring:
+      frequency: 60  # Seconds
+      retention: 14  # Days
+    alerts:
+      channels:
+        - "email"
+        - "slack"
+      escalation:
+        - "team_lead"
+        - "system_admin"
+
+  medium:
+    description: "Errors that affect system performance but don't cause critical issues"
+    thresholds:
+      resource_usage: 75  # Percentage
+      error_rate: 0.02    # 2% of operations
+      response_time: 1000 # Milliseconds
+      memory_leak: 25     # MB per hour
+      cpu_usage: 75       # Percentage
+      disk_usage: 75      # Percentage
+    actions:
+      - "log_issue"
+      - "monitor_trends"
+      - "optimize_code"
+      - "update_documentation"
+    monitoring:
+      frequency: 300  # Seconds
+      retention: 30   # Days
+    alerts:
+      channels:
+        - "slack"
+      escalation:
+        - "team_lead"
+
+  low:
+    description: "Errors that have minimal impact on system performance"
+    thresholds:
+      resource_usage: 65  # Percentage
+      error_rate: 0.01    # 1% of operations
+      response_time: 500  # Milliseconds
+      memory_leak: 10     # MB per hour
+      cpu_usage: 65       # Percentage
+      disk_usage: 65      # Percentage
+    actions:
+      - "log_issue"
+      - "monitor_trends"
+      - "document_issue"
+      - "schedule_optimization"
+    monitoring:
+      frequency: 3600  # Seconds
+      retention: 90    # Days
+    alerts:
+      channels:
+        - "slack"
+      escalation:
+        - "team_lead"
+
+# Monitoring thresholds for specific components
+component_thresholds:
+  database:
+    connection_pool:
+      max_connections: 100
+      idle_timeout: 300
+      max_lifetime: 3600
+    query_performance:
+      slow_query_threshold: 1000  # ms
+      max_execution_time: 30000   # ms
+      deadlock_threshold: 5       # per hour
+
+  api:
+    rate_limits:
+      requests_per_minute: 1000
+      burst_size: 100
+      cooldown_period: 300
+    response_codes:
+      error_threshold: 0.05  # 5% error rate
+      timeout_threshold: 0.02 # 2% timeout rate
+
+  cache:
+    hit_ratio:
+      minimum: 0.8
+      warning: 0.7
+      critical: 0.5
+    memory_usage:
+      warning: 80  # percentage
+      critical: 90 # percentage
+
+  logging:
+    volume:
+      warning: 1000  # entries per minute
+      critical: 5000 # entries per minute
+    error_ratio:
+      warning: 0.1   # 10% error logs
+      critical: 0.2  # 20% error logs
+
+# Resource scaling thresholds
+scaling_thresholds:
+  cpu:
+    scale_up: 80    # percentage
+    scale_down: 40  # percentage
+    cooldown: 300   # seconds
+
+  memory:
+    scale_up: 85    # percentage
+    scale_down: 45  # percentage
+    cooldown: 300   # seconds
+
+  disk:
+    scale_up: 85    # percentage
+    scale_down: 45  # percentage
+    cooldown: 3600  # seconds
+
+  network:
+    scale_up: 80    # percentage
+    scale_down: 40  # percentage
+    cooldown: 300   # seconds 

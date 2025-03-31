@@ -1,0 +1,142 @@
+{
+    "security": [
+        {
+            "name": "sql_injection",
+            "description": "Potential SQL injection vulnerability",
+            "regex": "execute\\(['\"].*\\$\\{.*\\}.*['\"]\\)",
+            "suggestion": "Use parameterized queries instead of string concatenation",
+            "severity": "critical",
+            "impact": "critical",
+            "confidence": 0.9,
+            "metadata": {
+                "category": "input_validation",
+                "cwe": "CWE-89"
+            }
+        },
+        {
+            "name": "xss_vulnerability",
+            "description": "Potential cross-site scripting vulnerability",
+            "regex": "innerHTML\\s*=\\s*['\"].*\\$\\{.*\\}.*['\"]",
+            "suggestion": "Use textContent or sanitize HTML input",
+            "severity": "high",
+            "impact": "high",
+            "confidence": 0.85,
+            "metadata": {
+                "category": "output_encoding",
+                "cwe": "CWE-79"
+            }
+        }
+    ],
+    "runtime": [
+        {
+            "name": "null_pointer",
+            "description": "Potential null pointer dereference",
+            "regex": "\\w+\\.\\w+\\s*=\\s*\\w+\\.\\w+\\.\\w+",
+            "suggestion": "Add null checks before accessing object properties",
+            "severity": "high",
+            "impact": "high",
+            "confidence": 0.8,
+            "metadata": {
+                "category": "null_safety",
+                "cwe": "CWE-476"
+            }
+        },
+        {
+            "name": "array_index",
+            "description": "Potential array index out of bounds",
+            "regex": "\\w+\\[\\w+\\s*\\+\\s*\\d+\\]",
+            "suggestion": "Add bounds checking before array access",
+            "severity": "high",
+            "impact": "high",
+            "confidence": 0.8,
+            "metadata": {
+                "category": "array_safety",
+                "cwe": "CWE-125"
+            }
+        }
+    ],
+    "logic": [
+        {
+            "name": "infinite_loop",
+            "description": "Potential infinite loop condition",
+            "regex": "while\\s*\\(true\\)|for\\s*\\(;;\\)",
+            "suggestion": "Add proper loop termination conditions",
+            "severity": "medium",
+            "impact": "medium",
+            "confidence": 0.75,
+            "metadata": {
+                "category": "loop_control",
+                "cwe": "CWE-835"
+            }
+        },
+        {
+            "name": "dead_code",
+            "description": "Unreachable code after return/break",
+            "regex": "return\\s+[^;]+;\\s*[^}]+",
+            "suggestion": "Remove unreachable code or fix control flow",
+            "severity": "low",
+            "impact": "low",
+            "confidence": 0.9,
+            "metadata": {
+                "category": "code_quality",
+                "cwe": "CWE-561"
+            }
+        }
+    ],
+    "performance": [
+        {
+            "name": "memory_leak",
+            "description": "Potential memory leak in resource handling",
+            "regex": "new\\s+\\w+\\([^)]*\\)\\s*;\\s*(?!delete)",
+            "suggestion": "Use smart pointers or ensure proper cleanup",
+            "severity": "high",
+            "impact": "high",
+            "confidence": 0.8,
+            "metadata": {
+                "category": "resource_management",
+                "cwe": "CWE-401"
+            }
+        },
+        {
+            "name": "inefficient_algorithm",
+            "description": "Potentially inefficient algorithm with nested loops",
+            "regex": "for\\s*\\([^)]+\\)\\s*\\{[^}]*for\\s*\\([^)]+\\)\\s*\\{",
+            "suggestion": "Consider using more efficient data structures or algorithms",
+            "severity": "medium",
+            "impact": "medium",
+            "confidence": 0.7,
+            "metadata": {
+                "category": "algorithm_complexity",
+                "cwe": "CWE-400"
+            }
+        }
+    ],
+    "resource": [
+        {
+            "name": "file_handle",
+            "description": "Unclosed file handle",
+            "regex": "open\\([^)]+\\)\\s*;\\s*(?!close)",
+            "suggestion": "Use try-with-resources or ensure file is closed",
+            "severity": "medium",
+            "impact": "medium",
+            "confidence": 0.85,
+            "metadata": {
+                "category": "resource_management",
+                "cwe": "CWE-404"
+            }
+        },
+        {
+            "name": "connection_leak",
+            "description": "Database connection not properly closed",
+            "regex": "getConnection\\([^)]+\\)\\s*;\\s*(?!close)",
+            "suggestion": "Use connection pooling or ensure connection is closed",
+            "severity": "high",
+            "impact": "high",
+            "confidence": 0.85,
+            "metadata": {
+                "category": "resource_management",
+                "cwe": "CWE-405"
+            }
+        }
+    ]
+} 

@@ -1,0 +1,72 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: default
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 9090
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gpu-access
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      nvidia.com/gpu: "true"
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: default
+    ports:
+    - protocol: TCP
+      port: 22
+    - protocol: TCP
+      port: 8888
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-access
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: default
+    ports:
+    - protocol: TCP
+      port: 8080 

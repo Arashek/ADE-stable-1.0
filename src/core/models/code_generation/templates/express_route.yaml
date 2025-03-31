@@ -1,0 +1,108 @@
+name: express_route
+description: Template for generating Express.js routes
+content: |
+  const express = require('express');
+  const router = express.Router();
+  const { {{ service_name }} } = require('../services');
+  {% for import in imports %}
+  const {{ import }};
+  {% endfor %}
+  
+  {% for middleware in middlewares %}
+  router.use({{ middleware }});
+  {% endfor %}
+  
+  {% for route in routes %}
+  /**
+   * {{ route.docstring }}
+   */
+  router.{{ route.method }}('{{ route.path }}', 
+    {% for middleware in route.middlewares %}
+    {{ middleware }}{% if not loop.last %}, {% endif %}
+    {% endfor %},
+    async (req, res) => {
+      try {
+        {% for validation in route.validations %}
+        {{ validation }}
+        {% endfor %}
+        
+        {% for operation in route.operations %}
+        {{ operation }}
+        {% endfor %}
+        
+        {% if route.response %}
+        {{ route.response }}
+        {% endif %}
+      } catch (error) {
+        {% if route.error_handler %}
+        {{ route.error_handler }}
+        {% else %}
+        res.status(500).json({ error: error.message });
+        {% endif %}
+      }
+    }
+  );
+  {% endfor %}
+  
+  module.exports = router;
+parameters:
+  service_name:
+    type: string
+    required: true
+    description: Name of the service to import
+  imports:
+    type: array
+    required: false
+    description: List of additional imports
+  middlewares:
+    type: array
+    required: false
+    description: List of route-level middlewares
+  routes:
+    type: array
+    required: false
+    description: List of route definitions
+    items:
+      docstring:
+        type: string
+        required: false
+        description: JSDoc description
+      method:
+        type: string
+        required: true
+        description: HTTP method (get, post, put, delete)
+      path:
+        type: string
+        required: true
+        description: Route path
+      middlewares:
+        type: array
+        required: false
+        description: List of route-specific middlewares
+      validations:
+        type: array
+        required: false
+        description: List of validation statements
+      operations:
+        type: array
+        required: false
+        description: List of operations to perform
+      response:
+        type: string
+        required: false
+        description: Response handling code
+      error_handler:
+        type: string
+        required: false
+        description: Custom error handling code
+tags:
+  - javascript
+  - express
+  - route
+  - backend
+language: javascript
+category: route
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

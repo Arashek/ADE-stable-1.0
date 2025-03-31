@@ -1,0 +1,358 @@
+name: adapter
+description: Adapter design pattern for making incompatible interfaces work together
+category: structural
+language: python
+template: |
+  from abc import ABC, abstractmethod
+  from typing import Any, Dict, List, Optional
+  from dataclasses import dataclass
+  from datetime import datetime
+  
+  class {{ target_interface }}(ABC):
+      """Target interface that the client expects"""
+      
+      @abstractmethod
+      def {{ target_method }}(self{% for arg in target_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ target_method_return_type }}:
+          """
+          Target method that the client expects
+          
+          Args:
+              {% for arg in target_method_args %}
+              {{ arg.name }}: {{ arg.description }}
+              {% endfor %}
+              
+          Returns:
+              {{ target_method_return_description }}
+          """
+          pass
+          
+      {% for method in target_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  class {{ adaptee_class }}:
+      """Adaptee class with incompatible interface"""
+      
+      def __init__(self{% for arg in adaptee_init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in adaptee_init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ adaptee_method }}(self{% for arg in adaptee_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ adaptee_method_return_type }}:
+          """
+          Adaptee method with incompatible interface
+          """
+          {{ adaptee_method_implementation }}
+          
+      {% for method in adaptee_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  class {{ adapter_class }}({{ target_interface }}):
+      """Adapter class that makes the adaptee work with the target interface"""
+      
+      def __init__(self, adaptee: {{ adaptee_class }}{% for arg in adapter_init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          self._adaptee = adaptee
+          {% for init in adapter_init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ target_method }}(self{% for arg in target_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ target_method_return_type }}:
+          """
+          Adapt the target method to use the adaptee's method
+          """
+          {{ adapter_method_implementation }}
+          
+      {% for method in adapter_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+parameters:
+  target_interface:
+    type: string
+    required: true
+    description: Name of the target interface that the client expects
+  target_method:
+    type: string
+    required: true
+    description: Name of the main target method
+  target_method_args:
+    type: array
+    required: false
+    description: Arguments for the target method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+  target_method_return_type:
+    type: string
+    required: true
+    description: Return type of the target method
+  target_method_return_description:
+    type: string
+    required: true
+    description: Description of what the target method returns
+  target_methods:
+    type: array
+    required: false
+    description: Additional methods for the target interface
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  adaptee_class:
+    type: string
+    required: true
+    description: Name of the adaptee class with incompatible interface
+  adaptee_init_args:
+    type: array
+    required: false
+    description: Arguments for the adaptee's __init__ method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  adaptee_init_body:
+    type: array
+    required: false
+    description: Body statements for the adaptee's __init__ method
+    items:
+      type: string
+  adaptee_method:
+    type: string
+    required: true
+    description: Name of the main adaptee method
+  adaptee_method_args:
+    type: array
+    required: false
+    description: Arguments for the adaptee method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  adaptee_method_return_type:
+    type: string
+    required: true
+    description: Return type of the adaptee method
+  adaptee_method_implementation:
+    type: string
+    required: true
+    description: Implementation of the adaptee method
+  adaptee_methods:
+    type: array
+    required: false
+    description: Additional methods for the adaptee class
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  adapter_class:
+    type: string
+    required: true
+    description: Name of the adapter class
+  adapter_init_args:
+    type: array
+    required: false
+    description: Arguments for the adapter's __init__ method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  adapter_init_body:
+    type: array
+    required: false
+    description: Body statements for the adapter's __init__ method
+    items:
+      type: string
+  adapter_method_implementation:
+    type: string
+    required: true
+    description: Implementation of the adapter method that adapts the target method to use the adaptee's method
+  adapter_methods:
+    type: array
+    required: false
+    description: Additional methods for the adapter class
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+examples:
+  - name: legacy_system
+    description: Legacy system adapter example
+    parameters:
+      target_interface: ModernInterface
+      target_method: process_data
+      target_method_args:
+        - name: data
+          type: Dict[str, Any]
+          description: Data to process
+      target_method_return_type: str
+      target_method_return_description: Processing result
+      adaptee_class: LegacySystem
+      adaptee_init_args:
+        - name: config_file
+          type: str
+      adaptee_init_body:
+        - self.config_file = config_file
+      adaptee_method: process_legacy_data
+      adaptee_method_args:
+        - name: input_data
+          type: str
+      adaptee_method_return_type: str
+      adaptee_method_implementation: |
+        # Legacy system processing
+        return f"Legacy system processed: {input_data}"
+      adapter_class: LegacySystemAdapter
+      adapter_method_implementation: |
+        # Convert modern data format to legacy format
+        legacy_data = json.dumps(data)
+        # Use legacy system
+        result = self._adaptee.process_legacy_data(legacy_data)
+        return result
+    code: |
+      from abc import ABC, abstractmethod
+      from typing import Dict, Any
+      import json
+      
+      class ModernInterface(ABC):
+          """Target interface that the client expects"""
+          
+          @abstractmethod
+          def process_data(self, data: Dict[str, Any]) -> str:
+              """
+              Process data in modern format
+              
+              Args:
+                  data: Data to process
+                  
+              Returns:
+                  Processing result
+              """
+              pass
+      
+      class LegacySystem:
+          """Adaptee class with incompatible interface"""
+          
+          def __init__(self, config_file: str):
+              self.config_file = config_file
+              
+          def process_legacy_data(self, input_data: str) -> str:
+              """
+              Process data in legacy format
+              """
+              # Legacy system processing
+              return f"Legacy system processed: {input_data}"
+      
+      class LegacySystemAdapter(ModernInterface):
+          """Adapter class that makes the legacy system work with the modern interface"""
+          
+          def __init__(self, adaptee: LegacySystem):
+              self._adaptee = adaptee
+              
+          def process_data(self, data: Dict[str, Any]) -> str:
+              """
+              Adapt the modern interface to use the legacy system
+              """
+              # Convert modern data format to legacy format
+              legacy_data = json.dumps(data)
+              # Use legacy system
+              result = self._adaptee.process_legacy_data(legacy_data)
+              return result
+best_practices:
+  - Use the adapter pattern when you need to make incompatible interfaces work together
+  - Keep the adapter focused on interface conversion
+  - Use abstract base classes to define the target interface
+  - Consider using object adapters for more flexibility
+  - Document the adapter pattern usage and interface differences
+  - Handle interface conversion errors properly
+anti_patterns:
+  - Creating adapters for simple interface differences
+  - Not properly encapsulating the adaptee
+  - Mixing business logic with interface conversion
+  - Not handling interface conversion errors
+  - Not documenting the adapter pattern usage
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

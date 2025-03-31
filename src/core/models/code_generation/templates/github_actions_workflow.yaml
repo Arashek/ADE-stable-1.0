@@ -1,0 +1,304 @@
+name: github_actions_workflow
+description: Template for generating GitHub Actions workflows
+content: |
+  name: {{ workflow_name }}
+  
+  {% if triggers %}
+  on:
+    {% for trigger in triggers %}
+    {{ trigger.type }}:
+      {% for option in trigger.options %}
+      {{ option.key }}: {{ option.value }}
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+  
+  {% if env %}
+  env:
+    {% for var in env %}
+    {{ var.name }}: {{ var.value }}
+    {% endfor %}
+  {% endif %}
+  
+  {% if permissions %}
+  permissions:
+    {% for permission in permissions %}
+    {{ permission.name }}: {{ permission.value }}
+    {% endfor %}
+  {% endif %}
+  
+  {% if concurrency %}
+  concurrency:
+    {% for option in concurrency %}
+    {{ option.key }}: {{ option.value }}
+    {% endfor %}
+  {% endif %}
+  
+  {% if jobs %}
+  jobs:
+    {% for job in jobs %}
+    {{ job.name }}:
+      {% if job.needs %}
+      needs: {{ job.needs }}
+      {% endif %}
+      {% if job.runs_on %}
+      runs-on: {{ job.runs_on }}
+      {% endif %}
+      {% if job.container %}
+      container:
+        image: {{ job.container.image }}
+        {% if job.container.env %}
+        env:
+          {% for env in job.container.env %}
+          {{ env.name }}: {{ env.value }}
+          {% endfor %}
+        {% endif %}
+        {% if job.container.ports %}
+        ports:
+          {% for port in job.container.ports %}
+          - {{ port }}
+          {% endfor %}
+        {% endif %}
+        {% if job.container.options %}
+        options: {{ job.container.options }}
+        {% endif %}
+      {% endif %}
+      {% if job.env %}
+      env:
+        {% for env in job.env %}
+        {{ env.name }}: {{ env.value }}
+        {% endfor %}
+      {% endif %}
+      {% if job.if %}
+      if: {{ job.if }}
+      {% endif %}
+      {% if job.timeout_minutes %}
+      timeout-minutes: {{ job.timeout_minutes }}
+      {% endif %}
+      {% if job.strategy %}
+      strategy:
+        {% for option in job.strategy %}
+        {{ option.key }}: {{ option.value }}
+        {% endfor %}
+      {% endif %}
+      {% if job.steps %}
+      steps:
+        {% for step in job.steps %}
+        - name: {{ step.name }}
+          {% if step.uses %}
+          uses: {{ step.uses }}
+          {% endif %}
+          {% if step.run %}
+          run: {{ step.run }}
+          {% endif %}
+          {% if step.shell %}
+          shell: {{ step.shell }}
+          {% endif %}
+          {% if step.with %}
+          with:
+            {% for param in step.with %}
+            {{ param.key }}: {{ param.value }}
+            {% endfor %}
+          {% endif %}
+          {% if step.env %}
+          env:
+            {% for env in step.env %}
+            {{ env.name }}: {{ env.value }}
+            {% endfor %}
+          {% endif %}
+          {% if step.continue_on_error %}
+          continue-on-error: {{ step.continue_on_error }}
+          {% endif %}
+          {% if step.timeout_minutes %}
+          timeout-minutes: {{ step.timeout_minutes }}
+          {% endif %}
+          {% if step.if %}
+          if: {{ step.if }}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+parameters:
+  workflow_name:
+    type: string
+    required: true
+    description: Name of the workflow
+  triggers:
+    type: array
+    required: false
+    description: List of workflow triggers
+    items:
+      type:
+        type: string
+        required: true
+      options:
+        type: array
+        required: false
+        description: List of trigger options
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+  env:
+    type: array
+    required: false
+    description: List of environment variables
+    items:
+      name:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+  permissions:
+    type: array
+    required: false
+    description: List of permissions
+    items:
+      name:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+  concurrency:
+    type: array
+    required: false
+    description: List of concurrency options
+    items:
+      key:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+  jobs:
+    type: array
+    required: false
+    description: List of jobs
+    items:
+      name:
+        type: string
+        required: true
+      needs:
+        type: string
+        required: false
+      runs_on:
+        type: string
+        required: false
+      container:
+        type: object
+        required: false
+        properties:
+          image:
+            type: string
+            required: true
+          env:
+            type: array
+            required: false
+            description: List of container environment variables
+            items:
+              name:
+                type: string
+                required: true
+              value:
+                type: string
+                required: true
+          ports:
+            type: array
+            required: false
+            description: List of container ports
+          options:
+            type: string
+            required: false
+      env:
+        type: array
+        required: false
+        description: List of job environment variables
+        items:
+          name:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+      if:
+        type: string
+        required: false
+      timeout_minutes:
+        type: integer
+        required: false
+      strategy:
+        type: array
+        required: false
+        description: List of strategy options
+        items:
+          key:
+            type: string
+            required: true
+          value:
+            type: string
+            required: true
+      steps:
+        type: array
+        required: false
+        description: List of job steps
+        items:
+          name:
+            type: string
+            required: true
+          uses:
+            type: string
+            required: false
+          run:
+            type: string
+            required: false
+          shell:
+            type: string
+            required: false
+          with:
+            type: array
+            required: false
+            description: List of step parameters
+            items:
+              key:
+                type: string
+                required: true
+              value:
+                type: string
+                required: true
+          env:
+            type: array
+            required: false
+            description: List of step environment variables
+            items:
+              name:
+                type: string
+                required: true
+              value:
+                type: string
+                required: true
+          continue_on_error:
+            type: boolean
+            required: false
+          timeout_minutes:
+            type: integer
+            required: false
+          if:
+            type: string
+            required: false
+tags:
+  - github
+  - actions
+  - ci
+  - automation
+language: yaml
+category: configuration
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

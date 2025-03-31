@@ -1,0 +1,393 @@
+name: facade
+description: Facade design pattern for providing a simplified interface to a complex subsystem
+category: structural
+language: python
+template: |
+  from abc import ABC, abstractmethod
+  from typing import Any, Dict, List, Optional
+  from dataclasses import dataclass
+  from datetime import datetime
+  
+  class {{ subsystem_class }}:
+      """Complex subsystem class"""
+      
+      def __init__(self{% for arg in subsystem_init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in subsystem_init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ subsystem_method }}(self{% for arg in subsystem_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ subsystem_method_return_type }}:
+          """
+          Complex subsystem method
+          """
+          {{ subsystem_method_implementation }}
+          
+      {% for method in subsystem_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  class {{ subsystem_class_2 }}:
+      """Another complex subsystem class"""
+      
+      def __init__(self{% for arg in subsystem_2_init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in subsystem_2_init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ subsystem_2_method }}(self{% for arg in subsystem_2_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ subsystem_2_method_return_type }}:
+          """
+          Another complex subsystem method
+          """
+          {{ subsystem_2_method_implementation }}
+          
+      {% for method in subsystem_2_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  class {{ facade_class }}:
+      """Facade class that provides a simplified interface to the subsystem"""
+      
+      def __init__(self{% for arg in facade_init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in facade_init_body %}
+          {{ init }}
+          {% endfor %}
+          self._subsystem = {{ subsystem_class }}({{ subsystem_init_args | map(attribute='name') | join(', ') }})
+          self._subsystem_2 = {{ subsystem_class_2 }}({{ subsystem_2_init_args | map(attribute='name') | join(', ') }})
+          
+      def {{ facade_method }}(self{% for arg in facade_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ facade_method_return_type }}:
+          """
+          Simplified interface method that coordinates subsystem operations
+          """
+          {{ facade_method_implementation }}
+          
+      {% for method in facade_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+parameters:
+  subsystem_class:
+    type: string
+    required: true
+    description: Name of the first subsystem class
+  subsystem_init_args:
+    type: array
+    required: false
+    description: Arguments for the first subsystem's __init__ method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  subsystem_init_body:
+    type: array
+    required: false
+    description: Body statements for the first subsystem's __init__ method
+    items:
+      type: string
+  subsystem_method:
+    type: string
+    required: true
+    description: Name of the main subsystem method
+  subsystem_method_args:
+    type: array
+    required: false
+    description: Arguments for the subsystem method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  subsystem_method_return_type:
+    type: string
+    required: true
+    description: Return type of the subsystem method
+  subsystem_method_implementation:
+    type: string
+    required: true
+    description: Implementation of the subsystem method
+  subsystem_methods:
+    type: array
+    required: false
+    description: Additional methods for the subsystem class
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  subsystem_class_2:
+    type: string
+    required: true
+    description: Name of the second subsystem class
+  subsystem_2_init_args:
+    type: array
+    required: false
+    description: Arguments for the second subsystem's __init__ method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  subsystem_2_init_body:
+    type: array
+    required: false
+    description: Body statements for the second subsystem's __init__ method
+    items:
+      type: string
+  subsystem_2_method:
+    type: string
+    required: true
+    description: Name of the main second subsystem method
+  subsystem_2_method_args:
+    type: array
+    required: false
+    description: Arguments for the second subsystem method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  subsystem_2_method_return_type:
+    type: string
+    required: true
+    description: Return type of the second subsystem method
+  subsystem_2_method_implementation:
+    type: string
+    required: true
+    description: Implementation of the second subsystem method
+  subsystem_2_methods:
+    type: array
+    required: false
+    description: Additional methods for the second subsystem class
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  facade_class:
+    type: string
+    required: true
+    description: Name of the facade class
+  facade_init_args:
+    type: array
+    required: false
+    description: Arguments for the facade's __init__ method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  facade_init_body:
+    type: array
+    required: false
+    description: Body statements for the facade's __init__ method
+    items:
+      type: string
+  facade_method:
+    type: string
+    required: true
+    description: Name of the main facade method
+  facade_method_args:
+    type: array
+    required: false
+    description: Arguments for the facade method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  facade_method_return_type:
+    type: string
+    required: true
+    description: Return type of the facade method
+  facade_method_implementation:
+    type: string
+    required: true
+    description: Implementation of the facade method that coordinates subsystem operations
+  facade_methods:
+    type: array
+    required: false
+    description: Additional methods for the facade class
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+examples:
+  - name: home_theater
+    description: Home theater system example using the facade pattern
+    parameters:
+      subsystem_class: Amplifier
+      subsystem_init_args:
+        - name: volume
+          type: int
+      subsystem_init_body:
+        - self.volume = volume
+      subsystem_method: set_volume
+      subsystem_method_args:
+        - name: volume
+          type: int
+      subsystem_method_return_type: None
+      subsystem_method_implementation: |
+        self.volume = volume
+        print(f"Amplifier volume set to {volume}")
+      subsystem_class_2: DVDPlayer
+      subsystem_2_init_args:
+        - name: movie
+          type: str
+      subsystem_2_init_body:
+        - self.movie = movie
+      subsystem_2_method: play
+      subsystem_2_method_args:
+        - name: movie
+          type: str
+      subsystem_2_method_return_type: None
+      subsystem_2_method_implementation: |
+        self.movie = movie
+        print(f"Playing movie: {movie}")
+      facade_class: HomeTheaterFacade
+      facade_method: watch_movie
+      facade_method_args:
+        - name: movie
+          type: str
+        - name: volume
+          type: int
+      facade_method_return_type: None
+      facade_method_implementation: |
+        print("Get ready to watch a movie...")
+        self._subsystem.set_volume(volume)
+        self._subsystem_2.play(movie)
+        print("Enjoy your movie!")
+    code: |
+      class Amplifier:
+          """Complex subsystem class for audio amplification"""
+          
+          def __init__(self, volume: int):
+              self.volume = volume
+              
+          def set_volume(self, volume: int) -> None:
+              """
+              Set the amplifier volume
+              """
+              self.volume = volume
+              print(f"Amplifier volume set to {volume}")
+      
+      class DVDPlayer:
+          """Complex subsystem class for DVD playback"""
+          
+          def __init__(self, movie: str):
+              self.movie = movie
+              
+          def play(self, movie: str) -> None:
+              """
+              Play a movie
+              """
+              self.movie = movie
+              print(f"Playing movie: {movie}")
+      
+      class HomeTheaterFacade:
+          """Facade class that provides a simplified interface to the home theater system"""
+          
+          def __init__(self):
+              self._subsystem = Amplifier(0)
+              self._subsystem_2 = DVDPlayer("")
+              
+          def watch_movie(self, movie: str, volume: int) -> None:
+              """
+              Simplified interface method that coordinates subsystem operations
+              """
+              print("Get ready to watch a movie...")
+              self._subsystem.set_volume(volume)
+              self._subsystem_2.play(movie)
+              print("Enjoy your movie!")
+best_practices:
+  - Use the facade pattern when you need to provide a simplified interface to a complex subsystem
+  - Keep the facade focused on simplifying the interface
+  - Use the facade to coordinate subsystem operations
+  - Consider using multiple facades for different client needs
+  - Document the facade pattern usage and subsystem interactions
+  - Handle subsystem errors properly
+anti_patterns:
+  - Creating facades for simple subsystems
+  - Not properly encapsulating subsystem complexity
+  - Mixing business logic with subsystem coordination
+  - Not handling subsystem errors
+  - Not documenting the facade pattern usage
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

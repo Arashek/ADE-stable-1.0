@@ -1,0 +1,152 @@
+rules:
+  - name: component_interface_implementation
+    description: Ensure all components implement required interfaces
+    pattern: |
+      class {name}:
+        def __init__
+        def initialize
+        def health_check
+        def shutdown
+    message: Components must implement all required interface methods
+    severity: error
+    
+  - name: interface_method_signature
+    description: Enforce correct method signatures for interfaces
+    pattern: |
+      def initialize(self, config: Dict[str, Any]) -> None
+      def health_check(self) -> Dict[str, Any]
+      def shutdown(self) -> None
+    message: Interface methods must follow the standard signature
+    severity: error
+    
+  - name: component_registration
+    description: Ensure components are registered with the coordinator
+    pattern: |
+      coordinator.register_component({component})
+    message: Components must be registered with the coordinator
+    severity: warning
+    
+  - name: error_handling
+    description: Enforce proper error handling
+    pattern: |
+      try:
+        {code}
+      except Exception as e:
+        error_handler.handle_error(e, {context})
+    message: Use error handler for exception handling
+    severity: warning
+    
+  - name: state_management
+    description: Enforce state management patterns
+    pattern: |
+      state_manager.save_state({state})
+      state_manager.load_state({state_id})
+    message: Use state manager for component state
+    severity: warning
+    
+  - name: resource_management
+    description: Enforce resource management patterns
+    pattern: |
+      resource_manager.allocate({resource_type}, {amount})
+      resource_manager.deallocate({allocation_id})
+    message: Use resource manager for resource allocation
+    severity: warning
+    
+  - name: monitoring
+    description: Ensure components implement monitoring
+    pattern: |
+      def get_metrics(self) -> Dict[str, Any]
+    message: Components should provide metrics
+    severity: warning
+    
+  - name: ui_component_structure
+    description: Enforce UI component structure
+    pattern: |
+      const {ComponentName}: React.FC = () => {
+        return (
+          {jsx}
+        );
+      };
+    message: UI components should follow standard structure
+    severity: warning
+    
+  - name: navigation_item
+    description: Enforce navigation item structure
+    pattern: |
+      {
+        path: string;
+        label: string;
+        icon: React.ReactNode;
+        tooltip: string;
+      }
+    message: Navigation items must include all required properties
+    severity: warning
+    
+  - name: test_coverage
+    description: Enforce test coverage for components
+    pattern: |
+      class Test{ComponentName}:
+        def test_{method_name}
+    message: Components must have corresponding test cases
+    severity: warning
+
+helpers:
+  - name: create_component
+    description: Create a new component with required interface
+    template: |
+      class {name}(ComponentInterface):
+          def __init__(self):
+              self.initialized = False
+              
+          def initialize(self, config: Dict[str, Any]) -> None:
+              self.initialized = True
+              
+          def health_check(self) -> Dict[str, Any]:
+              return {"status": "healthy"}
+              
+          def shutdown(self) -> None:
+              self.initialized = False
+              
+  - name: create_ui_component
+    description: Create a new UI component
+    template: |
+      import React from 'react';
+      
+      interface {name}Props {
+        // Add props here
+      }
+      
+      const {name}: React.FC<{name}Props> = (props) => {
+        return (
+          <div>
+            {/* Add component content */}
+          </div>
+        );
+      };
+      
+      export default {name};
+      
+  - name: create_test_suite
+    description: Create a test suite for a component
+    template: |
+      import pytest
+      from unittest.mock import MagicMock
+      from {module} import {component}
+      
+      class Test{component}:
+          @pytest.fixture
+          def component(self):
+              return {component}()
+              
+          def test_initialization(self, component):
+              config = {}
+              component.initialize(config)
+              assert component.initialized
+              
+          def test_health_check(self, component):
+              health = component.health_check()
+              assert "status" in health
+              
+          def test_shutdown(self, component):
+              component.shutdown()
+              assert not component.initialized 

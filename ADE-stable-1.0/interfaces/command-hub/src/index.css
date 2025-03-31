@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Roboto+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --primary-color: #90caf9;
+  --secondary-color: #f48fb1;
+  --background-color: #121212;
+  --paper-color: #1e1e1e;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Fira Code', 'Roboto Mono', monospace;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: 'Fira Code', monospace;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--paper-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Selection Styles */
+::selection {
+  background: var(--primary-color);
+  color: var(--background-color);
+}
+
+/* Focus Styles */
+:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Transitions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Utility Classes */
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-secondary {
+  color: var(--secondary-color);
+}
+
+.bg-paper {
+  background-color: var(--paper-color);
+}
+
+/* Monaco Editor Customization */
+.monaco-editor {
+  padding: 8px 0;
+}
+
+.monaco-editor .margin {
+  background-color: var(--paper-color);
+}
+
+.monaco-editor .line-numbers {
+  color: var(--text-secondary);
+}
+
+/* Material-UI Customization */
+.MuiPaper-root {
+  background-color: var(--paper-color);
+}
+
+.MuiChip-root {
+  font-family: 'Fira Code', monospace;
+}
+
+.MuiButton-root {
+  text-transform: none;
+  font-family: 'Fira Code', monospace;
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-in;
+} 

@@ -1,0 +1,28 @@
+C:\Users\arash>d:
+
+D:\>cd ade-platform
+
+D:\ade-platform>venv\Scripts\activate
+
+(venv) D:\ade-platform>python -m src.main
+
+
+# Database Configuration (.env file)
+MONGODB_URI=mongodb://mongodb:27017/ade
+
+# Authentication
+JWT_SECRET=468db577936ee71cccac99fc8f4498e3f22ec1ffcbbc289a74391ca135e2453217d1711754b5849c92d26240749e222de685decb11570735a67a52f443fa89a09ace22c32be905e237a752b8d1988fe348f27e89ba5a5b8c273970dc09387647f110afb427a068d7620f87cab31beba677f4275c4e621c1888c129960662ba0ae86ce8ca07bbf268f7eecebadc1f38bad2daabdf999a18dff6e398215d64c1f04d69c73b33390d8ea1c853f6d42f208480320aa8d8fdf20c462f6db3215cfd10c02e1f483e7cacaa6da1fcaf2a3b41312c6994def12834e2b8b5eb79b4cc4be0d4c25d4382a78eb5ab893fdc8128fe159ca2097a9ef4163845cedfc7a245443d
+JWT_ALGORITHM=HS256
+JWT_EXPIRATION=3600
+
+# Logging
+LOG_LEVEL=INFO
+
+# Provider API Keys
+OPENAI_API_KEY=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
+ANTHROPIC_API_KEY=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
+GOOGLE_API_KEY=AIzaSyCwbgArXr23U6badP9RV9-MgSzIlusWF6c
+DEEPSEEK_API_KEY=sk-bf1ad81bf6504af2bea46a869ae2746f
+
+# Monitoring
+PROMETHEUS_MULTIPROC_DIR=/tmp 

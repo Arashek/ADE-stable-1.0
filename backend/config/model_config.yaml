@@ -1,0 +1,279 @@
+agents:
+  architecture:
+    primary:
+      model: claude-3-opus-20240229
+      provider: anthropic
+      use_case: ["system_design", "architecture_planning"]
+    secondary:
+      model: neural-chat-7b
+      provider: ollama
+      use_case: ["documentation", "simple_analysis"]
+
+  code_generator:
+    primary:
+      model: codellama-13b
+      provider: ollama
+      use_case: ["code_implementation", "basic_refactoring"]
+    secondary:
+      model: deepseek-coder-6.7b
+      provider: ollama
+      use_case: ["code_completion", "simple_functions"]
+    expert:
+      model: claude-3-opus-20240229
+      provider: anthropic
+      use_case: ["complex_algorithms", "security_critical"]
+    specialized:
+      python:
+        model: wizardcoder-python-7b
+        provider: ollama
+        use_case: ["python_code", "django", "fastapi"]
+      javascript:
+        model: wizardcoder-js-7b
+        provider: ollama
+        use_case: ["javascript_code", "react", "node"]
+      rust:
+        model: codellama-rust-7b
+        provider: ollama
+        use_case: ["rust_code", "systems"]
+
+  test_writer:
+    primary:
+      model: codellama-13b
+      provider: ollama
+      use_case: ["unit_tests", "integration_tests"]
+    secondary:
+      model: wizardcoder-python-7b
+      provider: ollama
+      use_case: ["python_tests"]
+    specialized:
+      api_tests:
+        model: deepseek-coder-6.7b
+        provider: ollama
+        use_case: ["api_testing", "endpoint_tests"]
+
+  reviewer:
+    primary:
+      model: deepseek-coder-6.7b
+      provider: ollama
+      use_case: ["code_quality", "style_checks"]
+    security:
+      model: claude-3-opus-20240229
+      provider: anthropic
+      use_case: ["security_analysis", "vulnerability_checks"]
+    performance:
+      model: codellama-13b
+      provider: ollama
+      use_case: ["performance_review", "optimization"]
+
+  deployer:
+    primary:
+      model: codellama-13b
+      provider: ollama
+      use_case: ["infrastructure_code", "docker", "kubernetes"]
+    cloud:
+      model: wizardcoder-python-7b
+      provider: ollama
+      use_case: ["cloud_configs", "terraform"]
+
+  specialized_agents:
+    sql_expert:
+      model: sqlcoder-7b
+      provider: ollama
+      use_case: ["database_queries", "schema_design"]
+      fallback: deepseek-coder-6.7b
+    
+    api_designer:
+      model: deepseek-coder-6.7b
+      provider: ollama
+      use_case: ["api_design", "endpoint_planning"]
+      fallback: codellama-13b
+    
+    ui_generator:
+      model: wizardcoder-js-7b
+      provider: ollama
+      use_case: ["react_components", "ui_styling"]
+      fallback: deepseek-coder-6.7b
+    
+    documentation_writer:
+      model: neural-chat-7b
+      provider: ollama
+      use_case: ["code_documentation", "readme_generation"]
+      fallback: codellama-13b
+    
+    dependency_manager:
+      model: deepseek-coder-6.7b
+      provider: ollama
+      use_case: ["dependency_analysis", "version_management"]
+      fallback: codellama-13b
+    
+    performance_optimizer:
+      model: codellama-13b
+      provider: ollama
+      use_case: ["code_optimization", "performance_tuning"]
+      fallback: deepseek-coder-6.7b
+
+    security_auditor:
+      model: codellama-13b
+      provider: ollama
+      use_case: ["security_audit", "vulnerability_scanning"]
+      fallback: deepseek-coder-6.7b
+      expert_fallback: claude-3-opus-20240229
+
+    ci_cd_expert:
+      model: codellama-13b
+      provider: ollama
+      use_case: ["pipeline_config", "automation_scripts"]
+      fallback: wizardcoder-python-7b
+
+    microservice_architect:
+      model: deepseek-coder-6.7b
+      provider: ollama
+      use_case: ["service_design", "api_gateway", "load_balancing"]
+      fallback: codellama-13b
+      expert_fallback: claude-3-opus-20240229
+
+    data_engineer:
+      model: sqlcoder-7b
+      provider: ollama
+      use_case: ["data_pipelines", "etl_processes", "data_modeling"]
+      fallback: deepseek-coder-6.7b
+
+    cloud_architect:
+      model: codellama-13b
+      provider: ollama
+      use_case: ["cloud_infrastructure", "serverless", "containerization"]
+      fallback: deepseek-coder-6.7b
+
+    testing_specialist:
+      model: wizardcoder-python-7b
+      provider: ollama
+      use_case: ["test_strategy", "test_automation", "performance_testing"]
+      fallback: codellama-13b
+
+    accessibility_expert:
+      model: wizardcoder-js-7b
+      provider: ollama
+      use_case: ["a11y_compliance", "wcag_guidelines", "aria_implementation"]
+      fallback: neural-chat-7b
+
+    mobile_developer:
+      model: deepseek-coder-6.7b
+      provider: ollama
+      use_case: ["mobile_ui", "responsive_design", "native_integration"]
+      fallback: wizardcoder-js-7b
+
+language_specific:
+  python:
+    primary: wizardcoder-python-7b
+    fallback: codellama-13b
+    frameworks:
+      django: wizardcoder-python-7b
+      fastapi: deepseek-coder-6.7b
+      flask: codellama-13b
+      pytorch: deepseek-coder-6.7b
+    
+  javascript:
+    primary: wizardcoder-js-7b
+    fallback: deepseek-coder-6.7b
+    frameworks:
+      react: wizardcoder-js-7b
+      vue: deepseek-coder-6.7b
+      node: codellama-13b
+      next: wizardcoder-js-7b
+    
+  rust:
+    primary: codellama-rust-7b
+    fallback: codellama-13b
+    frameworks:
+      actix: codellama-rust-7b
+      tokio: codellama-13b
+      wasm: deepseek-coder-6.7b
+    
+  go:
+    primary: deepseek-coder-6.7b
+    fallback: codellama-13b
+    frameworks:
+      gin: deepseek-coder-6.7b
+      fiber: codellama-13b
+
+  java:
+    primary: deepseek-coder-6.7b
+    fallback: codellama-13b
+    frameworks:
+      spring: deepseek-coder-6.7b
+      quarkus: codellama-13b
+
+fallback_strategies:
+  performance:
+    - condition: "response_time > 5s"
+      action: "use_smaller_model"
+      models: ["neural-chat-7b", "deepseek-coder-6.7b"]
+    
+  quality:
+    - condition: "confidence_score < 0.7"
+      action: "escalate_to_expert"
+      model: "claude-3-opus-20240229"
+    
+  error_handling:
+    - condition: "model_error"
+      action: "try_alternative"
+      sequence: ["primary", "fallback", "expert_fallback"]
+    
+  load_balancing:
+    - condition: "high_load"
+      action: "distribute"
+      strategy: "round_robin"
+      models: ["codellama-13b", "deepseek-coder-6.7b", "neural-chat-7b"]
+
+gpu_acceleration:
+  enabled: true
+  strategies:
+    - model: "codellama-13b"
+      min_batch_size: 1
+      max_batch_size: 32
+      cuda_memory_fraction: 0.3
+    
+    - model: "deepseek-coder-6.7b"
+      min_batch_size: 1
+      max_batch_size: 64
+      cuda_memory_fraction: 0.2
+    
+    - model: ["wizardcoder-python-7b", "wizardcoder-js-7b"]
+      min_batch_size: 1
+      max_batch_size: 48
+      cuda_memory_fraction: 0.15
+    
+    - model: ["neural-chat-7b", "sqlcoder-7b"]
+      min_batch_size: 1
+      max_batch_size: 32
+      cuda_memory_fraction: 0.1
+
+model_selection_rules:
+  - condition: "task.security_critical || task.complexity >= 0.9"
+    use: "claude-3-opus-20240229"
+  - condition: "task.language == 'python'"
+    use: "wizardcoder-python-7b"
+  - condition: "task.language == 'javascript'"
+    use: "wizardcoder-js-7b"
+  - condition: "task.type == 'sql'"
+    use: "sqlcoder-7b"
+  - condition: "task.requires_speed"
+    use: "deepseek-coder-6.7b"
+
+cost_optimization:
+  premium_model_triggers:
+    - "security_critical: true"
+    - "complexity_score: >= 0.9"
+    - "requires_advanced_reasoning: true"
+  
+  open_source_preferences:
+    - task: "code_completion"
+      model: "codellama-13b"
+    - task: "python_code"
+      model: "wizardcoder-python-7b"
+    - task: "javascript_code"
+      model: "wizardcoder-js-7b"
+    - task: "sql"
+      model: "sqlcoder-7b"
+    - task: "documentation"
+      model: "neural-chat-7b"

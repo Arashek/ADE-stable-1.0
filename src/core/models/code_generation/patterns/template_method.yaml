@@ -1,0 +1,559 @@
+name: template_method
+description: Template Method design pattern for defining the skeleton of an algorithm while allowing subclasses to override specific steps
+category: behavioral
+language: python
+template: |
+  from abc import ABC, abstractmethod
+  from typing import Dict, List, Any, Optional
+  
+  class {{ abstract_class }}(ABC):
+      """Abstract base class that defines the template method"""
+      
+      def {{ template_method }}(self{% for arg in template_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ template_method_return_type }}:
+          """
+          Template method that defines the algorithm skeleton
+          
+          Args:
+              {% for arg in template_method_args %}
+              {{ arg.name }}: {{ arg.description }}
+              {% endfor %}
+              
+          Returns:
+              {{ template_method_return_type_description }}
+          """
+          {% for step in algorithm_steps %}
+          {{ step }}
+          {% endfor %}
+          
+      @abstractmethod
+      def {{ abstract_method_1 }}(self{% for arg in abstract_method_1_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ abstract_method_1_return_type }}:
+          """
+          Abstract method that must be implemented by subclasses
+          
+          Args:
+              {% for arg in abstract_method_1_args %}
+              {{ arg.name }}: {{ arg.description }}
+              {% endfor %}
+              
+          Returns:
+              {{ abstract_method_1_return_type_description }}
+          """
+          pass
+          
+      {% if abstract_method_2 %}
+      @abstractmethod
+      def {{ abstract_method_2 }}(self{% for arg in abstract_method_2_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ abstract_method_2_return_type }}:
+          """
+          Another abstract method that must be implemented by subclasses
+          
+          Args:
+              {% for arg in abstract_method_2_args %}
+              {{ arg.name }}: {{ arg.description }}
+              {% endfor %}
+              
+          Returns:
+              {{ abstract_method_2_return_type_description }}
+          """
+          pass
+      {% endif %}
+      
+      def {{ hook_method }}(self{% for arg in hook_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ hook_method_return_type }}:
+          """
+          Hook method that can be overridden by subclasses
+          
+          Args:
+              {% for arg in hook_method_args %}
+              {{ arg.name }}: {{ arg.description }}
+              {% endfor %}
+              
+          Returns:
+              {{ hook_method_return_type_description }}
+          """
+          {{ hook_method_implementation }}
+          
+      {% for method in common_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  {% for concrete_class in concrete_classes %}
+  class {{ concrete_class.name }}({{ abstract_class }}):
+      """Concrete implementation of the template method"""
+      
+      def __init__(self{% for arg in concrete_class.init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in concrete_class.init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ abstract_method_1 }}(self{% for arg in abstract_method_1_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ abstract_method_1_return_type }}:
+          """
+          Implementation of the first abstract method
+          """
+          {{ concrete_class.abstract_method_1_implementation }}
+          
+      {% if abstract_method_2 %}
+      def {{ abstract_method_2 }}(self{% for arg in abstract_method_2_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ abstract_method_2_return_type }}:
+          """
+          Implementation of the second abstract method
+          """
+          {{ concrete_class.abstract_method_2_implementation }}
+      {% endif %}
+      
+      {% if concrete_class.override_hook %}
+      def {{ hook_method }}(self{% for arg in hook_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ hook_method_return_type }}:
+          """
+          Override of the hook method
+          """
+          {{ concrete_class.hook_implementation }}
+      {% endif %}
+      
+      {% for method in concrete_class.methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  {% endfor %}
+parameters:
+  abstract_class:
+    type: string
+    required: true
+    description: Name of the abstract base class
+  template_method:
+    type: string
+    required: true
+    description: Name of the template method that defines the algorithm skeleton
+  template_method_args:
+    type: array
+    required: false
+    description: Arguments for the template method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+  template_method_return_type:
+    type: string
+    required: true
+    description: Return type of the template method
+  template_method_return_type_description:
+    type: string
+    required: true
+    description: Description of the template method's return value
+  algorithm_steps:
+    type: array
+    required: true
+    description: Steps in the algorithm skeleton
+    items:
+      type: string
+  abstract_method_1:
+    type: string
+    required: true
+    description: Name of the first abstract method
+  abstract_method_1_args:
+    type: array
+    required: false
+    description: Arguments for the first abstract method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+  abstract_method_1_return_type:
+    type: string
+    required: true
+    description: Return type of the first abstract method
+  abstract_method_1_return_type_description:
+    type: string
+    required: true
+    description: Description of the first abstract method's return value
+  abstract_method_2:
+    type: string
+    required: false
+    description: Name of the second abstract method
+  abstract_method_2_args:
+    type: array
+    required: false
+    description: Arguments for the second abstract method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+  abstract_method_2_return_type:
+    type: string
+    required: false
+    description: Return type of the second abstract method
+  abstract_method_2_return_type_description:
+    type: string
+    required: false
+    description: Description of the second abstract method's return value
+  hook_method:
+    type: string
+    required: true
+    description: Name of the hook method
+  hook_method_args:
+    type: array
+    required: false
+    description: Arguments for the hook method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+  hook_method_return_type:
+    type: string
+    required: true
+    description: Return type of the hook method
+  hook_method_return_type_description:
+    type: string
+    required: true
+    description: Description of the hook method's return value
+  hook_method_implementation:
+    type: string
+    required: true
+    description: Default implementation of the hook method
+  common_methods:
+    type: array
+    required: false
+    description: Common methods shared by all classes
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  concrete_classes:
+    type: array
+    required: false
+    description: List of concrete class implementations
+    items:
+      name:
+        type: string
+        required: true
+      init_args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      init_body:
+        type: array
+        required: false
+        items:
+          type: string
+      abstract_method_1_implementation:
+        type: string
+        required: true
+      abstract_method_2_implementation:
+        type: string
+        required: false
+      override_hook:
+        type: boolean
+        required: false
+        description: Whether to override the hook method
+      hook_implementation:
+        type: string
+        required: false
+      methods:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          args:
+            type: array
+            required: false
+            items:
+              name:
+                type: string
+                required: true
+              type:
+                type: string
+                required: true
+          return_type:
+            type: string
+            required: true
+          docstring:
+            type: string
+            required: true
+          body:
+            type: string
+            required: true
+examples:
+  - name: document_processing
+    description: Document processing example using the template method pattern
+    parameters:
+      abstract_class: DocumentProcessor
+      template_method: process_document
+      template_method_args:
+        - name: document
+          type: str
+          description: Document content to process
+      template_method_return_type: str
+      template_method_return_type_description: Processed document content
+      algorithm_steps:
+        - result = self.validate_document(document)
+        - result = self.parse_document(result)
+        - result = self.transform_document(result)
+        - result = self.format_document(result)
+        - return result
+      abstract_method_1: validate_document
+      abstract_method_1_args:
+        - name: document
+          type: str
+          description: Document content to validate
+      abstract_method_1_return_type: str
+      abstract_method_1_return_type_description: Validated document content
+      abstract_method_2: parse_document
+      abstract_method_2_args:
+        - name: document
+          type: str
+          description: Document content to parse
+      abstract_method_2_return_type: str
+      abstract_method_2_return_type_description: Parsed document content
+      hook_method: transform_document
+      hook_method_args:
+        - name: document
+          type: str
+          description: Document content to transform
+      hook_method_return_type: str
+      hook_method_return_type_description: Transformed document content
+      hook_method_implementation: |
+        return document
+      concrete_classes:
+        - name: MarkdownProcessor
+          init_args:
+            - name: strict_mode
+              type: bool
+          init_body:
+            - self.strict_mode = strict_mode
+          abstract_method_1_implementation: |
+            if self.strict_mode:
+                if not document.startswith("# "):
+                    raise ValueError("Document must start with a heading")
+            return document
+          abstract_method_2_implementation: |
+            lines = document.split("\n")
+            parsed_lines = []
+            for line in lines:
+                if line.startswith("# "):
+                    parsed_lines.append(f"<h1>{line[2:]}</h1>")
+                elif line.startswith("## "):
+                    parsed_lines.append(f"<h2>{line[3:]}</h2>")
+                else:
+                    parsed_lines.append(f"<p>{line}</p>")
+            return "\n".join(parsed_lines)
+        - name: HTMLProcessor
+          init_args:
+            - name: sanitize
+              type: bool
+          init_body:
+            - self.sanitize = sanitize
+          abstract_method_1_implementation: |
+            if not document.startswith("<html>"):
+                raise ValueError("Document must be valid HTML")
+            return document
+          abstract_method_2_implementation: |
+            if self.sanitize:
+                # Basic HTML sanitization
+                document = document.replace("<script>", "")
+                document = document.replace("</script>", "")
+            return document
+          override_hook: true
+          hook_implementation: |
+            # Add CSS styling
+            return f'<style>body {{ font-family: Arial, sans-serif; }}</style>\n{document}'
+    code: |
+      from abc import ABC, abstractmethod
+      
+      class DocumentProcessor(ABC):
+          """Abstract base class that defines the document processing template"""
+          
+          def process_document(self, document: str) -> str:
+              """
+              Template method that defines the document processing algorithm
+              
+              Args:
+                  document: Document content to process
+                  
+              Returns:
+                  Processed document content
+              """
+              result = self.validate_document(document)
+              result = self.parse_document(result)
+              result = self.transform_document(result)
+              result = self.format_document(result)
+              return result
+              
+          @abstractmethod
+          def validate_document(self, document: str) -> str:
+              """
+              Abstract method that must be implemented by subclasses
+              
+              Args:
+                  document: Document content to validate
+                  
+              Returns:
+                  Validated document content
+              """
+              pass
+              
+          @abstractmethod
+          def parse_document(self, document: str) -> str:
+              """
+              Another abstract method that must be implemented by subclasses
+              
+              Args:
+                  document: Document content to parse
+                  
+              Returns:
+                  Parsed document content
+              """
+              pass
+              
+          def transform_document(self, document: str) -> str:
+              """
+              Hook method that can be overridden by subclasses
+              
+              Args:
+                  document: Document content to transform
+                  
+              Returns:
+                  Transformed document content
+              """
+              return document
+              
+          def format_document(self, document: str) -> str:
+              """
+              Format the document
+              
+              Args:
+                  document: Document content to format
+                  
+              Returns:
+                  Formatted document content
+              """
+              return document.strip()
+      
+      class MarkdownProcessor(DocumentProcessor):
+          """Concrete implementation for processing Markdown documents"""
+          
+          def __init__(self, strict_mode: bool):
+              self.strict_mode = strict_mode
+              
+          def validate_document(self, document: str) -> str:
+              """
+              Implementation of the first abstract method
+              """
+              if self.strict_mode:
+                  if not document.startswith("# "):
+                      raise ValueError("Document must start with a heading")
+              return document
+              
+          def parse_document(self, document: str) -> str:
+              """
+              Implementation of the second abstract method
+              """
+              lines = document.split("\n")
+              parsed_lines = []
+              for line in lines:
+                  if line.startswith("# "):
+                      parsed_lines.append(f"<h1>{line[2:]}</h1>")
+                  elif line.startswith("## "):
+                      parsed_lines.append(f"<h2>{line[3:]}</h2>")
+                  else:
+                      parsed_lines.append(f"<p>{line}</p>")
+              return "\n".join(parsed_lines)
+      
+      class HTMLProcessor(DocumentProcessor):
+          """Concrete implementation for processing HTML documents"""
+          
+          def __init__(self, sanitize: bool):
+              self.sanitize = sanitize
+              
+          def validate_document(self, document: str) -> str:
+              """
+              Implementation of the first abstract method
+              """
+              if not document.startswith("<html>"):
+                  raise ValueError("Document must be valid HTML")
+              return document
+              
+          def parse_document(self, document: str) -> str:
+              """
+              Implementation of the second abstract method
+              """
+              if self.sanitize:
+                  # Basic HTML sanitization
+                  document = document.replace("<script>", "")
+                  document = document.replace("</script>", "")
+              return document
+              
+          def transform_document(self, document: str) -> str:
+              """
+              Override of the hook method
+              """
+              # Add CSS styling
+              return f'<style>body {{ font-family: Arial, sans-serif; }}</style>\n{document}'
+best_practices:
+  - Use the template method pattern when you have a common algorithm structure with varying implementations
+  - Keep the template method focused on the algorithm structure
+  - Use abstract methods for required steps
+  - Use hook methods for optional steps
+  - Document the template method pattern usage and algorithm steps
+  - Handle errors properly in each step
+anti_patterns:
+  - Creating too many abstract methods
+  - Not properly documenting the algorithm steps
+  - Mixing business logic with algorithm structure
+  - Not handling errors in individual steps
+  - Not documenting the template method pattern usage
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

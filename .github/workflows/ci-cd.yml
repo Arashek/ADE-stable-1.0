@@ -1,0 +1,143 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+          cd ../backend
+          npm ci
+
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm test -- --coverage --watchAll=false
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          npm test -- --coverage --watchAll=false
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: |
+            frontend/coverage/coverage-final.json
+            backend/coverage/coverage-final.json
+          fail_ci_if_error: true
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+          cd ../backend
+          npm ci
+
+      - name: Run frontend linting
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Run backend linting
+        run: |
+          cd backend
+          npm run lint
+
+  build:
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+          cd ../backend
+          npm ci
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          REACT_APP_WS_URL: ${{ secrets.REACT_APP_WS_URL }}
+
+      - name: Build backend
+        run: |
+          cd backend
+          npm run build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy frontend to S3
+        run: |
+          cd frontend
+          aws s3 sync build/ s3://${{ secrets.AWS_S3_BUCKET }} --delete
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
+      - name: Deploy backend to ECS
+        run: |
+          cd backend
+          aws ecs update-service --cluster ${{ secrets.AWS_ECS_CLUSTER }} --service ${{ secrets.AWS_ECS_SERVICE }} --force-new-deployment
+
+  notify:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always() 

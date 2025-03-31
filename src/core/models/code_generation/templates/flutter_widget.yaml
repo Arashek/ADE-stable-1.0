@@ -1,0 +1,87 @@
+name: flutter_widget
+description: Template for generating Flutter widgets
+content: |
+  import 'package:flutter/material.dart';
+  {% for import in imports %}
+  import '{{ import }}';
+  {% endfor %}
+  
+  class {{ widget_name }} extends {{ base_widget }} {
+    {% for field in fields %}
+    final {{ field.type }} {{ field.name }};
+    {% endfor %}
+  
+    const {{ widget_name }}({
+      {% for field in fields %}
+      this.{{ field.name }}{% if field.default != null %} = {{ field.default }}{% endif %},
+      {% endfor %}
+      Key? key,
+    }) : super(key: key);
+  
+    @override
+    Widget build(BuildContext context) {
+      return {{ root_widget }}(
+        {% for property in properties %}
+        {{ property.name }}: {{ property.value }},
+        {% endfor %}
+        child: {{ child_widget }},
+      );
+    }
+  }
+parameters:
+  widget_name:
+    type: string
+    required: true
+    description: Name of the Flutter widget
+  base_widget:
+    type: string
+    required: true
+    description: Base widget class to extend
+  imports:
+    type: array
+    required: false
+    description: List of additional imports
+  fields:
+    type: array
+    required: false
+    description: List of widget fields
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      default:
+        type: string
+        required: false
+  properties:
+    type: array
+    required: false
+    description: List of widget properties
+    items:
+      name:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+  root_widget:
+    type: string
+    required: true
+    description: Root widget to use in build method
+  child_widget:
+    type: string
+    required: true
+    description: Child widget to use in root widget
+tags:
+  - flutter
+  - dart
+  - mobile
+  - widget
+language: dart
+category: widget
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

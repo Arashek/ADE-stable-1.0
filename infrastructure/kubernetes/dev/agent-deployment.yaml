@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-pool
+  namespace: ade-dev
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: agent-pool
+  template:
+    metadata:
+      labels:
+        app: agent-pool
+    spec:
+      containers:
+      - name: architecture-agent
+        image: ade/architecture-agent:dev
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+        env:
+        - name: AGENT_TYPE
+          value: "architecture"
+        - name: MODEL_ENDPOINT
+          value: "http://model-service:8080"
+        volumeMounts:
+        - name: agent-storage
+          mountPath: /data
+
+      - name: code-generator-agent
+        image: ade/code-generator:dev
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+        env:
+        - name: AGENT_TYPE
+          value: "code-generator"
+        - name: MODEL_ENDPOINT
+          value: "http://model-service:8080"
+        volumeMounts:
+        - name: agent-storage
+          mountPath: /data
+
+      - name: test-writer-agent
+        image: ade/test-writer:dev
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+        env:
+        - name: AGENT_TYPE
+          value: "test-writer"
+        - name: MODEL_ENDPOINT
+          value: "http://model-service:8080"
+        volumeMounts:
+        - name: agent-storage
+          mountPath: /data
+
+      volumes:
+      - name: agent-storage
+        persistentVolumeClaim:
+          claimName: agent-storage-pvc

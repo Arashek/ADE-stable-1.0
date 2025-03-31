@@ -1,0 +1,106 @@
+name: sql_migration
+description: Template for generating SQL database migrations
+content: |
+  -- Migration: {{ migration_name }}
+  -- Created at: {{ timestamp }}
+  -- Description: {{ description }}
+  
+  -- Up Migration
+  CREATE TABLE IF NOT EXISTS {{ table_name }} (
+      {% for column in columns %}
+      {{ column.name }} {{ column.type }}{% if column.constraints %}{% for constraint in column.constraints %} {{ constraint }}{% endfor %}{% endif %}{% if not loop.last %},{% endif %}
+      {% endfor %}
+  );
+  
+  {% for index in indexes %}
+  CREATE INDEX IF NOT EXISTS {{ index.name }} ON {{ table_name }} ({{ index.columns | join(', ') }});
+  {% endfor %}
+  
+  {% for foreign_key in foreign_keys %}
+  ALTER TABLE {{ table_name }}
+      ADD CONSTRAINT {{ foreign_key.name }}
+      FOREIGN KEY ({{ foreign_key.column }})
+      REFERENCES {{ foreign_key.reference_table }}({{ foreign_key.reference_column }});
+  {% endfor %}
+  
+  -- Down Migration
+  DROP TABLE IF EXISTS {{ table_name }};
+parameters:
+  migration_name:
+    type: string
+    required: true
+    description: Name of the migration
+  timestamp:
+    type: string
+    required: true
+    description: Timestamp of the migration
+  description:
+    type: string
+    required: true
+    description: Description of the migration
+  table_name:
+    type: string
+    required: true
+    description: Name of the table to create
+  columns:
+    type: array
+    required: true
+    description: List of table columns
+    items:
+      name:
+        type: string
+        required: true
+        description: Name of the column
+      type:
+        type: string
+        required: true
+        description: Data type of the column
+      constraints:
+        type: array
+        required: false
+        description: List of column constraints
+  indexes:
+    type: array
+    required: false
+    description: List of indexes to create
+    items:
+      name:
+        type: string
+        required: true
+        description: Name of the index
+      columns:
+        type: array
+        required: true
+        description: List of columns to index
+  foreign_keys:
+    type: array
+    required: false
+    description: List of foreign key constraints
+    items:
+      name:
+        type: string
+        required: true
+        description: Name of the foreign key constraint
+      column:
+        type: string
+        required: true
+        description: Column in the current table
+      reference_table:
+        type: string
+        required: true
+        description: Referenced table name
+      reference_column:
+        type: string
+        required: true
+        description: Referenced column name
+tags:
+  - sql
+  - database
+  - migration
+  - schema
+language: sql
+category: migration
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

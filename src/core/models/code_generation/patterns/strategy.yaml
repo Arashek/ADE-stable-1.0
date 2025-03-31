@@ -1,0 +1,439 @@
+name: strategy
+description: Strategy design pattern for defining a family of algorithms and making them interchangeable
+category: behavioral
+language: python
+template: |
+  from abc import ABC, abstractmethod
+  from typing import Dict, List, Any, Optional
+  from enum import Enum
+  
+  class {{ strategy_type_enum }}:
+      """Enumeration of available strategy types"""
+      {% for type in strategy_types %}
+      {{ type.name }} = "{{ type.value }}"
+      {% endfor %}
+  
+  class {{ strategy_interface }}(ABC):
+      """Abstract base class for strategies"""
+      
+      @abstractmethod
+      def {{ execute_method }}(self{% for arg in execute_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ execute_method_return_type }}:
+          """
+          Execute the strategy
+          
+          Args:
+              {% for arg in execute_method_args %}
+              {{ arg.name }}: {{ arg.description }}
+              {% endfor %}
+              
+          Returns:
+              {{ execute_method_return_type_description }}
+          """
+          pass
+          
+      {% for method in strategy_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  
+  {% for strategy in concrete_strategies %}
+  class {{ strategy.name }}({{ strategy_interface }}):
+      """Concrete strategy implementation"""
+      
+      def __init__(self{% for arg in strategy.init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in strategy.init_body %}
+          {{ init }}
+          {% endfor %}
+          
+      def {{ execute_method }}(self{% for arg in execute_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ execute_method_return_type }}:
+          """
+          Execute this specific strategy
+          """
+          {{ strategy.execute_implementation }}
+          
+      {% for method in strategy.methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+  {% endfor %}
+  
+  class {{ context_class }}:
+      """Context class that uses the strategy"""
+      
+      def __init__(self{% for arg in context_init_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}):
+          {% for init in context_init_body %}
+          {{ init }}
+          {% endfor %}
+          self._strategy: Optional[{{ strategy_interface }}] = None
+          
+      def set_strategy(self, strategy: {{ strategy_interface }}) -> None:
+          """
+          Set the strategy to use
+          
+          Args:
+              strategy: The strategy to use
+          """
+          self._strategy = strategy
+          
+      def execute_strategy(self{% for arg in execute_method_args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ execute_method_return_type }}:
+          """
+          Execute the current strategy
+          
+          Args:
+              {% for arg in execute_method_args %}
+              {{ arg.name }}: {{ arg.description }}
+              {% endfor %}
+              
+          Returns:
+              {{ execute_method_return_type_description }}
+              
+          Raises:
+              ValueError: If no strategy is set
+          """
+          if self._strategy is None:
+              raise ValueError("No strategy set")
+          return self._strategy.{{ execute_method }}({{ execute_method_args | map(attribute='name') | join(', ') }})
+          
+      {% for method in context_methods %}
+      def {{ method.name }}(self{% for arg in method.args %}, {{ arg.name }}: {{ arg.type }}{% endfor %}) -> {{ method.return_type }}:
+          """
+          {{ method.docstring }}
+          """
+          {{ method.body }}
+      {% endfor %}
+parameters:
+  strategy_type_enum:
+    type: string
+    required: true
+    description: Name of the strategy type enumeration
+  strategy_types:
+    type: array
+    required: true
+    description: List of available strategy types
+    items:
+      name:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+  strategy_interface:
+    type: string
+    required: true
+    description: Name of the strategy interface class
+  execute_method:
+    type: string
+    required: true
+    description: Name of the execute method for strategies
+  execute_method_args:
+    type: array
+    required: false
+    description: Arguments for the execute method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+  execute_method_return_type:
+    type: string
+    required: true
+    description: Return type of the execute method
+  execute_method_return_type_description:
+    type: string
+    required: true
+    description: Description of the execute method's return value
+  strategy_methods:
+    type: array
+    required: false
+    description: Additional methods for the strategy interface
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+  concrete_strategies:
+    type: array
+    required: false
+    description: List of concrete strategy implementations
+    items:
+      name:
+        type: string
+        required: true
+      init_args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      init_body:
+        type: array
+        required: false
+        items:
+          type: string
+      execute_implementation:
+        type: string
+        required: true
+      methods:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          args:
+            type: array
+            required: false
+            items:
+              name:
+                type: string
+                required: true
+              type:
+                type: string
+                required: true
+          return_type:
+            type: string
+            required: true
+          docstring:
+            type: string
+            required: true
+          body:
+            type: string
+            required: true
+  context_class:
+    type: string
+    required: true
+    description: Name of the context class
+  context_init_args:
+    type: array
+    required: false
+    description: Arguments for the context's __init__ method
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+  context_init_body:
+    type: array
+    required: false
+    description: Body statements for the context's __init__ method
+    items:
+      type: string
+  context_methods:
+    type: array
+    required: false
+    description: Additional methods for the context class
+    items:
+      name:
+        type: string
+        required: true
+      args:
+        type: array
+        required: false
+        items:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+      return_type:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+examples:
+  - name: payment_processing
+    description: Payment processing example using the strategy pattern
+    parameters:
+      strategy_type_enum: PaymentMethod
+      strategy_types:
+        - name: CREDIT_CARD
+          value: "credit_card"
+        - name: PAYPAL
+          value: "paypal"
+      strategy_interface: PaymentStrategy
+      execute_method: process_payment
+      execute_method_args:
+        - name: amount
+          type: float
+          description: Amount to process
+        - name: currency
+          type: str
+          description: Currency code
+      execute_method_return_type: bool
+      execute_method_return_type_description: True if payment was successful, False otherwise
+      concrete_strategies:
+        - name: CreditCardStrategy
+          init_args:
+            - name: card_number
+              type: str
+            - name: expiry_date
+              type: str
+            - name: cvv
+              type: str
+          init_body:
+            - self.card_number = card_number
+            - self.expiry_date = expiry_date
+            - self.cvv = cvv
+          execute_implementation: |
+            print(f"Processing credit card payment of {amount} {currency}")
+            print(f"Card number: {self.card_number}")
+            print(f"Expiry date: {self.expiry_date}")
+            print(f"CVV: {self.cvv}")
+            return True
+        - name: PayPalStrategy
+          init_args:
+            - name: email
+              type: str
+          init_body:
+            - self.email = email
+          execute_implementation: |
+            print(f"Processing PayPal payment of {amount} {currency}")
+            print(f"PayPal email: {self.email}")
+            return True
+      context_class: PaymentProcessor
+    code: |
+      from abc import ABC, abstractmethod
+      from typing import Optional
+      from enum import Enum
+      
+      class PaymentMethod:
+          """Enumeration of available payment methods"""
+          CREDIT_CARD = "credit_card"
+          PAYPAL = "paypal"
+      
+      class PaymentStrategy(ABC):
+          """Abstract base class for payment strategies"""
+          
+          @abstractmethod
+          def process_payment(self, amount: float, currency: str) -> bool:
+              """
+              Process a payment
+              
+              Args:
+                  amount: Amount to process
+                  currency: Currency code
+                  
+              Returns:
+                  True if payment was successful, False otherwise
+              """
+              pass
+      
+      class CreditCardStrategy(PaymentStrategy):
+          """Concrete strategy implementation for credit card payments"""
+          
+          def __init__(self, card_number: str, expiry_date: str, cvv: str):
+              self.card_number = card_number
+              self.expiry_date = expiry_date
+              self.cvv = cvv
+              
+          def process_payment(self, amount: float, currency: str) -> bool:
+              """
+              Process a credit card payment
+              """
+              print(f"Processing credit card payment of {amount} {currency}")
+              print(f"Card number: {self.card_number}")
+              print(f"Expiry date: {self.expiry_date}")
+              print(f"CVV: {self.cvv}")
+              return True
+      
+      class PayPalStrategy(PaymentStrategy):
+          """Concrete strategy implementation for PayPal payments"""
+          
+          def __init__(self, email: str):
+              self.email = email
+              
+          def process_payment(self, amount: float, currency: str) -> bool:
+              """
+              Process a PayPal payment
+              """
+              print(f"Processing PayPal payment of {amount} {currency}")
+              print(f"PayPal email: {self.email}")
+              return True
+      
+      class PaymentProcessor:
+          """Context class that uses the payment strategy"""
+          
+          def __init__(self):
+              self._strategy: Optional[PaymentStrategy] = None
+              
+          def set_strategy(self, strategy: PaymentStrategy) -> None:
+              """
+              Set the payment strategy to use
+              
+              Args:
+                  strategy: The payment strategy to use
+              """
+              self._strategy = strategy
+              
+          def process_payment(self, amount: float, currency: str) -> bool:
+              """
+              Process a payment using the current strategy
+              
+              Args:
+                  amount: Amount to process
+                  currency: Currency code
+                  
+              Returns:
+                  True if payment was successful, False otherwise
+                  
+              Raises:
+                  ValueError: If no strategy is set
+              """
+              if self._strategy is None:
+                  raise ValueError("No payment strategy set")
+              return self._strategy.process_payment(amount, currency)
+best_practices:
+  - Use the strategy pattern when you need to define a family of algorithms and make them interchangeable
+  - Keep strategies focused on a single responsibility
+  - Use abstract base classes to define the strategy interface
+  - Consider using strategy factories for strategy creation
+  - Document the strategy pattern usage and available strategies
+  - Handle strategy selection and execution properly
+anti_patterns:
+  - Creating too many strategies for simple operations
+  - Not properly encapsulating strategy logic
+  - Mixing business logic with strategy selection
+  - Not handling strategy errors
+  - Not documenting the strategy pattern usage
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

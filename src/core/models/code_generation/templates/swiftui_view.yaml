@@ -1,0 +1,77 @@
+name: swiftui_view
+description: Template for generating SwiftUI views
+content: |
+  import SwiftUI
+  {% for import in imports %}
+  import {{ import }}
+  {% endfor %}
+  
+  struct {{ view_name }}: View {
+    {% for property in properties %}
+    @{{ property.wrapper }} var {{ property.name }}: {{ property.type }}{% if property.default != null %} = {{ property.default }}{% endif %}
+    {% endfor %}
+    
+    var body: some View {
+      {{ root_view }}
+        {% for modifier in modifiers %}
+        .{{ modifier.name }}({{ modifier.arguments }})
+        {% endfor %}
+    }
+  }
+  
+  #Preview {
+    {{ view_name }}()
+  }
+parameters:
+  view_name:
+    type: string
+    required: true
+    description: Name of the SwiftUI view
+  imports:
+    type: array
+    required: false
+    description: List of additional imports
+  properties:
+    type: array
+    required: false
+    description: List of view properties
+    items:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      wrapper:
+        type: string
+        required: true
+        description: Property wrapper (State, Binding, etc.)
+      default:
+        type: string
+        required: false
+  root_view:
+    type: string
+    required: true
+    description: Root view to use in body
+  modifiers:
+    type: array
+    required: false
+    description: List of view modifiers
+    items:
+      name:
+        type: string
+        required: true
+      arguments:
+        type: string
+        required: true
+tags:
+  - swift
+  - swiftui
+  - ios
+  - view
+language: swift
+category: view
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

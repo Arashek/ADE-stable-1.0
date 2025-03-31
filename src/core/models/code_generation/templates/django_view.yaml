@@ -1,0 +1,92 @@
+name: django_view
+description: Template for generating Django views
+content: |
+  from django.shortcuts import render, redirect
+  from django.contrib.auth.decorators import login_required
+  from django.http import JsonResponse
+  {% for import in imports %}
+  from {{ import }}
+  {% endfor %}
+  
+  {% for decorator in decorators %}
+  @{{ decorator }}
+  {% endfor %}
+  def {{ view_name }}(request{% for param in parameters %}, {{ param.name }}{% endfor %}):
+      """
+      {{ docstring }}
+      """
+      {% for operation in operations %}
+      {{ operation }}
+      {% endfor %}
+      
+      {% if context %}
+      context = {
+          {% for key, value in context.items %}
+          '{{ key }}': {{ value }},
+          {% endfor %}
+      }
+      {% endif %}
+      
+      {% if template %}
+      return render(request, '{{ template }}', context)
+      {% elif redirect_url %}
+      return redirect('{{ redirect_url }}')
+      {% elif json_response %}
+      return JsonResponse({{ json_response }})
+      {% endif %}
+parameters:
+  view_name:
+    type: string
+    required: true
+    description: Name of the view function
+  imports:
+    type: array
+    required: false
+    description: List of additional imports
+  decorators:
+    type: array
+    required: false
+    description: List of decorators to apply
+  parameters:
+    type: array
+    required: false
+    description: List of view parameters
+    items:
+      name:
+        type: string
+        required: true
+  docstring:
+    type: string
+    required: false
+    description: Docstring for the view
+  operations:
+    type: array
+    required: false
+    description: List of operations to perform
+  context:
+    type: object
+    required: false
+    description: Context dictionary for template rendering
+  template:
+    type: string
+    required: false
+    description: Template to render
+  redirect_url:
+    type: string
+    required: false
+    description: URL to redirect to
+  json_response:
+    type: string
+    required: false
+    description: JSON response data
+tags:
+  - python
+  - django
+  - view
+  - backend
+language: python
+category: view
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

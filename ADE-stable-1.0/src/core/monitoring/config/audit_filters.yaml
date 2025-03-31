@@ -1,0 +1,61 @@
+authentication:
+  - min_severity: "warning"
+    actions: ["login", "logout", "password_change", "token_refresh"]
+    action: "include"
+  - min_severity: "info"
+    actions: ["login_attempt"]
+    action: "include"
+  - action: "exclude"
+
+data_access:
+  - min_severity: "warning"
+    actions: ["read", "write", "delete"]
+    resources: ["sensitive_data", "user_data", "config"]
+    action: "include"
+  - min_severity: "info"
+    actions: ["read"]
+    resources: ["public_data"]
+    action: "include"
+  - action: "exclude"
+
+config_change:
+  - min_severity: "warning"
+    actions: ["update", "delete"]
+    resources: ["system_config", "security_settings"]
+    action: "include"
+  - min_severity: "info"
+    actions: ["read"]
+    resources: ["system_config"]
+    action: "include"
+  - action: "exclude"
+
+access_control:
+  - min_severity: "warning"
+    actions: ["grant", "revoke", "modify"]
+    resources: ["permissions", "roles", "groups"]
+    action: "include"
+  - min_severity: "info"
+    actions: ["read"]
+    resources: ["permissions", "roles", "groups"]
+    action: "include"
+  - action: "exclude"
+
+system_change:
+  - min_severity: "warning"
+    actions: ["start", "stop", "restart", "update"]
+    resources: ["service", "component", "system"]
+    action: "include"
+  - min_severity: "info"
+    actions: ["status_change"]
+    resources: ["service", "component", "system"]
+    action: "include"
+  - action: "exclude"
+
+security_event:
+  - min_severity: "warning"
+    actions: ["block", "alert", "threat_detected"]
+    action: "include"
+  - min_severity: "info"
+    actions: ["scan", "check"]
+    action: "include"
+  - action: "exclude" 

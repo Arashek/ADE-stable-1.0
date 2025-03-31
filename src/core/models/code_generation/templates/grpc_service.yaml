@@ -1,0 +1,116 @@
+name: grpc_service
+description: Template for generating gRPC service definitions
+content_edit: |
+  syntax = "proto3";
+  
+  package {{ package_name }};
+  
+  option go_package = "{{ go_package }}";
+  
+  {% for import in imports %}
+  import "{{ import }}";
+  {% endfor %}
+  
+  service {{ service_name }} {
+    {% for method in methods %}
+    // {{ method.docstring }}
+    rpc {{ method.name }}({{ method.request_type }}) returns ({{ method.response_type }}) {
+      option (google.api.http) = {
+        {{ method.http_method | lower }}: "{{ method.http_path }}"
+      };
+    }
+    {% endfor %}
+  }
+  
+  {% for message in messages %}
+  message {{ message.name }} {
+    {% for field in message.fields %}
+    {{ field.type }} {{ field.name }} = {{ field.number }}{% if field.options %}{% for option in field.options %} [{{ option }}]{% endfor %}{% endif %};
+    {% endfor %}
+  }
+  {% endfor %}
+parameters:
+  package_name:
+    type: string
+    required: true
+    description: Package name for the service
+  go_package:
+    type: string
+    required: true
+    description: Go package path
+  imports:
+    type: array
+    required: false
+    description: List of additional imports
+  service_name:
+    type: string
+    required: true
+    description: Name of the service
+  methods:
+    type: array
+    required: false
+    description: List of service methods
+    items:
+      name:
+        type: string
+        required: true
+      docstring:
+        type: string
+        required: false
+        description: Method documentation
+      request_type:
+        type: string
+        required: true
+        description: Request message type
+      response_type:
+        type: string
+        required: true
+        description: Response message type
+      http_method:
+        type: string
+        required: true
+        description: HTTP method (GET, POST, etc.)
+      http_path:
+        type: string
+        required: true
+        description: HTTP path
+  messages:
+    type: array
+    required: false
+    description: List of message definitions
+    items:
+      name:
+        type: string
+        required: true
+      fields:
+        type: array
+        required: true
+        description: List of message fields
+        items:
+          type:
+            type: string
+            required: true
+            description: Field type
+          name:
+            type: string
+            required: true
+            description: Field name
+          number:
+            type: integer
+            required: true
+            description: Field number
+          options:
+            type: array
+            required: false
+            description: List of field options
+tags:
+  - protobuf
+  - grpc
+  - service
+  - backend
+language: protobuf
+category: service
+version: "1.0.0"
+author: "System"
+created_at: "2024-01-01T00:00:00"
+updated_at: "2024-01-01T00:00:00" 

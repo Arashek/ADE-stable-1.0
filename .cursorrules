@@ -1,0 +1,56 @@
+{
+  "editor": {
+    "formatOnSave": true,
+    "tabSize": 2,
+    "insertSpaces": true,
+    "rulers": [80, 100],
+    "wordWrap": "off"
+  },
+  "typescript": {
+    "preferences": {
+      "importModuleSpecifier": "non-relative",
+      "quotePreference": "single"
+    }
+  },
+  "files": {
+    "exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/build": true,
+      "**/.git": true,
+      "**/coverage": true,
+      "**/__pycache__": true,
+      "**/.pytest_cache": true,
+      "**/venv": true,
+      "**/.env": true
+    }
+  },
+  "search": {
+    "exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/build": true,
+      "**/.git": true,
+      "**/coverage": true,
+      "**/__pycache__": true,
+      "**/.pytest_cache": true,
+      "**/venv": true,
+      "**/.env": true
+    }
+  },
+  "terminal": {
+    "integrated": {
+      "shell": {
+        "windows": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+      }
+    }
+  },
+  "git": {
+    "enabled": true,
+    "autofetch": true
+  },
+  "workbench": {
+    "colorTheme": "Default Dark+",
+    "iconTheme": "material-icon-theme"
+  }
+} 

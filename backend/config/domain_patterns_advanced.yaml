@@ -1,0 +1,191 @@
+scientific_computing:
+  - name: numerical_analysis
+    description: "Scientific computing and numerical analysis"
+    code_patterns:
+      - "matrix_operations"
+      - "numerical_integration"
+      - "differential_equations"
+    best_practices:
+      - "Vectorized operations"
+      - "Memory efficiency"
+      - "Numerical stability"
+    performance_requirements:
+      - "Optimized algorithms"
+      - "Parallel processing"
+      - "GPU acceleration"
+    validation_requirements:
+      - "Error bounds"
+      - "Convergence tests"
+      - "Stability analysis"
+    metrics:
+      computation_time: "optimized"
+      memory_usage: "efficient"
+      numerical_accuracy: "high"
+
+robotics:
+  - name: robot_control
+    description: "Robotics control systems"
+    code_patterns:
+      - "motion_planning"
+      - "sensor_fusion"
+      - "control_loops"
+    best_practices:
+      - "Real-time processing"
+      - "Safety checks"
+      - "Sensor calibration"
+    performance_requirements:
+      - "Real-time response"
+      - "Deterministic behavior"
+      - "Low latency"
+    safety_requirements:
+      - "Emergency stops"
+      - "Collision avoidance"
+      - "Fault tolerance"
+    metrics:
+      control_frequency: "> 1kHz"
+      response_time: "< 1ms"
+      safety_checks: "comprehensive"
+
+bioinformatics:
+  - name: genomics
+    description: "Genomics and bioinformatics analysis"
+    code_patterns:
+      - "sequence_alignment"
+      - "phylogenetic_analysis"
+      - "variant_calling"
+    best_practices:
+      - "Data validation"
+      - "Pipeline automation"
+      - "Result reproducibility"
+    performance_requirements:
+      - "Parallel processing"
+      - "Memory efficiency"
+      - "I/O optimization"
+    data_requirements:
+      - "Data integrity"
+      - "Version control"
+      - "Format standards"
+    metrics:
+      processing_speed: "optimized"
+      accuracy: "high"
+      reproducibility: "100%"
+
+cryptography:
+  - name: crypto_systems
+    description: "Cryptographic systems and protocols"
+    code_patterns:
+      - "key_management"
+      - "encryption_algorithms"
+      - "secure_protocols"
+    best_practices:
+      - "Secure key storage"
+      - "Random number generation"
+      - "Protocol validation"
+    security_requirements:
+      - "Side-channel protection"
+      - "Forward secrecy"
+      - "Perfect secrecy"
+    performance_requirements:
+      - "Efficient encryption"
+      - "Fast key generation"
+      - "Low overhead"
+    metrics:
+      key_strength: "sufficient"
+      operation_speed: "optimized"
+      security_level: "high"
+
+computer_vision:
+  - name: image_processing
+    description: "Computer vision and image processing"
+    code_patterns:
+      - "feature_detection"
+      - "object_recognition"
+      - "image_segmentation"
+    best_practices:
+      - "GPU acceleration"
+      - "Pipeline optimization"
+      - "Model optimization"
+    performance_requirements:
+      - "Real-time processing"
+      - "Memory efficiency"
+      - "GPU utilization"
+    validation_requirements:
+      - "Accuracy metrics"
+      - "Performance benchmarks"
+      - "Quality assessment"
+    metrics:
+      processing_speed: "real-time"
+      accuracy: "> 90%"
+      memory_usage: "optimized"
+
+natural_language:
+  - name: nlp_systems
+    description: "Natural Language Processing systems"
+    code_patterns:
+      - "text_preprocessing"
+      - "tokenization"
+      - "model_inference"
+    best_practices:
+      - "Text normalization"
+      - "Model optimization"
+      - "Batch processing"
+    performance_requirements:
+      - "Fast tokenization"
+      - "Efficient inference"
+      - "Memory management"
+    validation_requirements:
+      - "Accuracy metrics"
+      - "Language coverage"
+      - "Edge cases"
+    metrics:
+      processing_speed: "< 100ms"
+      accuracy: "> 85%"
+      language_support: "comprehensive"
+
+autonomous_systems:
+  - name: autonomous_control
+    description: "Autonomous systems and self-driving"
+    code_patterns:
+      - "perception_system"
+      - "decision_making"
+      - "control_system"
+    best_practices:
+      - "Sensor fusion"
+      - "Safety validation"
+      - "Redundancy"
+    safety_requirements:
+      - "Fault detection"
+      - "Fallback systems"
+      - "Safety monitors"
+    performance_requirements:
+      - "Real-time processing"
+      - "Low latency"
+      - "High reliability"
+    metrics:
+      response_time: "< 10ms"
+      reliability: "99.999%"
+      safety_score: "maximum"
+
+quantum_simulation:
+  - name: quantum_systems
+    description: "Quantum system simulation"
+    code_patterns:
+      - "quantum_circuits"
+      - "state_vectors"
+      - "quantum_gates"
+    best_practices:
+      - "State management"
+      - "Error mitigation"
+      - "Efficient simulation"
+    performance_requirements:
+      - "Efficient computation"
+      - "Memory optimization"
+      - "Parallel processing"
+    validation_requirements:
+      - "State verification"
+      - "Unitary checks"
+      - "Error bounds"
+    metrics:
+      simulation_accuracy: "high"
+      computation_efficiency: "optimized"
+      error_rates: "minimized"
