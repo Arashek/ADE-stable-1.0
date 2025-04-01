@@ -2,17 +2,18 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Dict, List, Optional
 from datetime import datetime
 from pydantic import BaseModel
-from ..auth.auth import get_current_user, require_admin
-from ..services.owner_panel_service import OwnerPanelService
-from ..models.owner_panel import (
+from auth.auth import get_current_user, require_admin
+from services.owner_panel_service import OwnerPanelService
+from models.owner_panel import (
     DashboardMetrics, APIConfig, WebhookConfig, MarketplaceItem,
     MarketplaceOrder, SupportTicket, SystemDiagnostic, PerformanceMetric,
     ErrorLog, LandingPageContent, ThemeConfig, UIComponent
 )
-from ..auth.auth import get_current_admin_user
-from ..config.logging_config import logger
+from auth.auth import get_current_admin_user
+from config.logging_config import logger
 
-router = APIRouter(prefix="/api/owner-panel", tags=["owner-panel"])
+# Change prefix to /owner-panel without the /api part since it's added in main.py
+router = APIRouter(prefix="/owner-panel", tags=["owner-panel"])
 
 # Request/Response Models
 class SystemMetrics(BaseModel):

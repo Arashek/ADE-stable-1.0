@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import ast
 import re
 import logging
-from ...core.base_agent import BaseAgent
+from services.core.base_agent import BaseAgent
 
 @dataclass
 class SecurityVulnerability:

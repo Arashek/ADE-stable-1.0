@@ -5,7 +5,7 @@ import re
 import logging
 import yaml
 from pathlib import Path
-from ...core.base_agent import BaseAgent
+from services.core.base_agent import BaseAgent
 
 @dataclass
 class ValidationIssue:

@@ -20,8 +20,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from PIL import Image
 from pydantic import BaseModel
 
-from backend.services.agent_coordinator import AgentCoordinator
-from backend.services.memory.memory_service import MemoryService
+from services.agent_coordinator import AgentCoordinator
+from services.memory.memory_service import MemoryService
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

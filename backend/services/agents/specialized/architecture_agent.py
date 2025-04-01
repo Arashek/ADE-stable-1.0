@@ -4,7 +4,7 @@ import ast
 import re
 import logging
 from pathlib import Path
-from ...core.base_agent import BaseAgent
+from services.core.base_agent import BaseAgent
 
 @dataclass
 class ArchitectureComponent:

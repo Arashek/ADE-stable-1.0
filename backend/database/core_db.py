@@ -4,12 +4,12 @@ import logging
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select, update, delete
-from ..models.core_components import (
+from .models.core_components import (
     UserProfile, Notification, DashboardMetrics, NavigationItem,
     UserSettings, SystemHealth, ResourceUsage, DeploymentStatus,
     UserManagement, SystemOverview
 )
-from ..config import settings
+from .config import settings
 
 logger = logging.getLogger(__name__)
 

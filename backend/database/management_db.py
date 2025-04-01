@@ -146,7 +146,7 @@ class MarketplaceItemDB(Base):
     description = Column(String)
     price = Column(Float, nullable=False)
     tags = Column(JSON)
-    metadata = Column(JSON)
+    item_metadata = Column(JSON)  # Renamed from 'metadata' which is reserved in SQLAlchemy
     status = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

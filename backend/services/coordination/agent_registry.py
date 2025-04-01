@@ -11,7 +11,7 @@ from typing import Dict, List, Any, Optional, Set
 import asyncio
 from enum import Enum
 
-from backend.services.coordination.agent_interface import AgentInterface, AgentCapability
+from services.coordination.agent_interface import AgentInterface, AgentCapability
 
 # Configure logging
 logger = logging.getLogger(__name__)

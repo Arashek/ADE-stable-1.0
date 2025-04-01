@@ -1,8 +1,8 @@
 from typing import Any, Optional, Union
 import json
 from redis.asyncio import Redis
-from ..config.settings import settings
-from ..config.logging_config import logger
+from .config.settings import settings
+from .config.logging_config import logger
 
 class RedisClient:
     """Redis client for caching and rate limiting"""

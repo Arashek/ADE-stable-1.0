@@ -2,7 +2,7 @@ from typing import Dict, List, Optional
 from datetime import datetime
 import psutil
 import logging
-from ..models.owner_panel import (
+from models.owner_panel import (
     SystemMetrics,
     UserStats,
     SecurityConfig,
@@ -23,11 +23,11 @@ from ..models.owner_panel import (
     ThemeConfig,
     UIComponent
 )
-from ..database.owner_panel_db import OwnerPanelDB
-from ..utils.security import generate_api_key, hash_api_key
-from ..utils.backup import create_backup, restore_backup
-from ..config.logging_config import logger
-from ..config.cache_config import cache
+from database.owner_panel_db import OwnerPanelDB
+from utils.security import generate_api_key, hash_api_key
+from utils.backup import create_backup, restore_backup
+from config.logging_config import logger
+from config.cache_config import cache
 import uuid
 
 class OwnerPanelService:
@@ -39,7 +39,27 @@ class OwnerPanelService:
         """Initialize required services and connections"""
         try:
             # Initialize database connections
-            self.db.connect()
+            # Convert async connect() call to sync by using connect_sync() if available
+            # or create a sync version for local testing
+            if hasattr(self.db, 'connect_sync'):
+                self.db.connect_sync()
+            else:
+                # Create a sync connection as a fallback for testing
+                import asyncio
+                try:
+                    # Try to use an existing event loop
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        logger.warning("Async event loop is running, database connection will be deferred to first request")
+                    else:
+                        loop.run_until_complete(self.db.connect())
+                except RuntimeError:
+                    # If no event loop exists in this thread, create one for sync operation
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    loop.run_until_complete(self.db.connect())
+                    loop.close()
+            
             logger.info("Owner panel services initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize owner panel services: {str(e)}")

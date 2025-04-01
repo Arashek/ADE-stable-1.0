@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import select, update, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from ...models.notification import Notification, NotificationPreference, NotificationStatus
-from ...config.logging_config import logger
+from models.notification import Notification, NotificationPreference, NotificationStatus
+from config.logging_config import logger
 
 class NotificationOperations:
     """Database operations for notifications"""

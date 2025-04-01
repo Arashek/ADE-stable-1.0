@@ -12,6 +12,7 @@ import sys
 import time
 from typing import Dict, List, Any
 import uuid
+import os
 
 # Configure logging
 logging.basicConfig(
@@ -25,13 +26,15 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Add the parent directory to the path to import backend modules
-import os
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Adjust the path to make 'backend' the root package
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from services.coordination.agent_coordinator import AgentCoordinator, CollaborationPattern, TaskPriority
-from services.coordination.task_manager import TaskStatus
-from services.monitoring import update_resource_metrics
+# Now import using the backend.services namespace
+from backend.services.coordination.agent_coordinator import AgentCoordinator, CollaborationPattern, TaskPriority
+from backend.services.coordination.task_manager import TaskStatus
+# Temporarily commented out for local testing
+# from backend.services.monitoring import update_resource_metrics
 
 # Sample application prompt for testing all specialized agents
 SAMPLE_APP_PROMPT = """
@@ -158,11 +161,11 @@ class AgentCoordinationTester:
                 }
                 
                 # Update metrics
-                update_resource_metrics(
-                    memory_usage=os.getpid(),
-                    cpu_usage=0,
-                    service_name=f"test_{pattern.value}"
-                )
+                # update_resource_metrics(
+                #     memory_usage=os.getpid(),
+                #     cpu_usage=0,
+                #     service_name=f"test_{pattern.value}"
+                # )
                 
                 logger.info("%s pattern test completed in %.2f seconds", pattern.value, duration)
             except Exception as e:

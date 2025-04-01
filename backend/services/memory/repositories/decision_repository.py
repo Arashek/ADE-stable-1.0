@@ -11,11 +11,11 @@ from typing import Dict, List, Optional, Any, Union
 from datetime import datetime
 from uuid import UUID
 from motor.motor_asyncio import AsyncIOMotorCollection
-from ..models.decision_memory import (
+from memory.repositories.models.decision_memory import (
     Decision, TechnicalDebt, DecisionCategory, 
     DecisionStatus, DecisionImpact, DecisionQuery
 )
-from ..mongodb_connection import mongodb_manager
+from memory.repositories.mongodb_connection import mongodb_manager
 
 logger = logging.getLogger(__name__)
 

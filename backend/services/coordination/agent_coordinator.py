@@ -15,21 +15,21 @@ import uuid
 from datetime import datetime
 
 # Import specialized agents
-from backend.services.agents.specialized.validation_agent import ValidationAgent
-from backend.services.agents.specialized.design_agent import DesignAgent
-from backend.services.agents.specialized.architecture_agent import ArchitectureAgent
-from backend.services.agents.specialized.security_agent import SecurityAgent
-from backend.services.agents.specialized.performance_agent import PerformanceAgent
+from services.agents.specialized.validation_agent import ValidationAgent
+from services.agents.specialized.design_agent import DesignAgent
+from services.agents.specialized.architecture_agent import ArchitectureAgent
+from services.agents.specialized.security_agent import SecurityAgent
+from services.agents.specialized.performance_agent import PerformanceAgent
 
 # Import coordination components
-from backend.services.coordination.agent_interface import AgentInterface, MessageType, AgentInterfaceFactory
-from backend.services.coordination.agent_registry import AgentRegistry, AgentRegistryManager, AgentStatus
-from backend.services.coordination.task_manager import TaskManager, TaskStatus
-from backend.services.coordination.collaboration_patterns import CollaborationPatternFactory, PatternStrategyFactory
-from backend.services.coordination.consensus_mechanism import ConsensusMechanism, ConflictDetector, ConflictResolutionStrategy
+from services.coordination.agent_interface import AgentInterface, MessageType, AgentInterfaceFactory
+from services.coordination.agent_registry import AgentRegistry, AgentRegistryManager, AgentStatus
+from services.coordination.task_manager import TaskManager, TaskStatus
+from services.coordination.collaboration_patterns import CollaborationPatternFactory, PatternStrategyFactory
+from services.coordination.consensus_mechanism import ConsensusMechanism, ConflictDetector, ConflictResolutionStrategy
 
 # Import monitoring components
-from backend.services.monitoring import (
+from services.monitoring import (
     track_agent_task, 
     track_collaboration_pattern,
     track_consensus_decision,

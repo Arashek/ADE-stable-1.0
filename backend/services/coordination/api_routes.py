@@ -10,9 +10,9 @@ from typing import Dict, List, Any, Optional
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel, Field
 
-from backend.services.coordination.agent_coordinator import AgentCoordinator
-from backend.services.coordination.task_manager import TaskManager, TaskStatus, TaskPriority
-from backend.services.coordination.collaboration_patterns import CollaborationPattern
+from services.coordination.agent_coordinator import AgentCoordinator
+from services.coordination.task_manager import TaskManager, TaskStatus, TaskPriority
+from services.coordination.collaboration_patterns import CollaborationPattern
 
 # Configure logging
 logger = logging.getLogger(__name__)

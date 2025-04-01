@@ -30,7 +30,7 @@ interface ToolActionResult {
   error?: string;
 }
 
-interface DesignSuggestion {
+export interface DesignSuggestion {
   id: string;
   type: 'component' | 'style' | 'layout' | 'page' | 'system';
   target: string;
@@ -42,7 +42,7 @@ interface DesignSuggestion {
   timestamp: Date;
 }
 
-interface DesignNotification {
+export interface DesignNotification {
   id: string;
   type: 'suggestion' | 'review' | 'update' | 'finalize';
   title: string;

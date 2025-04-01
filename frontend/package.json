@@ -33,8 +33,10 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-force-graph-2d": "^1.25.3",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^6.22.1",
     "react-scripts": "5.0.1",
+    "react-syntax-highlighter": "^15.6.1",
     "recharts": "^2.12.0",
     "socket.io-client": "^4.7.4",
     "three": "^0.161.0",
@@ -69,6 +71,7 @@
   "devDependencies": {
     "@types/lodash": "^4.14.202",
     "@types/react-dnd": "^3.0.2",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@types/socket.io-client": "^3.0.0",
     "@types/three": "^0.161.2",
     "@types/uuid": "^9.0.8",

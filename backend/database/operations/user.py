@@ -1,8 +1,8 @@
 from typing import List, Optional, Dict, Any
 from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..models.user import User, Role, Permission
-from ..models.base import TimestampMixin
+from operations.models.user import User, Role, Permission
+from operations.models.base import TimestampMixin
 import logging
 
 logger = logging.getLogger(__name__)

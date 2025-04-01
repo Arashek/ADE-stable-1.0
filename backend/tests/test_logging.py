@@ -2,7 +2,7 @@ import pytest
 import os
 import logging
 from datetime import datetime
-from backend.core.logging import LogManager, CustomFormatter
+from core.logging import LogManager, CustomFormatter
 
 @pytest.fixture
 def log_manager(tmp_path):

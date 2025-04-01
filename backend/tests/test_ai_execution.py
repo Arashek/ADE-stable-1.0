@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
-from backend.main import app
-from backend.core.security import API_KEY
+from main import app
+from core.security import API_KEY
 
 client = TestClient(app)
 

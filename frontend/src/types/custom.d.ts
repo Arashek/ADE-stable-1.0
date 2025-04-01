@@ -24,7 +24,7 @@ declare module '@monaco-editor/react' {
   export function Editor(props: EditorProps): React.ReactElement;
   export function DiffEditor(props: DiffEditorProps): React.ReactElement;
   export function useMonaco(): any;
-  export function loader: any;
+  export const loader: any;
 }
 
 declare module 'react-force-graph-2d' {
@@ -73,4 +73,4 @@ declare module 'jsoneditor-react' {
   }
 
   export class JsonEditor extends React.Component<JsonEditorProps> {}
-} 
+}

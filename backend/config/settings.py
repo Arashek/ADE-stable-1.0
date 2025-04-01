@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 from pydantic import BaseSettings, validator, AnyHttpUrl
 from pathlib import Path
 import os
@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     # API settings
     API_V1_STR: str = "/api/v1"
+    API_PREFIX: str = "/api"  # Added to align with main.py reference
     PROJECT_NAME: str = "ADE Platform API"
     
     # Security settings
@@ -34,6 +35,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "ade_platform")
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
+    DATABASE_URL: Optional[str] = None  # Used by owner_panel_db.py
 
     # Email settings
     SMTP_TLS: bool = True
@@ -52,6 +54,9 @@ class Settings(BaseSettings):
     # Logging settings
     LOG_LEVEL: str = "INFO"
     LOG_FILE: str = "logs/app.log"
+    LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    LOG_MAX_SIZE: int = 10 * 1024 * 1024  # 10MB
+    LOG_BACKUP_COUNT: int = 5
 
     # Cache settings
     REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
@@ -70,6 +75,8 @@ class Settings(BaseSettings):
     S3_BUCKET: Optional[str] = os.getenv("S3_BUCKET", None)
 
     # Monitoring settings
+    ENABLE_METRICS = False
+    PROMETHEUS_MULTIPROC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "prometheus_multiproc")
     SENTRY_DSN: Optional[str] = os.getenv("SENTRY_DSN", None)
     NEW_RELIC_LICENSE_KEY: Optional[str] = os.getenv("NEW_RELIC_LICENSE_KEY", None)
 
@@ -83,11 +90,11 @@ class Settings(BaseSettings):
     NOTIFICATION_RETENTION_DAYS: int = 30
 
     # Memory infrastructure settings
+    MEMORY_ENABLED: bool = False  # Disabled for initial local testing
     MONGODB_URI: str = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
     MONGODB_DB: str = os.getenv("MONGODB_DB", "ade_memory")
     OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY", None)
     OPENAI_EMBEDDING_MODEL: str = "text-embedding-ada-002"
-    MEMORY_ENABLED: bool = True
     VECTOR_SIMILARITY_THRESHOLD: float = 0.7
     KNOWLEDGE_GRAPH_MAX_DEPTH: int = 3
 
@@ -99,6 +106,16 @@ class Settings(BaseSettings):
     VISUAL_PERCEPTION_STORAGE_ENABLED: bool = True
     VISUAL_PERCEPTION_STORAGE_PATH: Path = Path("storage/visual_perception")
     VISUAL_PERCEPTION_MAX_STORED_IMAGES: int = 100
+
+    def get_log_file_path(self) -> str:
+        """Get the log file path, creating directories if needed"""
+        log_dir = Path("logs")
+        log_dir.mkdir(exist_ok=True)
+        return str(log_dir / "app.log")
+        
+    def get_cors_origins(self) -> List[str]:
+        """Get the list of allowed CORS origins"""
+        return self.BACKEND_CORS_ORIGINS
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
@@ -119,11 +136,18 @@ class Settings(BaseSettings):
         log_dir.mkdir(parents=True, exist_ok=True)
         return v
 
-    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
-    def assemble_db_connection(cls, v: Optional[str], values: dict) -> str:
+    @validator("SQLALCHEMY_DATABASE_URI", "DATABASE_URL", pre=True)
+    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
-        return f"postgresql://{values.get('POSTGRES_USER')}:{values.get('POSTGRES_PASSWORD')}@{values.get('POSTGRES_SERVER')}/{values.get('POSTGRES_DB')}"
+        
+        postgres_server = values.get("POSTGRES_SERVER")
+        postgres_user = values.get("POSTGRES_USER")
+        postgres_password = values.get("POSTGRES_PASSWORD")
+        postgres_db = values.get("POSTGRES_DB")
+        
+        # Construct PostgreSQL connection string
+        return f"postgresql+asyncpg://{postgres_user}:{postgres_password}@{postgres_server}/{postgres_db}"
 
     @validator("VISUAL_PERCEPTION_STORAGE_PATH")
     def create_visual_perception_storage_dir(cls, v: Path) -> Path:

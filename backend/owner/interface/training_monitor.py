@@ -7,10 +7,10 @@ from pathlib import Path
 import json
 import asyncio
 from datetime import datetime
-from ...learning.config.training_config import ConfigManager
-from ...learning.checkpoint_manager import CheckpointManager
-from ...learning.visualization.learning_visualizer import LearningVisualizer
-from ...config.logging_config import logger
+from learning.config.training_config import ConfigManager
+from learning.checkpoint_manager import CheckpointManager
+from learning.visualization.learning_visualizer import LearningVisualizer
+from config.logging_config import logger
 
 class TrainingMonitor:
     """Web interface for monitoring training progress"""

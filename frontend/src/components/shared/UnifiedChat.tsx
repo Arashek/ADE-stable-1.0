@@ -45,7 +45,7 @@ import {
 } from '@mui/icons-material';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import Editor from '@monaco-editor/react';
+import { Editor } from '@monaco-editor/react';
 
 interface Message {
   id: string;
@@ -179,7 +179,7 @@ const UnifiedChat: React.FC<UnifiedChatProps> = ({
   const handleSend = async () => {
     if (!newMessage.trim() || isLoading) return;
 
-    const newMessage: Message = {
+    const messageToSend: Message = {
       id: Date.now().toString(),
       content: newMessage,
       sender: {
@@ -191,14 +191,14 @@ const UnifiedChat: React.FC<UnifiedChatProps> = ({
       status: 'sending'
     };
 
-    setMessages(prev => [...prev, newMessage]);
+    setMessages(prev => [...prev, messageToSend]);
     setNewMessage('');
     setIsLoading(true);
 
     try {
-      await onSendMessage(newMessage.content, activeThread || undefined);
+      await onSendMessage(messageToSend.content, activeThread || undefined);
       setMessages(prev => prev.map(m => 
-        m.id === newMessage.id ? { ...m, status: 'sent' } : m
+        m.id === messageToSend.id ? { ...m, status: 'sent' } : m
       ));
     } catch (err) {
       const errorMessage: Message['error'] = {
@@ -208,11 +208,11 @@ const UnifiedChat: React.FC<UnifiedChatProps> = ({
       };
       
       setMessages(prev => prev.map(m => 
-        m.id === newMessage.id ? { ...m, status: 'error', error: errorMessage } : m
+        m.id === messageToSend.id ? { ...m, status: 'error', error: errorMessage } : m
       ));
       
       if (isOffline) {
-        setRetryQueue(prev => [...prev, newMessage]);
+        setRetryQueue(prev => [...prev, messageToSend]);
       }
     } finally {
       setIsLoading(false);
@@ -245,14 +245,14 @@ const UnifiedChat: React.FC<UnifiedChatProps> = ({
   };
 
   const handleAddCodeBlock = () => {
-    setNewMessage((prev) => \`\${prev}\n\`\`\`\n// Add your code here\n\`\`\`\`);
+    setNewMessage((prev) => `${prev}\n\`\`\`\n// Add your code here\n\`\`\``);
     handleMenuClose();
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && onFileUpload) {
-      onFileUpload(file, activeThread);
+      onFileUpload(file, activeThread || undefined);
     }
   };
 
@@ -582,7 +582,7 @@ const UnifiedChat: React.FC<UnifiedChatProps> = ({
             height="400px"
             language={selectedLanguage}
             value={codeContent}
-            onChange={(value) => setCodeContent(value || '')}
+            onChange={(value: string | undefined) => setCodeContent(value || '')}
             theme="vs-dark"
             options={{
               minimap: { enabled: false },

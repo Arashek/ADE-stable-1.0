@@ -10,9 +10,9 @@ from typing import Dict, List, Optional, Any, Union
 from datetime import datetime
 from uuid import UUID
 from motor.motor_asyncio import AsyncIOMotorCollection
-from ..models.conversation_memory import Conversation, Message, ConversationSummary, VectorEmbedding
-from ..mongodb_connection import mongodb_manager
-from ..vector_embeddings import vector_embeddings_service
+from memory.repositories.models.conversation_memory import Conversation, Message, ConversationSummary, VectorEmbedding
+from memory.repositories.mongodb_connection import mongodb_manager
+from memory.repositories.vector_embeddings import vector_embeddings_service
 
 logger = logging.getLogger(__name__)
 

@@ -16,6 +16,23 @@ import {
 } from '../types/agent.types';
 import { MonitoringService } from './monitoring.service';
 
+// Export these types to fix import errors in other components
+export { 
+  GenerationType, 
+  ReviewType, 
+  TestType, 
+  DocumentationType, 
+  CodeGenerationRequest, 
+  CodeGenerationResponse, 
+  CodeReviewRequest, 
+  CodeReviewResponse, 
+  TestGenerationRequest, 
+  TestGenerationResponse, 
+  DocumentationRequest, 
+  DocumentationResponse, 
+  AgentCapabilities 
+};
+
 export interface GenerationContext {
   project_id: string;
   language: string;

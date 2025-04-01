@@ -1,6 +1,6 @@
 import pytest
 from fastapi import HTTPException
-from backend.core.security import (
+from core.security import (
     RateLimiter,
     CommandValidator,
     ResourceMonitor,

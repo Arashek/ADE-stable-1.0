@@ -9,7 +9,7 @@ import logging
 from typing import Optional, Dict, Any, List
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo.errors import ConnectionFailure, OperationFailure
-from ...config.settings import settings
+from config.settings import settings
 
 logger = logging.getLogger(__name__)
 

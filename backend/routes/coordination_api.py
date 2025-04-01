@@ -6,9 +6,9 @@ import logging
 import uuid
 from datetime import datetime
 
-from backend.services.coordination.agent_coordinator import AgentCoordinator
-from backend.services.coordination.agent_registry import AgentRegistry
-from backend.services.coordination.consensus_mechanism import ConsensusMechanism, ConflictResolutionStrategy
+from services.coordination.agent_coordinator import AgentCoordinator
+from services.coordination.agent_registry import AgentRegistry
+from services.coordination.consensus_mechanism import ConsensusMechanism, ConflictResolutionStrategy
 
 # Configure logging
 logger = logging.getLogger(__name__)

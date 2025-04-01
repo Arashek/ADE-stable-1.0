@@ -4,8 +4,8 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
-from ..models.management_components import User, Role, Permission
-from ..database.management_db import ManagementDB
+from models.management_components import User, Role, Permission
+from database.management_db import ManagementDB
 import logging
 
 logger = logging.getLogger(__name__)
@@ -226,5 +226,50 @@ class AuthManager:
             logger.error(f"Error deleting permission: {str(e)}")
             raise
 
+# Dependency to get the current user
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except jwt.JWTError:
+        raise credentials_exception
+    
+    auth_manager = AuthManager()
+    user = await auth_manager.get_user_by_username(username)
+    if user is None:
+        raise credentials_exception
+    return user
+
+# Dependency to get the current active user
+async def get_current_active_user(current_user: User = Depends(get_current_user)):
+    if not current_user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+# Dependency to get the current admin user
+async def get_current_admin_user(current_user: User = Depends(get_current_active_user)):
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions. Admin access required."
+        )
+    return current_user
+
+# Dependency to require admin role
+async def require_admin(current_user: User = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required"
+        )
+    return current_user
+
 # Create a global instance of AuthManager
-auth_manager = AuthManager() 
+auth_manager = AuthManager()

@@ -4,7 +4,7 @@ import logging
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select, update, delete
-from ..models.owner_panel import (
+from models.owner_panel import (
     SystemMetrics,
     UserStats,
     SecurityConfig,
@@ -14,7 +14,7 @@ from ..models.owner_panel import (
     SystemDiagnostics,
     APIKey
 )
-from ..config import settings
+from config.settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -310,4 +310,4 @@ class OwnerPanelDB:
 
     async def close(self):
         """Close database connection"""
-        await self.engine.dispose() 
+        await self.engine.dispose()

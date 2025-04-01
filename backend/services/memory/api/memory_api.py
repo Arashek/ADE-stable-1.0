@@ -12,18 +12,18 @@ from uuid import UUID
 from datetime import datetime
 from pydantic import BaseModel
 
-from ..models.conversation_memory import Conversation, Message, ConversationSummary
-from ..models.knowledge_graph import (
+from memory.api.models.conversation_memory import Conversation, Message, ConversationSummary
+from memory.api.models.knowledge_graph import (
     Entity, Relationship, EntityType, RelationshipType,
     KnowledgeGraphQuery, ProjectOntology
 )
-from ..models.decision_memory import (
+from memory.api.models.decision_memory import (
     Decision, TechnicalDebt, DecisionCategory, 
     DecisionStatus, DecisionImpact, DecisionQuery
 )
-from ..repositories.conversation_repository import conversation_repository
-from ..repositories.knowledge_graph_repository import knowledge_graph_repository
-from ..repositories.decision_repository import decision_repository
+from memory.api.repositories.conversation_repository import conversation_repository
+from memory.api.repositories.knowledge_graph_repository import knowledge_graph_repository
+from memory.api.repositories.decision_repository import decision_repository
 
 # Create router
 router = APIRouter(

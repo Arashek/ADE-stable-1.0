@@ -11,10 +11,23 @@ import logging
 import time
 
 # Import monitoring components
-from backend.services.monitoring import track_collaboration_pattern
+# Temporarily disabled for local testing
+# from services.monitoring import track_collaboration_pattern
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+# Temporary replacement for track_collaboration_pattern decorator
+def track_collaboration_pattern(pattern_type):
+    """Temporary replacement for the monitoring decorator"""
+    def decorator(func):
+        async def wrapper(*args, **kwargs):
+            logger.info(f"Executing {pattern_type} collaboration pattern")
+            result = await func(*args, **kwargs)
+            logger.info(f"Completed {pattern_type} collaboration pattern")
+            return result
+        return wrapper
+    return decorator
 
 class CollaborationPattern(Enum):
     """Enumeration of collaboration patterns for agent coordination"""

@@ -12,7 +12,7 @@ import json
 from typing import List, Dict, Any, Optional, Union
 from uuid import UUID
 import numpy as np
-from ...config.settings import settings
+from config.settings import settings
 from .models.conversation_memory import VectorEmbedding, SemanticSearchResult
 
 logger = logging.getLogger(__name__)

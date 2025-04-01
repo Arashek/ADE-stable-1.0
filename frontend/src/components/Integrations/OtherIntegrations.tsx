@@ -226,8 +226,8 @@ const OtherIntegrations: React.FC = () => {
                       ...settings.notifications,
                       pullRequests: e.target.checked,
                     },
-                  })
-                }
+                  })}
+                />
               }
               label="Pull Requests"
             />
@@ -241,8 +241,8 @@ const OtherIntegrations: React.FC = () => {
                       ...settings.notifications,
                       issues: e.target.checked,
                     },
-                  })
-                }
+                  })}
+                />
               }
               label="Issues"
             />
@@ -256,8 +256,8 @@ const OtherIntegrations: React.FC = () => {
                       ...settings.notifications,
                       comments: e.target.checked,
                     },
-                  })
-                }
+                  })}
+                />
               }
               label="Comments"
             />
@@ -329,8 +329,8 @@ const OtherIntegrations: React.FC = () => {
                       ...settings.notifications,
                       pullRequests: e.target.checked,
                     },
-                  })
-                }
+                  })}
+                />
               }
               label="Pull Requests"
             />
@@ -344,8 +344,8 @@ const OtherIntegrations: React.FC = () => {
                       ...settings.notifications,
                       issues: e.target.checked,
                     },
-                  })
-                }
+                  })}
+                />
               }
               label="Issues"
             />
@@ -359,8 +359,8 @@ const OtherIntegrations: React.FC = () => {
                       ...settings.notifications,
                       comments: e.target.checked,
                     },
-                  })
-                }
+                  })}
+                />
               }
               label="Comments"
             />

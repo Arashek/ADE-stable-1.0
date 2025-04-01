@@ -8,14 +8,14 @@ import os
 # Add the parent directory to the path so we can import the modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend.services.coordination.consensus_mechanism import (
+from services.coordination.consensus_mechanism import (
     ConsensusMechanism, 
     ConflictDetector, 
     ConflictResolutionStrategy,
     ConsensusVote
 )
-from backend.services.coordination.agent_interface import AgentInterface, MessageType
-from backend.services.coordination.agent_coordinator import AgentCoordinator
+from services.coordination.agent_interface import AgentInterface, MessageType
+from services.coordination.agent_coordinator import AgentCoordinator
 
 
 class MockAgentInterface(AgentInterface):

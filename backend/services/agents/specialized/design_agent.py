@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import json
 import logging
 from pathlib import Path
-from ...core.base_agent import BaseAgent
+from services.core.base_agent import BaseAgent
 
 @dataclass
 class DesignComponent:

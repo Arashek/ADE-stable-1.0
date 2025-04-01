@@ -12,7 +12,8 @@ interface User {
   };
 }
 
-interface Change {
+// Renamed to TextChange and exported to fix import errors
+export interface TextChange {
   type: 'insert' | 'delete' | 'replace';
   position: number;
   text: string;
@@ -20,6 +21,9 @@ interface Change {
   userId: string;
   timestamp: number;
 }
+
+// Alias for backward compatibility
+type Change = TextChange;
 
 interface Document {
   id: string;
@@ -293,4 +297,4 @@ await collaborationService.applyChange('doc123', {
 
 // Leave the document
 await collaborationService.leaveDocument('doc123', user.id);
-*/ 
+*/

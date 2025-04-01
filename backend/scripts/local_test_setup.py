@@ -33,15 +33,15 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import required modules
 try:
-    from backend.services.coordination.agent_coordinator import AgentCoordinator
-    from backend.services.coordination.agent_registry import AgentRegistry, AgentRegistryManager
-    from backend.services.coordination.agent_interface import AgentInterface, AgentInterfaceFactory
-    from backend.services.coordination.consensus_mechanism import ConsensusMechanism, ConflictDetector
-    from backend.services.agents.specialized.validation_agent import ValidationAgent
-    from backend.services.agents.specialized.design_agent import DesignAgent
-    from backend.services.agents.specialized.architecture_agent import ArchitectureAgent
-    from backend.services.agents.specialized.security_agent import SecurityAgent
-    from backend.services.agents.specialized.performance_agent import PerformanceAgent
+    from services.coordination.agent_coordinator import AgentCoordinator
+    from services.coordination.agent_registry import AgentRegistry, AgentRegistryManager
+    from services.coordination.agent_interface import AgentInterface, AgentInterfaceFactory
+    from services.coordination.consensus_mechanism import ConsensusMechanism, ConflictDetector
+    from services.agents.specialized.validation_agent import ValidationAgent
+    from services.agents.specialized.design_agent import DesignAgent
+    from services.agents.specialized.architecture_agent import ArchitectureAgent
+    from services.agents.specialized.security_agent import SecurityAgent
+    from services.agents.specialized.performance_agent import PerformanceAgent
 except ImportError as e:
     logger.error(f"Failed to import required modules: {e}")
     logger.error("Make sure you're running this script from the project root directory")

@@ -11,11 +11,11 @@ from typing import Dict, List, Optional, Any, Union, Tuple
 from datetime import datetime
 from uuid import UUID
 from motor.motor_asyncio import AsyncIOMotorCollection
-from ..models.knowledge_graph import (
+from memory.repositories.models.knowledge_graph import (
     Entity, Relationship, EntityType, RelationshipType,
     KnowledgeGraphQuery, ProjectOntology
 )
-from ..mongodb_connection import mongodb_manager
+from memory.repositories.mongodb_connection import mongodb_manager
 
 logger = logging.getLogger(__name__)
 
