@@ -51,6 +51,7 @@ import { DocumentationPanel } from './components/DocumentationPanel';
 import DesignHubPage from './routes/DesignHub';
 import { useAuth } from './hooks/useAuth';
 import VisualPerceptionCapture from './components/VisualPerceptionCapture';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 const drawerWidth = 240;
 
@@ -324,26 +325,54 @@ const App: React.FC = () => {
             <DrawerHeader />
             <Container maxWidth="xl">
               <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/analytics" element={<Analytics />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/admin" element={<AdminDashboard projectId="default" />} />
+                <Route path="/" element={
+                  <ErrorBoundary componentName="Home">
+                    <Home />
+                  </ErrorBoundary>
+                } />
+                <Route path="/analytics" element={
+                  <ErrorBoundary componentName="Analytics">
+                    <Analytics />
+                  </ErrorBoundary>
+                } />
+                <Route path="/settings" element={
+                  <ErrorBoundary componentName="Settings">
+                    <Settings />
+                  </ErrorBoundary>
+                } />
+                <Route path="/admin" element={
+                  <ErrorBoundary componentName="AdminDashboard">
+                    <AdminDashboard projectId="default" />
+                  </ErrorBoundary>
+                } />
                 <Route path="/command-hub" element={
-                  <CommandHub 
-                    onSave={handleDesignSave} 
-                    onGenerateCode={handleCodeGeneration} 
-                    isGenerating={isGenerating} 
-                    activeAgent={activeAgent} 
-                  />
+                  <ErrorBoundary componentName="CommandHub">
+                    <CommandHub 
+                      onSave={handleDesignSave} 
+                      onGenerateCode={handleCodeGeneration} 
+                      isGenerating={isGenerating} 
+                      activeAgent={activeAgent} 
+                    />
+                  </ErrorBoundary>
                 }>
-                  <Route path="design-hub" element={<DesignHubPage />} />
-                  <Route path="design-hub/:projectId" element={<DesignHubPage />} />
+                  <Route path="design-hub" element={
+                    <ErrorBoundary componentName="DesignHubPage">
+                      <DesignHubPage />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="design-hub/:projectId" element={
+                    <ErrorBoundary componentName="DesignHubPage">
+                      <DesignHubPage />
+                    </ErrorBoundary>
+                  } />
                 </Route>
                 <Route
                   path="/projects/:projectId/metrics"
                   element={
                     <PrivateRoute>
-                      <ProjectMetrics />
+                      <ErrorBoundary componentName="ProjectMetrics">
+                        <ProjectMetrics />
+                      </ErrorBoundary>
                     </PrivateRoute>
                   }
                 />
@@ -351,7 +380,9 @@ const App: React.FC = () => {
                   path="/projects/:projectId/sprints/:sprintId"
                   element={
                     <PrivateRoute>
-                      <SprintBoard />
+                      <ErrorBoundary componentName="SprintBoard">
+                        <SprintBoard />
+                      </ErrorBoundary>
                     </PrivateRoute>
                   }
                 />

@@ -30,6 +30,10 @@ from services.coordination.agent_coordinator import AgentCoordinator
 # Temporarily disabled for local testing
 # from services.monitoring import metrics_middleware, metrics_endpoint, update_resource_metrics
 
+# Import error logging system
+from utils.error_logging import log_error, ErrorCategory, ErrorSeverity
+from routes.error_logging_routes import router as error_logging_router
+
 # Configure logging
 logging.basicConfig(
     level=settings.LOG_LEVEL,
@@ -114,9 +118,15 @@ app.add_middleware(
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Add a simple health check route for testing
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "owner_panel_enabled": True}
+
 # Include routers
 app.include_router(owner_panel_router, prefix=settings.API_PREFIX)
 app.include_router(coordination_router)
+app.include_router(error_logging_router, prefix=settings.API_PREFIX)
 
 # Include memory router if enabled
 if settings.MEMORY_ENABLED:
@@ -151,16 +161,6 @@ async def general_exception_handler(request, exc):
             "message": "Internal server error"
         }
     )
-
-# Health check endpoint
-@app.get("/health")
-async def health_check() -> Dict[str, Any]:
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "version": settings.APP_VERSION,
-        "environment": settings.ENVIRONMENT
-    }
 
 # API documentation
 @app.get("/docs")
