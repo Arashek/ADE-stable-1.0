@@ -124,9 +124,10 @@ async def health_check():
     return {"status": "ok", "owner_panel_enabled": True}
 
 # Include routers
-app.include_router(owner_panel_router, prefix=settings.API_PREFIX)
+# Temporarily disabled: app.include_router(owner_panel_router, prefix=settings.API_PREFIX)
 app.include_router(coordination_router)
-app.include_router(error_logging_router, prefix=settings.API_PREFIX)
+# Include error logging router without additional prefix since it already has one
+app.include_router(error_logging_router)
 
 # Include memory router if enabled
 if settings.MEMORY_ENABLED:

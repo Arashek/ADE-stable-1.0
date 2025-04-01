@@ -1,0 +1,289 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>ADE Error Check Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }
+                h1, h2, h3 { color: #333; }
+                .container { max-width: 1200px; margin: 0 auto; }
+                .summary { display: flex; justify-content: space-between; background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+                .summary-item { text-align: center; }
+                .errors { background-color: #fff5f5; padding: 10px; border-left: 5px solid #dc3545; margin-bottom: 20px; }
+                .warnings { background-color: #fff3cd; padding: 10px; border-left: 5px solid #ffc107; margin-bottom: 20px; }
+                .info { background-color: #e9f5ff; padding: 10px; border-left: 5px solid #0d6efd; margin-bottom: 20px; }
+                .item { margin-bottom: 10px; padding: 10px; background-color: rgba(255, 255, 255, 0.7); border-radius: 3px; }
+                .timestamp { color: #6c757d; font-size: 0.9em; margin-bottom: 20px; }
+                .status-pass { color: #28a745; }
+                .status-fail { color: #dc3545; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>ADE Error Check Report</h1>
+                <div class="timestamp">Generated on: 2025-04-01T20:59:02.727137</div>
+                
+                <div class="summary">
+                    <div class="summary-item">
+                        <h3>Status</h3>
+                        <p class="status-fail">
+                            FAIL
+                        </p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Errors</h3>
+                        <p>8</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Warnings</h3>
+                        <p>0</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Info</h3>
+                        <p>15</p>
+                    </div>
+                </div>
+        
+                <div class="errors">
+                    <h2>Errors</h2>
+            
+                    <div class="item">
+                        <strong>backend_import:</strong> Import error in routes.owner_panel_routes: Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "D:\ADE-stable-1.0\backend\routes\owner_panel_routes.py", line 49, in <module>
+    owner_service = OwnerPanelService()
+                    ^^^^^^^^^^^^^^^^^^^
+  File "D:\ADE-stable-1.0\backend\services\owner_panel_service.py", line 36, in __init__
+    self._initialize_services()
+  File "D:\ADE-stable-1.0\backend\services\owner_panel_service.py", line 55, in _initialize_services
+    loop.run_until_complete(self.db.connect())
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 650, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "D:\ADE-stable-1.0\backend\database\owner_panel_db.py", line 31, in connect
+    async with self.engine.begin() as conn:
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 204, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\ext\asyncio\engine.py", line 1061, in begin
+    async with conn:
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\ext\asyncio\base.py", line 125, in __aenter__
+    return await self.start(is_ctxmanager=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\ext\asyncio\engine.py", line 270, in start
+    await greenlet_spawn(self.sync_engine.connect)
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 190, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 3268, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 145, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 3292, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 452, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 1269, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 716, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\impl.py", line 169, in _do_get
+    with util.safe_reraise():
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\impl.py", line 167, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 393, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 678, in __init__
+    self.__connect()
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 902, in __connect
+    with util.safe_reraise():
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 898, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\create.py", line 637, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\default.py", line 616, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 936, in connect
+    await_only(creator_fn(*arg, **kw)),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 125, in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 185, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\asyncpg\connection.py", line 2421, in connect
+    return await connect_utils._connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\asyncpg\connect_utils.py", line 1075, in _connect
+    raise last_error or exceptions.TargetServerAttributeNotMatched(
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\asyncpg\connect_utils.py", line 1049, in _connect
+    conn = await _connect_addr(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\asyncpg\connect_utils.py", line 886, in _connect_addr
+    return await __connect_addr(params, True, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\asyncpg\connect_utils.py", line 931, in __connect_addr
+    tr, pr = await connector
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\asyncpg\connect_utils.py", line 802, in _create_ssl_connection
+    tr, pr = await loop.create_connection(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 1078, in create_connection
+    raise exceptions[0]
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 1058, in create_connection
+    sock = await self._connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 964, in _connect_sock
+    await self.sock_connect(sock, address)
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\asyncio\proactor_events.py", line 722, in sock_connect
+    return await self._proactor.connect(sock, address)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\asyncio\windows_events.py", line 837, in _poll
+    value = callback(transferred, key, ov)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\asyncio\windows_events.py", line 624, in finish_connect
+    ov.getresult()
+ConnectionRefusedError: [WinError 1225] The remote computer refused the network connection
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_import:</strong> Import error in agents.specialized_agents.design_agent: Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\agents\__init__.py", line 8, in <module>
+    from .agent import Agent, ToolsToFinalOutputFunction, ToolsToFinalOutputResult
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\agents\agent.py", line 12, in <module>
+    from .handoffs import Handoff
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\agents\handoffs.py", line 8, in <module>
+    from pydantic import TypeAdapter
+ImportError: cannot import name 'TypeAdapter' from 'pydantic' (C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\pydantic\__init__.cp311-win_amd64.pyd)
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_import:</strong> Import error in agents.specialized_agents.development_agent: Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\agents\__init__.py", line 8, in <module>
+    from .agent import Agent, ToolsToFinalOutputFunction, ToolsToFinalOutputResult
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\agents\agent.py", line 12, in <module>
+    from .handoffs import Handoff
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\agents\handoffs.py", line 8, in <module>
+    from pydantic import TypeAdapter
+ImportError: cannot import name 'TypeAdapter' from 'pydantic' (C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\pydantic\__init__.cp311-win_amd64.pyd)
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_import:</strong> Import error in agents.agent_coordinator: Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\agents\__init__.py", line 8, in <module>
+    from .agent import Agent, ToolsToFinalOutputFunction, ToolsToFinalOutputResult
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\agents\agent.py", line 12, in <module>
+    from .handoffs import Handoff
+  File "C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\agents\handoffs.py", line 8, in <module>
+    from pydantic import TypeAdapter
+ImportError: cannot import name 'TypeAdapter' from 'pydantic' (C:\Users\arash\AppData\Local\Programs\Python\Python311\Lib\site-packages\pydantic\__init__.cp311-win_amd64.pyd)
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_dependency:</strong> Missing required package: pyjwt
+                    </div>
+                
+                    <div class="item">
+                        <strong>frontend_typescript:</strong> Found 556 TypeScript errors
+                    </div>
+                
+                    <div class="item">
+                        <strong>owner_panel_api:</strong> Endpoint /api/owner-panel/health returned unexpected status code 404
+                    </div>
+                
+                    <div class="item">
+                        <strong>owner_panel_api:</strong> Endpoint /api/owner-panel/metrics/summary returned unexpected status code 404
+                    </div>
+                
+                </div>
+            
+                <div class="info">
+                    <h2>Information</h2>
+            
+                    <div class="item">
+                        <strong>backend_import:</strong> Module routes.coordination_api imports successfully
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_import:</strong> Module services.owner_panel_service imports successfully
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_dependency:</strong> Package fastapi is installed
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_dependency:</strong> Package uvicorn is installed
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_dependency:</strong> Package pydantic is installed
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_dependency:</strong> Package sqlalchemy is installed
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_dependency:</strong> Package passlib is installed
+                    </div>
+                
+                    <div class="item">
+                        <strong>backend_status:</strong> Backend server is running
+                    </div>
+                
+                    <div class="item">
+                        <strong>frontend_dependency:</strong> Dependency installed: react
+                    </div>
+                
+                    <div class="item">
+                        <strong>frontend_dependency:</strong> Dependency installed: react-dom
+                    </div>
+                
+                    <div class="item">
+                        <strong>frontend_dependency:</strong> Dependency installed: typescript
+                    </div>
+                
+                    <div class="item">
+                        <strong>frontend_dependency:</strong> Dependency installed: axios
+                    </div>
+                
+                    <div class="item">
+                        <strong>frontend_dependency:</strong> Dependency installed: @mui/material
+                    </div>
+                
+                    <div class="item">
+                        <strong>frontend_status:</strong> Frontend server is running
+                    </div>
+                
+                    <div class="item">
+                        <strong>api_health:</strong> API health check passed
+                    </div>
+                
+                </div>
+            
+            </div>
+        </body>
+        </html>
+        

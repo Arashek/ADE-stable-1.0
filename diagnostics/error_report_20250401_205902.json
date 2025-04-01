@@ -1,0 +1,106 @@
+{
+  "timestamp": "2025-04-01T20:59:02.727137",
+  "errors": [
+    [
+      "backend_import",
+      "Import error in routes.owner_panel_routes: Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"D:\\ADE-stable-1.0\\backend\\routes\\owner_panel_routes.py\", line 49, in <module>\n    owner_service = OwnerPanelService()\n                    ^^^^^^^^^^^^^^^^^^^\n  File \"D:\\ADE-stable-1.0\\backend\\services\\owner_panel_service.py\", line 36, in __init__\n    self._initialize_services()\n  File \"D:\\ADE-stable-1.0\\backend\\services\\owner_panel_service.py\", line 55, in _initialize_services\n    loop.run_until_complete(self.db.connect())\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\asyncio\\base_events.py\", line 650, in run_until_complete\n    return future.result()\n           ^^^^^^^^^^^^^^^\n  File \"D:\\ADE-stable-1.0\\backend\\database\\owner_panel_db.py\", line 31, in connect\n    async with self.engine.begin() as conn:\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py\", line 204, in __aenter__\n    return await anext(self.gen)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\ext\\asyncio\\engine.py\", line 1061, in begin\n    async with conn:\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\ext\\asyncio\\base.py\", line 125, in __aenter__\n    return await self.start(is_ctxmanager=True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\ext\\asyncio\\engine.py\", line 270, in start\n    await greenlet_spawn(self.sync_engine.connect)\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\util\\_concurrency_py3k.py\", line 190, in greenlet_spawn\n    result = context.throw(*sys.exc_info())\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 3268, in connect\n    return self._connection_cls(self)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 145, in __init__\n    self._dbapi_connection = engine.raw_connection()\n                             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 3292, in raw_connection\n    return self.pool.connect()\n           ^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 452, in connect\n    return _ConnectionFairy._checkout(self)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 1269, in _checkout\n    fairy = _ConnectionRecord.checkout(pool)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 716, in checkout\n    rec = pool._do_get()\n          ^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\pool\\impl.py\", line 169, in _do_get\n    with util.safe_reraise():\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\util\\langhelpers.py\", line 146, in __exit__\n    raise exc_value.with_traceback(exc_tb)\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\pool\\impl.py\", line 167, in _do_get\n    return self._create_connection()\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 393, in _create_connection\n    return _ConnectionRecord(self)\n           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 678, in __init__\n    self.__connect()\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 902, in __connect\n    with util.safe_reraise():\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\util\\langhelpers.py\", line 146, in __exit__\n    raise exc_value.with_traceback(exc_tb)\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 898, in __connect\n    self.dbapi_connection = connection = pool._invoke_creator(self)\n                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\engine\\create.py\", line 637, in connect\n    return dialect.connect(*cargs, **cparams)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\engine\\default.py\", line 616, in connect\n    return self.loaded_dbapi.connect(*cargs, **cparams)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\dialects\\postgresql\\asyncpg.py\", line 936, in connect\n    await_only(creator_fn(*arg, **kw)),\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\util\\_concurrency_py3k.py\", line 125, in await_only\n    return current.driver.switch(awaitable)  # type: ignore[no-any-return]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sqlalchemy\\util\\_concurrency_py3k.py\", line 185, in greenlet_spawn\n    value = await result\n            ^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\asyncpg\\connection.py\", line 2421, in connect\n    return await connect_utils._connect(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 1075, in _connect\n    raise last_error or exceptions.TargetServerAttributeNotMatched(\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 1049, in _connect\n    conn = await _connect_addr(\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 886, in _connect_addr\n    return await __connect_addr(params, True, *args)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 931, in __connect_addr\n    tr, pr = await connector\n             ^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 802, in _create_ssl_connection\n    tr, pr = await loop.create_connection(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\asyncio\\base_events.py\", line 1078, in create_connection\n    raise exceptions[0]\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\asyncio\\base_events.py\", line 1058, in create_connection\n    sock = await self._connect_sock(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\asyncio\\base_events.py\", line 964, in _connect_sock\n    await self.sock_connect(sock, address)\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\asyncio\\proactor_events.py\", line 722, in sock_connect\n    return await self._proactor.connect(sock, address)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\asyncio\\windows_events.py\", line 837, in _poll\n    value = callback(transferred, key, ov)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\asyncio\\windows_events.py\", line 624, in finish_connect\n    ov.getresult()\nConnectionRefusedError: [WinError 1225] The remote computer refused the network connection"
+    ],
+    [
+      "backend_import",
+      "Import error in agents.specialized_agents.design_agent: Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\agents\\__init__.py\", line 8, in <module>\n    from .agent import Agent, ToolsToFinalOutputFunction, ToolsToFinalOutputResult\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\agents\\agent.py\", line 12, in <module>\n    from .handoffs import Handoff\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\agents\\handoffs.py\", line 8, in <module>\n    from pydantic import TypeAdapter\nImportError: cannot import name 'TypeAdapter' from 'pydantic' (C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pydantic\\__init__.cp311-win_amd64.pyd)"
+    ],
+    [
+      "backend_import",
+      "Import error in agents.specialized_agents.development_agent: Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\agents\\__init__.py\", line 8, in <module>\n    from .agent import Agent, ToolsToFinalOutputFunction, ToolsToFinalOutputResult\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\agents\\agent.py\", line 12, in <module>\n    from .handoffs import Handoff\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\agents\\handoffs.py\", line 8, in <module>\n    from pydantic import TypeAdapter\nImportError: cannot import name 'TypeAdapter' from 'pydantic' (C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pydantic\\__init__.cp311-win_amd64.pyd)"
+    ],
+    [
+      "backend_import",
+      "Import error in agents.agent_coordinator: Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\agents\\__init__.py\", line 8, in <module>\n    from .agent import Agent, ToolsToFinalOutputFunction, ToolsToFinalOutputResult\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\agents\\agent.py\", line 12, in <module>\n    from .handoffs import Handoff\n  File \"C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\agents\\handoffs.py\", line 8, in <module>\n    from pydantic import TypeAdapter\nImportError: cannot import name 'TypeAdapter' from 'pydantic' (C:\\Users\\arash\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pydantic\\__init__.cp311-win_amd64.pyd)"
+    ],
+    [
+      "backend_dependency",
+      "Missing required package: pyjwt"
+    ],
+    [
+      "frontend_typescript",
+      "Found 556 TypeScript errors"
+    ],
+    [
+      "owner_panel_api",
+      "Endpoint /api/owner-panel/health returned unexpected status code 404"
+    ],
+    [
+      "owner_panel_api",
+      "Endpoint /api/owner-panel/metrics/summary returned unexpected status code 404"
+    ]
+  ],
+  "warnings": [],
+  "info": [
+    [
+      "backend_import",
+      "Module routes.coordination_api imports successfully"
+    ],
+    [
+      "backend_import",
+      "Module services.owner_panel_service imports successfully"
+    ],
+    [
+      "backend_dependency",
+      "Package fastapi is installed"
+    ],
+    [
+      "backend_dependency",
+      "Package uvicorn is installed"
+    ],
+    [
+      "backend_dependency",
+      "Package pydantic is installed"
+    ],
+    [
+      "backend_dependency",
+      "Package sqlalchemy is installed"
+    ],
+    [
+      "backend_dependency",
+      "Package passlib is installed"
+    ],
+    [
+      "backend_status",
+      "Backend server is running"
+    ],
+    [
+      "frontend_dependency",
+      "Dependency installed: react"
+    ],
+    [
+      "frontend_dependency",
+      "Dependency installed: react-dom"
+    ],
+    [
+      "frontend_dependency",
+      "Dependency installed: typescript"
+    ],
+    [
+      "frontend_dependency",
+      "Dependency installed: axios"
+    ],
+    [
+      "frontend_dependency",
+      "Dependency installed: @mui/material"
+    ],
+    [
+      "frontend_status",
+      "Frontend server is running"
+    ],
+    [
+      "api_health",
+      "API health check passed"
+    ]
+  ],
+  "summary": {
+    "error_count": 8,
+    "warning_count": 0,
+    "info_count": 15,
+    "status": "fail"
+  }
+}

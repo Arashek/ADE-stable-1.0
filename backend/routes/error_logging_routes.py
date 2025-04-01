@@ -16,6 +16,16 @@ from config.logging_config import logger
 
 router = APIRouter(prefix="/error-logging", tags=["error-logging"])
 
+# Add a simple health check endpoint that doesn't require authentication
+@router.get("/health", response_model=Dict[str, str])
+async def error_logging_health():
+    """Health check endpoint for error logging system"""
+    return {
+        "status": "operational",
+        "system": "error-logging",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
 # Request/Response Models
 class ErrorLogRequest(BaseModel):
     """Request model for logging errors from frontend or other sources"""
