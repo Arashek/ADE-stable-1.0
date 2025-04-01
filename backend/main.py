@@ -15,6 +15,8 @@ from routes.owner_panel_routes import router as owner_panel_router
 from routes.coordination_api import router as coordination_router
 from services.owner_panel_service import OwnerPanelService
 from services.coordination.agent_coordinator import AgentCoordinator
+from services.memory.memory_service import memory_service
+from services.memory.api.memory_api import router as memory_router
 
 # Configure logging
 logging.basicConfig(
@@ -45,6 +47,12 @@ async def lifespan(app: FastAPI):
         # Initialize agents asynchronously
         asyncio.create_task(app.state.agent_coordinator._initialize_agents())
         
+        # Initialize memory service if enabled
+        if settings.MEMORY_ENABLED:
+            await memory_service.initialize()
+            app.state.memory_service = memory_service
+            logger.info("Memory service initialized successfully")
+        
         logger.info("Application services initialized successfully")
     except Exception as e:
         logger.error(f"Error initializing application services: {str(e)}")
@@ -56,6 +64,12 @@ async def lifespan(app: FastAPI):
     try:
         # Cleanup services
         await app.state.owner_service.cleanup()
+        
+        # Shutdown memory service if enabled
+        if settings.MEMORY_ENABLED:
+            await memory_service.shutdown()
+            logger.info("Memory service shut down successfully")
+            
         logger.info("Application services cleaned up successfully")
     except Exception as e:
         logger.error(f"Error cleaning up application services: {str(e)}")
@@ -83,6 +97,11 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Include routers
 app.include_router(owner_panel_router, prefix=settings.API_PREFIX)
 app.include_router(coordination_router)
+
+# Include memory router if enabled
+if settings.MEMORY_ENABLED:
+    app.include_router(memory_router, prefix=settings.API_PREFIX)
+    logger.info("Memory API routes registered")
 
 # Error handlers
 @app.exception_handler(RequestValidationError)

@@ -82,6 +82,15 @@ class Settings(BaseSettings):
     MAX_NOTIFICATIONS_PER_USER: int = 1000
     NOTIFICATION_RETENTION_DAYS: int = 30
 
+    # Memory infrastructure settings
+    MONGODB_URI: str = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+    MONGODB_DB: str = os.getenv("MONGODB_DB", "ade_memory")
+    OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY", None)
+    OPENAI_EMBEDDING_MODEL: str = "text-embedding-ada-002"
+    MEMORY_ENABLED: bool = True
+    VECTOR_SIMILARITY_THRESHOLD: float = 0.7
+    KNOWLEDGE_GRAPH_MAX_DEPTH: int = 3
+
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
