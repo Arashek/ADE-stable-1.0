@@ -28,6 +28,14 @@ from backend.services.coordination.task_manager import TaskManager, TaskStatus
 from backend.services.coordination.collaboration_patterns import CollaborationPatternFactory, PatternStrategyFactory
 from backend.services.coordination.consensus_mechanism import ConsensusMechanism, ConflictDetector, ConflictResolutionStrategy
 
+# Import monitoring components
+from backend.services.monitoring import (
+    track_agent_task, 
+    track_collaboration_pattern,
+    track_consensus_decision,
+    track_conflict_resolution
+)
+
 # Configure logging
 logger = logging.getLogger(__name__)
 
@@ -343,79 +351,168 @@ class AgentCoordinator:
                 "error": error_msg
             }
     
+    async def execute_task(self, task_id: str, pattern: CollaborationPattern = CollaborationPattern.SEQUENTIAL) -> Dict[str, Any]:
+        """
+        Execute a task using the specified collaboration pattern.
+        
+        Args:
+            task_id: ID of the task to execute
+            pattern: Collaboration pattern to use
+            
+        Returns:
+            Dictionary containing task results
+        """
+        logger.info(f"Executing task {task_id} using {pattern.value} pattern")
+        
+        # Get task details
+        task = await self.task_manager.get_task(task_id)
+        if not task:
+            logger.error(f"Task {task_id} not found")
+            return {"error": f"Task {task_id} not found"}
+        
+        # Update task status
+        await self.task_manager.update_task_status(task_id, TaskStatus.IN_PROGRESS)
+        
+        # Get collaboration pattern strategy
+        pattern_strategy = self.pattern_factory.create_pattern(pattern.value)
+        
+        try:
+            # Execute task using the selected pattern
+            @track_collaboration_pattern(pattern.value)
+            async def execute_with_pattern():
+                return await pattern_strategy.execute(
+                    task=task,
+                    agents=self.specialized_agents,
+                    registry=self.registry,
+                    coordinator=self
+                )
+            
+            results = await execute_with_pattern()
+            
+            # Update task with results
+            await self.task_manager.update_task_results(task_id, results)
+            
+            # Update task status
+            await self.task_manager.update_task_status(task_id, TaskStatus.COMPLETED)
+            
+            return results
+        except Exception as e:
+            logger.error(f"Error executing task {task_id}: {str(e)}")
+            
+            # Update task status
+            await self.task_manager.update_task_status(task_id, TaskStatus.FAILED)
+            
+            return {"error": str(e)}
+
+    @track_consensus_decision()
+    async def build_consensus(self, task_id: str, agent_results: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Build consensus among agent results for a task.
+        
+        Args:
+            task_id: ID of the task
+            agent_results: Dictionary of agent results
+            
+        Returns:
+            Consensus result
+        """
+        logger.info(f"Building consensus for task {task_id}")
+        
+        # Get task details
+        task = await self.task_manager.get_task(task_id)
+        if not task:
+            logger.error(f"Task {task_id} not found")
+            return {"error": f"Task {task_id} not found"}
+        
+        # Build consensus using consensus mechanism
+        consensus_result = await self.consensus_mechanism.build_consensus(
+            task=task,
+            agent_results=agent_results
+        )
+        
+        return consensus_result
+
+    @track_conflict_resolution("priority_based")
+    async def resolve_conflicts(self, task_id: str, agent_results: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Resolve conflicts in agent results for a task.
+        
+        Args:
+            task_id: ID of the task
+            agent_results: Dictionary of agent results
+            
+        Returns:
+            Resolved result
+        """
+        logger.info(f"Resolving conflicts for task {task_id}")
+        
+        # Get task details
+        task = await self.task_manager.get_task(task_id)
+        if not task:
+            logger.error(f"Task {task_id} not found")
+            return {"error": f"Task {task_id} not found"}
+        
+        # Detect conflicts
+        conflicts = await ConflictDetector.detect_conflicts(agent_results)
+        
+        if not conflicts:
+            logger.info(f"No conflicts detected for task {task_id}")
+            return agent_results
+        
+        logger.info(f"Detected {len(conflicts)} conflicts for task {task_id}")
+        
+        # Resolve conflicts using priority-based strategy
+        resolved_result = await ConflictResolutionStrategy.resolve_priority_based(
+            conflicts=conflicts,
+            agent_results=agent_results,
+            agent_priorities=self.agent_priorities
+        )
+        
+        return resolved_result
+
     async def delegate_task_to_agent(self, agent_type: str, task_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Delegate a task to a specific type of agent.
+        Delegate a task to a specific agent.
         
         Args:
             agent_type: Type of agent to delegate to
             task_data: Task data
             
         Returns:
-            Task result
+            Agent result
         """
-        logger.info("Delegating task to %s agent", agent_type)
+        logger.info(f"Delegating task to {agent_type} agent")
         
-        try:
-            # Get agent interface
-            agent_ids = await self.registry.get_agents_by_type(agent_type)
-            
-            if not agent_ids:
-                error_msg = f"No {agent_type} agent available"
-                logger.error(error_msg)
-                return {"success": False, "error": error_msg}
-            
-            # For now, just use the first agent of the requested type
-            agent_id = agent_ids[0]
-            agent_interface = await self.registry.get_agent_interface(agent_id)
-            
-            if not agent_interface:
-                error_msg = f"Interface for {agent_type} agent not found"
-                logger.error(error_msg)
-                return {"success": False, "error": error_msg}
-            
-            # Send task request to agent
-            message_id = await self.interface.send_message(
-                target_agent_id=agent_id,
-                message_type=MessageType.REQUEST.value,
-                content={
-                    "request_type": "process_task",
-                    "request_data": {
-                        "task_data": task_data
-                    }
-                }
-            )
-            
-            # Wait for response (in a real implementation, this would use a callback or event)
-            # For now, simulate a response
-            # This is a placeholder - in a real implementation, we would wait for the actual response
-            await asyncio.sleep(1)
-            
-            # Get the agent from specialized_agents
-            agent_instance = self.specialized_agents.get(agent_type, {}).get("agent")
-            
-            if not agent_instance:
-                error_msg = f"{agent_type} agent instance not found"
-                logger.error(error_msg)
-                return {"success": False, "error": error_msg}
-            
-            # Process task with agent instance
-            # This is a direct call for now - in a real implementation, this would be handled through the interface
-            result = await self._process_with_agent(agent_instance, task_data)
-            
-            logger.info("Task delegated to %s agent successfully", agent_type)
-            
-            return {
-                "success": True,
-                "agent_type": agent_type,
-                "result": result
-            }
+        if agent_type not in self.specialized_agents:
+            logger.error(f"Agent type {agent_type} not found")
+            return {"error": f"Agent type {agent_type} not found"}
         
-        except Exception as e:
-            error_msg = f"Error delegating task to {agent_type} agent: {str(e)}"
-            logger.error(error_msg)
-            return {"success": False, "error": error_msg}
-    
+        agent_info = self.specialized_agents[agent_type]
+        agent = agent_info["agent"]
+        
+        # Create a task for the agent
+        task_id = str(uuid.uuid4())
+        await self.task_manager.create_task(
+            task_id=task_id,
+            task_type=task_data.get("type", "unknown"),
+            task_data=task_data,
+            priority=TaskPriority.MEDIUM.value,
+            assigned_to=agent_type
+        )
+        
+        # Execute the task with the agent
+        @track_agent_task(agent_type, task_data.get("type", "unknown"))
+        async def execute_agent_task():
+            return await agent.process_task(task_data)
+        
+        result = await execute_agent_task()
+        
+        # Update task with result
+        await self.task_manager.update_task_results(task_id, result)
+        await self.task_manager.update_task_status(task_id, TaskStatus.COMPLETED)
+        
+        return result
+
     async def _process_with_agent(self, agent, task_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Process a task with an agent instance.

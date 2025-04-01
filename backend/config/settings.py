@@ -91,6 +91,15 @@ class Settings(BaseSettings):
     VECTOR_SIMILARITY_THRESHOLD: float = 0.7
     KNOWLEDGE_GRAPH_MAX_DEPTH: int = 3
 
+    # Visual Perception MCP settings
+    VISUAL_PERCEPTION_ENABLED: bool = True
+    TESSERACT_CMD_PATH: str = os.getenv("TESSERACT_CMD_PATH", r"C:\Program Files\Tesseract-OCR\tesseract.exe")
+    VISUAL_PERCEPTION_CAPTURE_INTERVAL: int = 5000  # milliseconds
+    VISUAL_PERCEPTION_AUTO_CAPTURE: bool = False
+    VISUAL_PERCEPTION_STORAGE_ENABLED: bool = True
+    VISUAL_PERCEPTION_STORAGE_PATH: Path = Path("storage/visual_perception")
+    VISUAL_PERCEPTION_MAX_STORED_IMAGES: int = 100
+
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
@@ -116,9 +125,15 @@ class Settings(BaseSettings):
             return v
         return f"postgresql://{values.get('POSTGRES_USER')}:{values.get('POSTGRES_PASSWORD')}@{values.get('POSTGRES_SERVER')}/{values.get('POSTGRES_DB')}"
 
+    @validator("VISUAL_PERCEPTION_STORAGE_PATH")
+    def create_visual_perception_storage_dir(cls, v: Path) -> Path:
+        if os.getenv("VISUAL_PERCEPTION_STORAGE_ENABLED", "True").lower() == "true":
+            v.mkdir(parents=True, exist_ok=True)
+        return v
+
     class Config:
         case_sensitive = True
         env_file = ".env"
 
 # Create global settings instance
-settings = Settings() 
+settings = Settings()

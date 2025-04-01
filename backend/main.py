@@ -3,12 +3,14 @@ import logging.handlers
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.exceptions import RequestValidationError
 from contextlib import asynccontextmanager
 import uvicorn
 from typing import Dict, Any
 import asyncio
+import os
+import psutil
 
 from config.settings import settings
 from routes.owner_panel_routes import router as owner_panel_router
@@ -17,6 +19,8 @@ from services.owner_panel_service import OwnerPanelService
 from services.coordination.agent_coordinator import AgentCoordinator
 from services.memory.memory_service import memory_service
 from services.memory.api.memory_api import router as memory_router
+from services.mcp.visual_perception_mcp import get_visual_perception_router
+from services.monitoring import metrics_middleware, metrics_endpoint, update_resource_metrics
 
 # Configure logging
 logging.basicConfig(
@@ -52,6 +56,13 @@ async def lifespan(app: FastAPI):
             await memory_service.initialize()
             app.state.memory_service = memory_service
             logger.info("Memory service initialized successfully")
+        
+        # Initialize Visual Perception MCP
+        app.state.visual_perception_router = get_visual_perception_router(
+            memory_service=app.state.memory_service if settings.MEMORY_ENABLED else None,
+            agent_coordinator=app.state.agent_coordinator
+        )
+        logger.info("Visual Perception MCP initialized successfully")
         
         logger.info("Application services initialized successfully")
     except Exception as e:
@@ -91,6 +102,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Add metrics middleware if metrics are enabled
+if settings.ENABLE_METRICS:
+    @app.middleware("http")
+    async def metrics_middleware_handler(request, call_next):
+        return await metrics_middleware(request, call_next)
+    
+    # Metrics endpoint for Prometheus
+    @app.get("/metrics")
+    async def metrics():
+        # Update resource metrics
+        process = psutil.Process(os.getpid())
+        memory_usage = process.memory_info().rss
+        cpu_usage = process.cpu_percent()
+        update_resource_metrics(memory_usage, cpu_usage)
+        
+        # Generate metrics
+        content, content_type = metrics_endpoint()
+        return Response(content=content, media_type=content_type)
+    
+    logger.info("Metrics collection enabled")
+
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -102,6 +134,10 @@ app.include_router(coordination_router)
 if settings.MEMORY_ENABLED:
     app.include_router(memory_router, prefix=settings.API_PREFIX)
     logger.info("Memory API routes registered")
+
+# Include Visual Perception MCP router
+app.include_router(app.state.visual_perception_router)
+logger.info("Visual Perception MCP routes registered")
 
 # Error handlers
 @app.exception_handler(RequestValidationError)

@@ -8,6 +8,10 @@ to facilitate effective collaboration between specialized agents in the ADE plat
 from enum import Enum
 from typing import Dict, List, Any, Optional
 import logging
+import time
+
+# Import monitoring components
+from backend.services.monitoring import track_collaboration_pattern
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -26,6 +30,16 @@ class CollaborationPatternFactory:
     This class provides predefined collaboration pattern configurations for different
     types of tasks in the ADE platform, ensuring consistent and effective agent collaboration.
     """
+    
+    def __init__(self):
+        """Initialize the collaboration pattern factory."""
+        self.pattern_metrics = {}
+        for pattern in CollaborationPattern:
+            self.pattern_metrics[pattern.value] = {
+                "executions": 0,
+                "success_rate": 1.0,
+                "avg_duration": 0.0
+            }
     
     @staticmethod
     def get_pattern_config(task_type: str, custom_config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -99,6 +113,67 @@ class CollaborationPatternFactory:
                    config.get("pattern"), task_type)
         
         return config
+    
+    async def execute_pattern(self, pattern_type: str, task: Dict[str, Any], 
+                             agents: Dict[str, Any], registry: Any, coordinator: Any) -> Dict[str, Any]:
+        """
+        Execute a collaboration pattern with metrics tracking.
+        
+        Args:
+            pattern_type: Type of collaboration pattern
+            task: Task to execute
+            agents: Available agents
+            registry: Agent registry
+            coordinator: Agent coordinator
+            
+        Returns:
+            Result of pattern execution
+        """
+        start_time = time.time()
+        strategy = PatternStrategyFactory.create_strategy(pattern_type, {
+            "conflict_resolution_strategy": "priority_based"
+        })
+        
+        try:
+            @track_collaboration_pattern(pattern_type)
+            async def execute_with_tracking():
+                return await strategy.execute(
+                    coordinator=coordinator,
+                    task_context=task
+                )
+            
+            result = await execute_with_tracking()
+            
+            # Update metrics
+            self.pattern_metrics[pattern_type]["executions"] += 1
+            self.pattern_metrics[pattern_type]["success_rate"] = (
+                0.9 * self.pattern_metrics[pattern_type]["success_rate"] + 
+                0.1 * (1.0 if result.get("success", False) else 0.0)
+            )
+            
+            duration = time.time() - start_time
+            self.pattern_metrics[pattern_type]["avg_duration"] = (
+                0.9 * self.pattern_metrics[pattern_type]["avg_duration"] + 
+                0.1 * duration
+            )
+            
+            return result
+        except Exception as e:
+            logger.error(f"Error executing {pattern_type} pattern: {str(e)}")
+            
+            # Update metrics on failure
+            self.pattern_metrics[pattern_type]["executions"] += 1
+            self.pattern_metrics[pattern_type]["success_rate"] = (
+                0.9 * self.pattern_metrics[pattern_type]["success_rate"] + 0.1 * 0.0
+            )
+            
+            duration = time.time() - start_time
+            self.pattern_metrics[pattern_type]["avg_duration"] = (
+                0.9 * self.pattern_metrics[pattern_type]["avg_duration"] + 
+                0.1 * duration
+            )
+            
+            raise
 
 class PatternExecutionStrategy:
     """
@@ -667,14 +742,16 @@ class PatternStrategyFactory:
         Returns:
             Pattern execution strategy
         """
-        if pattern == CollaborationPattern.SEQUENTIAL.value:
-            return SequentialStrategy(config)
-        elif pattern == CollaborationPattern.PARALLEL.value:
-            return ParallelStrategy(config)
-        elif pattern == CollaborationPattern.ITERATIVE.value:
-            return IterativeStrategy(config)
-        elif pattern == CollaborationPattern.CONSENSUS.value:
-            return ConsensusStrategy(config)
-        else:
+        strategies = {
+            CollaborationPattern.SEQUENTIAL.value: SequentialStrategy,
+            CollaborationPattern.PARALLEL.value: ParallelStrategy,
+            CollaborationPattern.ITERATIVE.value: IterativeStrategy,
+            CollaborationPattern.CONSENSUS.value: ConsensusStrategy
+        }
+        
+        strategy_class = strategies.get(pattern)
+        if not strategy_class:
             logger.warning("Unknown pattern %s, defaulting to parallel", pattern)
-            return ParallelStrategy(config)
+            strategy_class = ParallelStrategy
+        
+        return strategy_class(config)

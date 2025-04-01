@@ -15,6 +15,7 @@ import {
   ZoomOut as ZoomOutIcon
 } from '@mui/icons-material';
 import { useAgentContext } from '../../contexts/AgentContext';
+// Import the full d3 library
 import * as d3 from 'd3';
 
 interface AgentVisualizationProps {
@@ -27,6 +28,15 @@ interface Node {
   type: 'file' | 'directory' | 'agent';
   children?: Node[];
   agentFocus?: number;
+}
+
+// Define the zoom event type
+interface ZoomEvent {
+  transform: {
+    k: number;
+    x: number;
+    y: number;
+  };
 }
 
 const AgentVisualization: React.FC<AgentVisualizationProps> = ({ projectId }) => {
@@ -86,11 +96,11 @@ const AgentVisualization: React.FC<AgentVisualizationProps> = ({ projectId }) =>
     // Create zoom behavior
     const zoomBehavior = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.5, 3])
-      .on('zoom', (event) => {
+      .on('zoom', (event: any) => {
         setZoom(event.transform.k);
       });
 
-    svg.call(zoomBehavior);
+    svg.call(zoomBehavior as any);
 
     // Create the visualization based on active tab
     switch (activeTab) {
@@ -114,50 +124,53 @@ const AgentVisualization: React.FC<AgentVisualizationProps> = ({ projectId }) =>
     height: number,
     margin: { top: number; right: number; bottom: number; left: number }
   ) => {
+    const hierarchy = d3.hierarchy(mockData);
+    
     const treeLayout = d3.tree<Node>()
-      .size([height - margin.top - margin.bottom, width - margin.left - margin.right]);
-
-    const root = d3.hierarchy(mockData);
-    const treeData = treeLayout(root);
-
-    // Add links
-    svg.selectAll('path.link')
-      .data(treeData.links())
-      .enter()
-      .append('path')
-      .attr('class', 'link')
-      .attr('d', d => {
-        const link = d3.linkHorizontal()
-          .x((d: any) => d.y)
-          .y((d: any) => d.x);
-        return link(d as any);
-      })
+      .size([width - margin.left - margin.right, height - margin.top - margin.bottom]);
+    
+    const root = treeLayout(hierarchy as d3.HierarchyNode<Node>);
+    
+    // Create links
+    svg.append('g')
       .attr('fill', 'none')
-      .attr('stroke', '#ccc')
-      .attr('stroke-width', 1.5);
-
-    // Add nodes
-    const nodes = svg.selectAll('g.node')
-      .data(treeData.descendants())
-      .enter()
-      .append('g')
-      .attr('class', 'node')
-      .attr('transform', d => `translate(${d.y},${d.x})`);
-
-    // Add circles for nodes
-    nodes.append('circle')
-      .attr('r', 6)
-      .attr('fill', d => d.data.type === 'file' ? '#4CAF50' : '#2196F3')
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 2);
-
-    // Add labels
-    nodes.append('text')
-      .attr('dy', '.35em')
-      .attr('x', d => d.children ? -8 : 8)
-      .attr('text-anchor', d => d.children ? 'end' : 'start')
-      .text(d => d.data.name)
-      .attr('font-size', '12px');
+      .attr('stroke', '#555')
+      .attr('stroke-opacity', 0.4)
+      .attr('stroke-width', 1.5)
+      .selectAll('path')
+      .data(root.links())
+      .join('path')
+      .attr('d', (d: d3.HierarchyLink<Node>) => {
+        // Use optional chaining and nullish coalescing to handle possibly undefined values
+        const sourceX = d.source.x ?? 0;
+        const sourceY = d.source.y ?? 0;
+        const targetX = d.target.x ?? 0;
+        const targetY = d.target.y ?? 0;
+        return `M${sourceX},${sourceY}C${sourceX},${(sourceY + targetY) / 2} ${targetX},${(sourceY + targetY) / 2} ${targetX},${targetY}`;
+      });
+    
+    // Create nodes
+    const node = svg.append('g')
+      .attr('stroke-linejoin', 'round')
+      .attr('stroke-width', 3)
+      .selectAll('g')
+      .data(root.descendants())
+      .join('g')
+      .attr('transform', (d: d3.HierarchyNode<Node>) => `translate(${d.x ?? 0},${d.y ?? 0})`);
+    
+    // Add circles to nodes
+    node.append('circle')
+      .attr('fill', (d: d3.HierarchyNode<Node>) => d.data.type === 'file' ? '#4CAF50' : d.data.type === 'agent' ? '#2196F3' : '#FFC107')
+      .attr('r', (d: d3.HierarchyNode<Node>) => d.data.type === 'directory' ? 8 : 5);
+    
+    // Add labels to nodes
+    node.append('text')
+      .attr('dy', '0.31em')
+      .attr('x', (d: d3.HierarchyNode<Node>) => d.children ? -9 : 9)
+      .attr('text-anchor', (d: d3.HierarchyNode<Node>) => d.children ? 'end' : 'start')
+      .text((d: d3.HierarchyNode<Node>) => d.data.name)
+      .clone(true).lower()
+      .attr('stroke', 'white');
   };
 
   const renderAgentFocus = (
@@ -249,4 +262,4 @@ const AgentVisualization: React.FC<AgentVisualizationProps> = ({ projectId }) =>
   );
 };
 
-export default AgentVisualization; 
+export default AgentVisualization;

@@ -50,6 +50,7 @@ import { MainDashboard } from './components/MainDashboard';
 import { DocumentationPanel } from './components/DocumentationPanel';
 import DesignHubPage from './routes/DesignHub';
 import { useAuth } from './hooks/useAuth';
+import VisualPerceptionCapture from './components/VisualPerceptionCapture';
 
 const drawerWidth = 240;
 
@@ -109,10 +110,40 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
 
+const ProjectMetrics: React.FC = () => {
+  return (
+    <Box>
+      <Typography variant="h4">Project Metrics</Typography>
+      <Typography>This feature is coming soon.</Typography>
+    </Box>
+  );
+};
+
+const SprintBoard: React.FC = () => {
+  return (
+    <Box>
+      <Typography variant="h4">Sprint Board</Typography>
+      <Typography>This feature is coming soon.</Typography>
+    </Box>
+  );
+};
+
+interface CommandHubProps {
+  onSave: (design: any) => void;
+  onGenerateCode: (design: any) => void;
+  isGenerating: boolean;
+  activeAgent: string;
+}
+
+interface AdminDashboardProps {
+  projectId: string;
+}
+
 const App: React.FC = () => {
   const [open, setOpen] = useState(true);
   const [activeAgent, setActiveAgent] = useState<string>('design');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [visualPerceptionEnabled, setVisualPerceptionEnabled] = useState<boolean>(true);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
@@ -210,6 +241,20 @@ const App: React.FC = () => {
     }
   };
 
+  const handleAnalysisResult = (result: any) => {
+    console.log('Visual perception analysis result:', result);
+    // Here you could add logic to respond to different UI states
+    // For example, if there's an error state detected, you could show a notification
+    if (result.recognized_state === 'error_state' && result.error_messages?.length > 0) {
+      console.error('UI Error detected:', result.error_messages);
+    }
+    
+    // If blank page is detected, you could trigger a reload or show a message
+    if (result.recognized_state === 'blank_page') {
+      console.warn('Blank page detected in UI');
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -282,8 +327,15 @@ const App: React.FC = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/command-hub" element={<CommandHub />}>
+                <Route path="/admin" element={<AdminDashboard projectId="default" />} />
+                <Route path="/command-hub" element={
+                  <CommandHub 
+                    onSave={handleDesignSave} 
+                    onGenerateCode={handleCodeGeneration} 
+                    isGenerating={isGenerating} 
+                    activeAgent={activeAgent} 
+                  />
+                }>
                   <Route path="design-hub" element={<DesignHubPage />} />
                   <Route path="design-hub/:projectId" element={<DesignHubPage />} />
                 </Route>
@@ -308,10 +360,21 @@ const App: React.FC = () => {
           </Main>
 
           <DocumentationPanel />
+          
+          {/* Visual Perception MCP Component */}
+          {visualPerceptionEnabled && (
+            <VisualPerceptionCapture 
+              targetSelector="#root"
+              captureInterval={5000}
+              autoCapture={false}
+              onAnalysisResult={handleAnalysisResult}
+              position="bottom-right"
+            />
+          )}
         </Box>
       </BrowserRouter>
     </ThemeProvider>
   );
 };
 
-export default App; 
+export default App;
