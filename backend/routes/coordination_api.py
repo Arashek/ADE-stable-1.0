@@ -4,7 +4,36 @@ from pydantic import BaseModel
 import asyncio
 import logging
 import uuid
+import sys
+import traceback
 from datetime import datetime
+from pathlib import Path
+
+# Add project root to path for imports
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+# Import error logging system
+try:
+    from scripts.basic_error_logging import log_error, ErrorCategory, ErrorSeverity
+    error_logging_available = True
+except ImportError:
+    error_logging_available = False
+    # Define fallback error categories and severities
+    class ErrorCategory:
+        API = "API"
+        COORDINATION = "COORDINATION"
+        AGENT = "AGENT"
+        COMMUNICATION = "COMMUNICATION"
+        PROCESSING = "PROCESSING"
+        SYSTEM = "SYSTEM"
+        VALIDATION = "VALIDATION"
+    
+    class ErrorSeverity:
+        CRITICAL = "CRITICAL"
+        ERROR = "ERROR"
+        WARNING = "WARNING"
+        INFO = "INFO"
 
 from services.coordination.agent_coordinator import AgentCoordinator
 from services.coordination.agent_registry import AgentRegistry
@@ -59,6 +88,7 @@ class CoordinationStatusResponse(BaseModel):
     agents: List[AgentStatusResponse]
     conflicts: List[ConflictResolutionResponse] = []
     consensus_decisions: List[ConsensusDecisionResponse] = []
+    errors: Dict[str, Any] = {}
 
 
 # In-memory storage for active conflicts and consensus decisions
@@ -66,6 +96,7 @@ class CoordinationStatusResponse(BaseModel):
 active_conflicts = []
 active_consensus_decisions = []
 coordination_active = False
+api_errors = []
 
 
 # Helper function to get agent coordinator instance
@@ -76,6 +107,50 @@ def get_coordinator():
 # Helper function to get agent registry instance
 def get_registry():
     return AgentRegistry()
+
+
+# Helper function to log errors
+def log_api_error(error: Any, category: str = ErrorCategory.API, 
+                 severity: str = ErrorSeverity.ERROR, context: Dict[str, Any] = None):
+    """
+    Log an error using the error logging system
+    
+    Args:
+        error: The error object or message
+        category: Category of the error
+        severity: Severity level of the error
+        context: Additional context information
+    """
+    error_message = str(error)
+    
+    # Log to console
+    logger.error(f"API Error [{category}][{severity}]: {error_message}")
+    
+    # Add to in-memory error list
+    error_entry = {
+        "message": error_message,
+        "category": category,
+        "severity": severity,
+        "timestamp": datetime.now().isoformat(),
+        "context": context or {}
+    }
+    
+    api_errors.append(error_entry)
+    
+    # Log to error logging system if available
+    if error_logging_available:
+        try:
+            error_id = log_error(
+                error=error,
+                category=category,
+                severity=severity,
+                component="coordination_api",
+                source="backend.routes.coordination_api",
+                context=context or {}
+            )
+            error_entry["id"] = error_id
+        except Exception as e:
+            logger.error(f"Failed to log error: {str(e)}")
 
 
 @router.get("/status", response_model=CoordinationStatusResponse)
@@ -133,15 +208,37 @@ async def get_coordination_status(
                 status=decision.get("status", "pending")
             ))
         
+        # Compile error statistics
+        error_stats = {}
+        if hasattr(coordinator, 'errors'):
+            coordinator_errors = coordinator.errors
+            error_stats["coordinator"] = {
+                "total": len(coordinator_errors),
+                "by_severity": {}
+            }
+            for error in coordinator_errors:
+                severity = error.get("severity", "UNKNOWN")
+                error_stats["coordinator"]["by_severity"][severity] = error_stats["coordinator"]["by_severity"].get(severity, 0) + 1
+        
+        error_stats["api"] = {
+            "total": len(api_errors),
+            "by_severity": {}
+        }
+        for error in api_errors:
+            severity = error.get("severity", "UNKNOWN")
+            error_stats["api"]["by_severity"][severity] = error_stats["api"]["by_severity"].get(severity, 0) + 1
+        
         return CoordinationStatusResponse(
             active=coordination_active,
             agents=agents,
             conflicts=conflicts,
-            consensus_decisions=consensus_decisions
+            consensus_decisions=consensus_decisions,
+            errors=error_stats
         )
     
     except Exception as e:
-        logger.error(f"Error getting coordination status: {str(e)}")
+        error_context = {"action": "get_coordination_status"}
+        log_api_error(e, context=error_context)
         raise HTTPException(status_code=500, detail=f"Failed to get coordination status: {str(e)}")
 
 
@@ -164,7 +261,8 @@ async def start_coordination(
         return {"success": True, "message": "Agent coordination system started"}
     
     except Exception as e:
-        logger.error(f"Error starting coordination: {str(e)}")
+        error_context = {"action": "start_coordination"}
+        log_api_error(e, context=error_context)
         raise HTTPException(status_code=500, detail=f"Failed to start coordination: {str(e)}")
 
 
@@ -183,7 +281,8 @@ async def stop_coordination():
         return {"success": True, "message": "Agent coordination system stopped"}
     
     except Exception as e:
-        logger.error(f"Error stopping coordination: {str(e)}")
+        error_context = {"action": "stop_coordination"}
+        log_api_error(e, context=error_context)
         raise HTTPException(status_code=500, detail=f"Failed to stop coordination: {str(e)}")
 
 
@@ -199,44 +298,61 @@ async def create_consensus_decision(
     
     try:
         if not coordination_active:
-            raise HTTPException(status_code=400, detail="Agent coordination system is not active")
+            error_msg = "Coordination system is not active"
+            log_api_error(
+                error_msg,
+                category=ErrorCategory.API,
+                severity=ErrorSeverity.WARNING,
+                context={"action": "create_consensus_decision"}
+            )
+            raise HTTPException(status_code=400, detail=error_msg)
         
-        # Generate a unique ID for the decision
-        decision_id = f"decision_{uuid.uuid4().hex[:8]}"
+        # Validate required fields
+        required_fields = ["key", "description", "options"]
+        for field in required_fields:
+            if field not in decision:
+                error_msg = f"Missing required field: {field}"
+                log_api_error(
+                    error_msg,
+                    category=ErrorCategory.VALIDATION,
+                    severity=ErrorSeverity.ERROR,
+                    context={"action": "create_consensus_decision", "decision": decision}
+                )
+                raise HTTPException(status_code=400, detail=error_msg)
         
-        # Create the decision point
-        decision_point = {
+        # Create decision object
+        decision_id = str(uuid.uuid4())
+        new_decision = {
             "id": decision_id,
-            "key": decision.get("key", "unnamed_decision"),
-            "description": decision.get("description", "No description provided"),
-            "options": decision.get("options", []),
-            "status": "pending",
+            "key": decision["key"],
+            "description": decision["description"],
+            "options": decision["options"],
             "votes": [],
-            "confidence": 0.0,
+            "status": "pending",
             "created_at": datetime.now().isoformat()
         }
         
-        # Add to active decisions
-        active_consensus_decisions.append(decision_point)
+        active_consensus_decisions.append(new_decision)
         
-        # If agents are specified, start the consensus process asynchronously
-        if "agents" in decision and decision["agents"]:
-            asyncio.create_task(
-                process_consensus_decision(decision_id, decision["agents"], coordinator)
-            )
+        # Start async process to collect votes if agents are specified
+        if "agents" in decision and isinstance(decision["agents"], list) and len(decision["agents"]) > 0:
+            asyncio.create_task(process_consensus_decision(decision_id, decision["agents"], coordinator))
         
         return ConsensusDecisionResponse(
-            id=decision_point["id"],
-            key=decision_point["key"],
-            description=decision_point["description"],
-            options=decision_point["options"],
-            status=decision_point["status"]
+            id=new_decision["id"],
+            key=new_decision["key"],
+            description=new_decision["description"],
+            options=new_decision["options"],
+            status=new_decision["status"]
         )
     
     except HTTPException:
+        # Re-raise HTTP exceptions
         raise
+    
     except Exception as e:
-        logger.error(f"Error creating consensus decision: {str(e)}")
+        error_context = {"action": "create_consensus_decision", "decision": decision}
+        log_api_error(e, context=error_context)
         raise HTTPException(status_code=500, detail=f"Failed to create consensus decision: {str(e)}")
 
 
@@ -245,8 +361,6 @@ async def get_consensus_decision(decision_id: str):
     """
     Get the status of a consensus decision.
     """
-    global active_consensus_decisions
-    
     try:
         # Find the decision
         for decision in active_consensus_decisions:
@@ -262,12 +376,23 @@ async def get_consensus_decision(decision_id: str):
                     status=decision.get("status", "pending")
                 )
         
-        raise HTTPException(status_code=404, detail=f"Consensus decision {decision_id} not found")
+        # Decision not found
+        error_msg = f"Consensus decision not found: {decision_id}"
+        log_api_error(
+            error_msg,
+            category=ErrorCategory.API,
+            severity=ErrorSeverity.WARNING,
+            context={"action": "get_consensus_decision", "decision_id": decision_id}
+        )
+        raise HTTPException(status_code=404, detail=error_msg)
     
     except HTTPException:
+        # Re-raise HTTP exceptions
         raise
+    
     except Exception as e:
-        logger.error(f"Error getting consensus decision: {str(e)}")
+        error_context = {"action": "get_consensus_decision", "decision_id": decision_id}
+        log_api_error(e, context=error_context)
         raise HTTPException(status_code=500, detail=f"Failed to get consensus decision: {str(e)}")
 
 
@@ -281,9 +406,17 @@ async def submit_vote(
     """
     Submit a vote for a consensus decision.
     """
-    global active_consensus_decisions
-    
     try:
+        if not coordination_active:
+            error_msg = "Coordination system is not active"
+            log_api_error(
+                error_msg,
+                category=ErrorCategory.API,
+                severity=ErrorSeverity.WARNING,
+                context={"action": "submit_vote", "decision_id": decision_id}
+            )
+            raise HTTPException(status_code=400, detail=error_msg)
+        
         # Find the decision
         decision_index = None
         for i, decision in enumerate(active_consensus_decisions):
@@ -292,30 +425,52 @@ async def submit_vote(
                 break
         
         if decision_index is None:
-            raise HTTPException(status_code=404, detail=f"Consensus decision {decision_id} not found")
+            error_msg = f"Consensus decision not found: {decision_id}"
+            log_api_error(
+                error_msg,
+                category=ErrorCategory.API,
+                severity=ErrorSeverity.WARNING,
+                context={"action": "submit_vote", "decision_id": decision_id}
+            )
+            raise HTTPException(status_code=404, detail=error_msg)
+        
+        # Check if decision is still pending
+        if active_consensus_decisions[decision_index]["status"] != "pending":
+            error_msg = f"Consensus decision is already {active_consensus_decisions[decision_index]['status']}"
+            log_api_error(
+                error_msg,
+                category=ErrorCategory.API,
+                severity=ErrorSeverity.WARNING,
+                context={"action": "submit_vote", "decision_id": decision_id}
+            )
+            raise HTTPException(status_code=400, detail=error_msg)
         
         # Add the vote
-        if "votes" not in active_consensus_decisions[decision_index]:
-            active_consensus_decisions[decision_index]["votes"] = []
-        
-        active_consensus_decisions[decision_index]["votes"].append({
-            "agent": agent_type,
+        vote_entry = {
             "agent_id": agent_id,
+            "agent_type": agent_type,
             "option": vote.option,
             "confidence": vote.confidence,
             "reasoning": vote.reasoning,
             "timestamp": datetime.now().isoformat()
-        })
+        }
         
-        # Update status to in_progress
-        active_consensus_decisions[decision_index]["status"] = "in_progress"
+        active_consensus_decisions[decision_index]["votes"].append(vote_entry)
         
         return {"success": True, "message": "Vote submitted successfully"}
     
     except HTTPException:
+        # Re-raise HTTP exceptions
         raise
+    
     except Exception as e:
-        logger.error(f"Error submitting vote: {str(e)}")
+        error_context = {
+            "action": "submit_vote", 
+            "decision_id": decision_id, 
+            "agent_id": agent_id,
+            "vote": vote.dict() if hasattr(vote, "dict") else str(vote)
+        }
+        log_api_error(e, context=error_context)
         raise HTTPException(status_code=500, detail=f"Failed to submit vote: {str(e)}")
 
 
@@ -323,8 +478,6 @@ async def process_consensus_decision(decision_id: str, agents: List[str], coordi
     """
     Process a consensus decision asynchronously.
     """
-    global active_consensus_decisions
-    
     try:
         # Find the decision
         decision_index = None
@@ -334,53 +487,79 @@ async def process_consensus_decision(decision_id: str, agents: List[str], coordi
                 break
         
         if decision_index is None:
-            logger.error(f"Consensus decision {decision_id} not found for processing")
+            error_msg = f"Consensus decision not found: {decision_id}"
+            log_api_error(
+                error_msg,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.ERROR,
+                context={"action": "process_consensus_decision", "decision_id": decision_id}
+            )
             return
         
-        # Update status
-        active_consensus_decisions[decision_index]["status"] = "in_progress"
+        # Wait for votes (with timeout)
+        max_wait_time = 60  # seconds
+        wait_interval = 1  # seconds
+        total_waited = 0
         
-        # Build consensus using the coordinator
-        decision_point = {
-            "id": decision_id,
-            "key": active_consensus_decisions[decision_index]["key"],
-            "description": active_consensus_decisions[decision_index]["description"],
-            "options": active_consensus_decisions[decision_index]["options"]
-        }
+        while total_waited < max_wait_time:
+            # Check if we have votes from all agents
+            votes = active_consensus_decisions[decision_index]["votes"]
+            voting_agents = [vote["agent_id"] for vote in votes]
+            
+            if all(agent in voting_agents for agent in agents):
+                break
+            
+            await asyncio.sleep(wait_interval)
+            total_waited += wait_interval
         
-        result = await coordinator.build_consensus(
-            decision_point=active_consensus_decisions[decision_index]["key"],
-            options=active_consensus_decisions[decision_index]["options"],
-            agents=agents
-        )
+        # Process votes
+        votes = active_consensus_decisions[decision_index]["votes"]
+        if not votes:
+            active_consensus_decisions[decision_index]["status"] = "failed"
+            active_consensus_decisions[decision_index]["error"] = "No votes received"
+            error_msg = f"No votes received for decision: {decision_id}"
+            log_api_error(
+                error_msg,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.WARNING,
+                context={"action": "process_consensus_decision", "decision_id": decision_id}
+            )
+            return
         
-        # Update the decision with the result
-        active_consensus_decisions[decision_index]["selected_option"] = result
-        active_consensus_decisions[decision_index]["status"] = "resolved"
+        # Simple consensus mechanism: select option with highest confidence
+        option_scores = {}
+        for vote in votes:
+            option = vote["option"]
+            confidence = vote["confidence"]
+            
+            if option not in option_scores:
+                option_scores[option] = 0
+            
+            option_scores[option] += confidence
         
-        # Calculate confidence based on votes
-        votes = active_consensus_decisions[decision_index].get("votes", [])
-        if votes:
-            # Find votes for the selected option
-            matching_votes = [v for v in votes if v["option"] == result]
-            if matching_votes:
-                avg_confidence = sum(v["confidence"] for v in matching_votes) / len(matching_votes)
-                active_consensus_decisions[decision_index]["confidence"] = avg_confidence
-            else:
-                active_consensus_decisions[decision_index]["confidence"] = 0.5
-        else:
-            active_consensus_decisions[decision_index]["confidence"] = 0.7  # Default confidence
+        # Find option with highest score
+        selected_option = max(option_scores.items(), key=lambda x: x[1])
+        
+        # Update decision
+        active_consensus_decisions[decision_index]["selected_option"] = selected_option[0]
+        active_consensus_decisions[decision_index]["confidence"] = selected_option[1] / len(votes)
+        active_consensus_decisions[decision_index]["status"] = "completed"
+        
+        logger.info(f"Consensus decision {decision_id} completed with option: {selected_option[0]}")
     
     except Exception as e:
-        logger.error(f"Error processing consensus decision: {str(e)}")
+        error_context = {"action": "process_consensus_decision", "decision_id": decision_id}
+        log_api_error(e, severity=ErrorSeverity.ERROR, context=error_context)
         
-        # Update status to indicate error
-        if decision_index is not None:
-            active_consensus_decisions[decision_index]["status"] = "error"
-            active_consensus_decisions[decision_index]["error"] = str(e)
+        # Update decision status
+        for i, decision in enumerate(active_consensus_decisions):
+            if decision["id"] == decision_id:
+                active_consensus_decisions[i]["status"] = "failed"
+                active_consensus_decisions[i]["error"] = str(e)
+                break
 
 
-@router.post("/conflicts")
+@router.post("/conflict")
 async def record_conflict_resolution(
     conflict: Dict[str, Any] = Body(...),
     coordinator: AgentCoordinator = Depends(get_coordinator)
@@ -392,21 +571,43 @@ async def record_conflict_resolution(
     
     try:
         if not coordination_active:
-            raise HTTPException(status_code=400, detail="Agent coordination system is not active")
+            error_msg = "Coordination system is not active"
+            log_api_error(
+                error_msg,
+                category=ErrorCategory.API,
+                severity=ErrorSeverity.WARNING,
+                context={"action": "record_conflict_resolution"}
+            )
+            raise HTTPException(status_code=400, detail=error_msg)
+        
+        # Validate required fields
+        required_fields = ["attribute", "values", "selected_value", "selected_agent", "confidence"]
+        for field in required_fields:
+            if field not in conflict:
+                error_msg = f"Missing required field: {field}"
+                log_api_error(
+                    error_msg,
+                    category=ErrorCategory.VALIDATION,
+                    severity=ErrorSeverity.ERROR,
+                    context={"action": "record_conflict_resolution", "conflict": conflict}
+                )
+                raise HTTPException(status_code=400, detail=error_msg)
+        
+        # Add timestamp
+        conflict["timestamp"] = datetime.now().isoformat()
         
         # Add to active conflicts
         active_conflicts.append(conflict)
         
-        # Limit the number of stored conflicts
-        if len(active_conflicts) > 10:
-            active_conflicts = active_conflicts[-10:]
-        
         return {"success": True, "message": "Conflict resolution recorded"}
     
     except HTTPException:
+        # Re-raise HTTP exceptions
         raise
+    
     except Exception as e:
-        logger.error(f"Error recording conflict resolution: {str(e)}")
+        error_context = {"action": "record_conflict_resolution", "conflict": conflict}
+        log_api_error(e, context=error_context)
         raise HTTPException(status_code=500, detail=f"Failed to record conflict resolution: {str(e)}")
 
 
@@ -440,5 +641,79 @@ async def get_agents(registry: AgentRegistry = Depends(get_registry)):
         return agents
     
     except Exception as e:
-        logger.error(f"Error getting agents: {str(e)}")
+        error_context = {"action": "get_agents"}
+        log_api_error(e, context=error_context)
         raise HTTPException(status_code=500, detail=f"Failed to get agents: {str(e)}")
+
+
+@router.get("/errors")
+async def get_errors(
+    limit: int = 50,
+    severity: Optional[str] = None,
+    category: Optional[str] = None,
+    coordinator: AgentCoordinator = Depends(get_coordinator)
+):
+    """
+    Get errors from the coordination system.
+    """
+    try:
+        errors = []
+        
+        # Get errors from coordinator
+        if hasattr(coordinator, 'errors'):
+            coordinator_errors = coordinator.errors
+            for error in coordinator_errors:
+                if (severity is None or error.get("severity") == severity) and \
+                   (category is None or error.get("category") == category):
+                    errors.append({
+                        "source": "coordinator",
+                        **error
+                    })
+        
+        # Get errors from API
+        for error in api_errors:
+            if (severity is None or error.get("severity") == severity) and \
+               (category is None or error.get("category") == category):
+                errors.append({
+                    "source": "api",
+                    **error
+                })
+        
+        # Sort by timestamp (most recent first) and limit
+        errors.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+        errors = errors[:limit]
+        
+        return {
+            "total": len(errors),
+            "errors": errors
+        }
+    
+    except Exception as e:
+        error_context = {"action": "get_errors", "limit": limit, "severity": severity, "category": category}
+        log_api_error(e, context=error_context)
+        raise HTTPException(status_code=500, detail=f"Failed to get errors: {str(e)}")
+
+
+@router.delete("/errors")
+async def clear_errors(
+    coordinator: AgentCoordinator = Depends(get_coordinator)
+):
+    """
+    Clear errors from the coordination system.
+    """
+    global api_errors
+    
+    try:
+        # Clear API errors
+        api_errors = []
+        
+        # Clear coordinator errors if possible
+        if hasattr(coordinator, 'errors'):
+            coordinator.errors = []
+        
+        return {"success": True, "message": "Errors cleared"}
+    
+    except Exception as e:
+        error_context = {"action": "clear_errors"}
+        log_api_error(e, context=error_context)
+        raise HTTPException(status_code=500, detail=f"Failed to clear errors: {str(e)}")

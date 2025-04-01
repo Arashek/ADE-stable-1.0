@@ -13,6 +13,46 @@ from fastapi.responses import JSONResponse, Response
 from fastapi.exceptions import RequestValidationError
 from contextlib import asynccontextmanager
 import uvicorn
+
+# Import routes
+try:
+    from routes import error_logging_routes
+except ImportError:
+    logging.warning("Error logging routes could not be imported")
+    error_logging_routes = None
+
+try:
+    from routes import coordination_api
+except ImportError:
+    logging.warning("Coordination API routes could not be imported")
+    coordination_api = None
+
+# Import services
+try:
+    from services.owner_panel_service import owner_panel_service
+except ImportError:
+    logging.warning("Owner panel service could not be imported")
+    owner_panel_service = None
+
+try:
+    from services.auth_service import auth_service
+except ImportError:
+    logging.warning("Auth service could not be imported")
+    auth_service = None
+
+# Import settings
+try:
+    from config.settings import CORS_ORIGINS, API_VERSION
+except ImportError:
+    logging.warning("Settings module could not be imported, using defaults")
+    CORS_ORIGINS = [
+        "http://localhost:3000",
+        "http://localhost:3001", 
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001"
+    ]
+    API_VERSION = "v1"
+
 from typing import Dict, Any
 import asyncio
 import psutil

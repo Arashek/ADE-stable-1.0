@@ -12,6 +12,34 @@ from enum import Enum
 import json
 import asyncio
 import inspect
+import sys
+import traceback
+from pathlib import Path
+
+# Add project root to path for imports
+project_root = Path(__file__).resolve().parent.parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+# Import error logging system
+try:
+    from scripts.basic_error_logging import log_error, ErrorCategory, ErrorSeverity
+    error_logging_available = True
+except ImportError:
+    error_logging_available = False
+    # Define fallback error categories and severities
+    class ErrorCategory:
+        AGENT = "AGENT"
+        COMMUNICATION = "COMMUNICATION"
+        PROCESSING = "PROCESSING"
+        SYSTEM = "SYSTEM"
+        API = "API"
+        VALIDATION = "VALIDATION"
+    
+    class ErrorSeverity:
+        CRITICAL = "CRITICAL"
+        ERROR = "ERROR"
+        WARNING = "WARNING"
+        INFO = "INFO"
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -85,8 +113,58 @@ class AgentInterface:
         # Initialize agent registry
         self.agent_registry = {}
         
+        # Initialize error tracking
+        self.errors = []
+        
         logger.info("Agent interface initialized for %s agent with ID %s", 
                    agent_type, agent_id)
+    
+    def log_error(self, error: Any, category: str = ErrorCategory.AGENT, 
+                 severity: str = ErrorSeverity.ERROR, context: Dict[str, Any] = None):
+        """
+        Log an error using the error logging system
+        
+        Args:
+            error: The error object or message
+            category: Category of the error
+            severity: Severity level of the error
+            context: Additional context information
+        """
+        error_message = str(error)
+        
+        # Log to console
+        logger.error("Error [%s][%s]: %s", category, severity, error_message)
+        
+        # Add agent context
+        if context is None:
+            context = {}
+        
+        context.update({
+            "agent_id": self.agent_id,
+            "agent_type": self.agent_type,
+            "capabilities": self.capabilities
+        })
+        
+        # Log to error logging system if available
+        if error_logging_available:
+            try:
+                error_id = log_error(
+                    error=error,
+                    category=category,
+                    severity=severity,
+                    component=f"agent_{self.agent_type}",
+                    source=f"backend.services.coordination.agent_interface.{self.agent_id}",
+                    context=context
+                )
+                self.errors.append({
+                    "id": error_id,
+                    "message": error_message,
+                    "category": category,
+                    "severity": severity,
+                    "context": context
+                })
+            except Exception as e:
+                logger.error("Failed to log error: %s", str(e))
     
     async def send_message(self, target_agent_id: str, message_type: str, 
                          content: Dict[str, Any], metadata: Dict[str, Any] = None) -> str:
@@ -102,34 +180,59 @@ class AgentInterface:
         Returns:
             Message ID
         """
-        # Create message
-        message_id = self._generate_message_id()
-        message = {
-            "message_id": message_id,
-            "sender_id": self.agent_id,
-            "sender_type": self.agent_type,
-            "target_id": target_agent_id,
-            "message_type": message_type,
-            "content": content,
-            "metadata": metadata or {},
-            "timestamp": self._get_timestamp()
-        }
-        
-        # Log message
-        logger.info("Sending %s message from %s to %s", 
-                   message_type, self.agent_id, target_agent_id)
-        
-        # Add to history
-        self.message_history.append(message)
-        
-        # Send message to target agent
-        if target_agent_id in self.agent_registry:
-            target_interface = self.agent_registry[target_agent_id]
-            await target_interface.receive_message(message)
-        else:
-            logger.warning("Target agent %s not found in registry", target_agent_id)
-        
-        return message_id
+        try:
+            # Create message
+            message_id = self._generate_message_id()
+            message = {
+                "message_id": message_id,
+                "sender_id": self.agent_id,
+                "sender_type": self.agent_type,
+                "target_id": target_agent_id,
+                "message_type": message_type,
+                "content": content,
+                "metadata": metadata or {},
+                "timestamp": self._get_timestamp()
+            }
+            
+            # Log message
+            logger.info("Sending %s message from %s to %s", 
+                       message_type, self.agent_id, target_agent_id)
+            
+            # Add to history
+            self.message_history.append(message)
+            
+            # Send message to target agent
+            if target_agent_id in self.agent_registry:
+                target_interface = self.agent_registry[target_agent_id]
+                await target_interface.receive_message(message)
+            else:
+                error_msg = f"Target agent {target_agent_id} not found in registry"
+                logger.warning(error_msg)
+                self.log_error(
+                    error=error_msg,
+                    category=ErrorCategory.COMMUNICATION,
+                    severity=ErrorSeverity.WARNING,
+                    context={
+                        "message_type": message_type,
+                        "target_id": target_agent_id,
+                        "message_id": message_id
+                    }
+                )
+            
+            return message_id
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.COMMUNICATION,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "send_message",
+                    "target_id": target_agent_id,
+                    "message_type": message_type
+                }
+            )
+            # Return a generated error message ID
+            return f"error_{self._get_timestamp()}"
     
     async def broadcast_message(self, message_type: str, content: Dict[str, Any], 
                               metadata: Dict[str, Any] = None,
@@ -146,24 +249,37 @@ class AgentInterface:
         Returns:
             List of message IDs
         """
-        message_ids = []
-        
-        # Filter target agents
-        target_agents = []
-        for agent_id, interface in self.agent_registry.items():
-            if target_types is None or interface.agent_type in target_types:
-                target_agents.append(agent_id)
-        
-        # Send message to each target agent
-        for target_id in target_agents:
-            message_id = await self.send_message(
-                target_id, message_type, content, metadata)
-            message_ids.append(message_id)
-        
-        logger.info("Broadcasted %s message to %d agents", 
-                   message_type, len(target_agents))
-        
-        return message_ids
+        try:
+            message_ids = []
+            
+            # Filter target agents
+            target_agents = []
+            for agent_id, interface in self.agent_registry.items():
+                if target_types is None or interface.agent_type in target_types:
+                    target_agents.append(agent_id)
+            
+            # Send message to each target agent
+            for target_id in target_agents:
+                message_id = await self.send_message(
+                    target_id, message_type, content, metadata)
+                message_ids.append(message_id)
+            
+            logger.info("Broadcasted %s message to %d agents", 
+                       message_type, len(target_agents))
+            
+            return message_ids
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.COMMUNICATION,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "broadcast_message",
+                    "message_type": message_type,
+                    "target_types": target_types
+                }
+            )
+            return []
     
     async def receive_message(self, message: Dict[str, Any]) -> None:
         """
@@ -172,29 +288,52 @@ class AgentInterface:
         Args:
             message: The received message
         """
-        # Log message
-        logger.info("Received %s message from %s", 
-                   message["message_type"], message["sender_id"])
-        
-        # Add to history
-        self.message_history.append(message)
-        
-        # Add to queue for processing
-        await self.message_queue.put(message)
+        try:
+            # Log message
+            logger.info("Received %s message from %s", 
+                       message["message_type"], message["sender_id"])
+            
+            # Add to history
+            self.message_history.append(message)
+            
+            # Add to queue for processing
+            await self.message_queue.put(message)
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.COMMUNICATION,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "receive_message",
+                    "message": message
+                }
+            )
     
     async def process_messages(self) -> None:
         """
         Process messages in the queue.
         """
         while True:
-            # Get message from queue
-            message = await self.message_queue.get()
-            
-            # Process message
-            await self._process_message(message)
-            
-            # Mark as done
-            self.message_queue.task_done()
+            try:
+                # Get message from queue
+                message = await self.message_queue.get()
+                
+                # Process message
+                await self._process_message(message)
+                
+                # Mark as done
+                self.message_queue.task_done()
+            except Exception as e:
+                self.log_error(
+                    error=e,
+                    category=ErrorCategory.PROCESSING,
+                    severity=ErrorSeverity.ERROR,
+                    context={
+                        "action": "process_messages"
+                    }
+                )
+                # Continue processing other messages even if one fails
+                self.message_queue.task_done()
     
     async def _process_message(self, message: Dict[str, Any]) -> None:
         """
@@ -203,18 +342,38 @@ class AgentInterface:
         Args:
             message: The message to process
         """
-        message_type = message["message_type"]
-        
-        # Check for custom handler
-        if message_type in self.custom_message_handlers:
-            await self.custom_message_handlers[message_type](message)
-            return
-        
-        # Use default handler
-        if message_type in self.message_handlers:
-            await self.message_handlers[message_type](message)
-        else:
-            logger.warning("No handler for message type %s", message_type)
+        try:
+            message_type = message["message_type"]
+            
+            # Check if we have a handler for this message type
+            if message_type in self.message_handlers:
+                # Call the handler
+                await self.message_handlers[message_type](message)
+            elif message_type in self.custom_message_handlers:
+                # Call the custom handler
+                await self.custom_message_handlers[message_type](message)
+            else:
+                # Log unknown message type
+                error_msg = f"Unknown message type: {message_type}"
+                logger.warning(error_msg)
+                self.log_error(
+                    error=error_msg,
+                    category=ErrorCategory.PROCESSING,
+                    severity=ErrorSeverity.WARNING,
+                    context={
+                        "message": message
+                    }
+                )
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "_process_message",
+                    "message": message
+                }
+            )
     
     async def _handle_request(self, message: Dict[str, Any]) -> None:
         """
@@ -223,52 +382,63 @@ class AgentInterface:
         Args:
             message: The request message
         """
-        # Extract request details
-        request_type = message["content"].get("request_type")
-        request_data = message["content"].get("request_data", {})
-        
-        # Process request based on type
-        if request_type == "capability_check":
-            # Check if agent has requested capability
-            capability = request_data.get("capability")
-            has_capability = capability in self.capabilities
+        try:
+            # Extract request details
+            request_type = message["content"].get("request_type")
+            request_data = message["content"].get("request_data", {})
             
-            # Send response
-            await self.send_message(
-                message["sender_id"],
-                MessageType.RESPONSE.value,
-                {
-                    "response_type": "capability_check",
-                    "response_data": {
-                        "capability": capability,
-                        "has_capability": has_capability
-                    },
-                    "request_id": message["message_id"]
+            # Process request based on type
+            if request_type == "capability_check":
+                # Check if agent has requested capability
+                capability = request_data.get("capability")
+                has_capability = capability in self.capabilities
+                
+                # Send response
+                await self.send_message(
+                    message["sender_id"],
+                    MessageType.RESPONSE.value,
+                    {
+                        "response_type": "capability_check",
+                        "response_data": {
+                            "capability": capability,
+                            "has_capability": has_capability
+                        },
+                        "request_id": message["message_id"]
+                    }
+                )
+            
+            elif request_type == "process_task":
+                # Process task request
+                task_data = request_data.get("task_data", {})
+                
+                # This would call into the agent's task processing logic
+                # For now, just send a placeholder response
+                await self.send_message(
+                    message["sender_id"],
+                    MessageType.RESPONSE.value,
+                    {
+                        "response_type": "process_task",
+                        "response_data": {
+                            "task_id": task_data.get("task_id"),
+                            "status": "completed",
+                            "result": {"message": "Task processed by agent"}
+                        },
+                        "request_id": message["message_id"]
+                    }
+                )
+            
+            else:
+                logger.warning("Unknown request type: %s", request_type)
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "_handle_request",
+                    "message": message
                 }
             )
-        
-        elif request_type == "process_task":
-            # Process task request
-            task_data = request_data.get("task_data", {})
-            
-            # This would call into the agent's task processing logic
-            # For now, just send a placeholder response
-            await self.send_message(
-                message["sender_id"],
-                MessageType.RESPONSE.value,
-                {
-                    "response_type": "process_task",
-                    "response_data": {
-                        "task_id": task_data.get("task_id"),
-                        "status": "completed",
-                        "result": {"message": "Task processed by agent"}
-                    },
-                    "request_id": message["message_id"]
-                }
-            )
-        
-        else:
-            logger.warning("Unknown request type: %s", request_type)
     
     async def _handle_response(self, message: Dict[str, Any]) -> None:
         """
@@ -277,19 +447,30 @@ class AgentInterface:
         Args:
             message: The response message
         """
-        # Extract response details
-        response_type = message["content"].get("response_type")
-        response_data = message["content"].get("response_data", {})
-        request_id = message["content"].get("request_id")
-        
-        # Log response
-        logger.info("Received %s response for request %s", 
-                   response_type, request_id)
-        
-        # Process response based on type
-        # This would typically update some internal state or trigger a callback
-        # For now, just log the response
-        logger.info("Response data: %s", json.dumps(response_data))
+        try:
+            # Extract response details
+            response_type = message["content"].get("response_type")
+            response_data = message["content"].get("response_data", {})
+            request_id = message["content"].get("request_id")
+            
+            # Log response
+            logger.info("Received %s response for request %s", 
+                       response_type, request_id)
+            
+            # Process response based on type
+            # This would typically update some internal state or trigger a callback
+            # For now, just log the response
+            logger.info("Response data: %s", json.dumps(response_data))
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "_handle_response",
+                    "message": message
+                }
+            )
     
     async def _handle_notification(self, message: Dict[str, Any]) -> None:
         """
@@ -298,31 +479,42 @@ class AgentInterface:
         Args:
             message: The notification message
         """
-        # Extract notification details
-        notification_type = message["content"].get("notification_type")
-        notification_data = message["content"].get("notification_data", {})
-        
-        # Log notification
-        logger.info("Received %s notification from %s", 
-                   notification_type, message["sender_id"])
-        
-        # Process notification based on type
-        if notification_type == "task_status_change":
-            # Update task status
-            task_id = notification_data.get("task_id")
-            new_status = notification_data.get("new_status")
+        try:
+            # Extract notification details
+            notification_type = message["content"].get("notification_type")
+            notification_data = message["content"].get("notification_data", {})
             
-            logger.info("Task %s status changed to %s", task_id, new_status)
-        
-        elif notification_type == "agent_status_change":
-            # Update agent status
-            agent_id = notification_data.get("agent_id")
-            new_status = notification_data.get("new_status")
+            # Log notification
+            logger.info("Received %s notification from %s", 
+                       notification_type, message["sender_id"])
             
-            logger.info("Agent %s status changed to %s", agent_id, new_status)
-        
-        else:
-            logger.info("Received notification: %s", json.dumps(notification_data))
+            # Process notification based on type
+            if notification_type == "task_status_change":
+                # Update task status
+                task_id = notification_data.get("task_id")
+                new_status = notification_data.get("new_status")
+                
+                logger.info("Task %s status changed to %s", task_id, new_status)
+            
+            elif notification_type == "agent_status_change":
+                # Update agent status
+                agent_id = notification_data.get("agent_id")
+                new_status = notification_data.get("new_status")
+                
+                logger.info("Agent %s status changed to %s", agent_id, new_status)
+            
+            else:
+                logger.info("Received notification: %s", json.dumps(notification_data))
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "_handle_notification",
+                    "message": message
+                }
+            )
     
     async def _handle_query(self, message: Dict[str, Any]) -> None:
         """
@@ -331,45 +523,56 @@ class AgentInterface:
         Args:
             message: The query message
         """
-        # Extract query details
-        query_type = message["content"].get("query_type")
-        query_data = message["content"].get("query_data", {})
-        
-        # Process query based on type
-        if query_type == "capability_query":
-            # Return agent capabilities
-            await self.send_message(
-                message["sender_id"],
-                MessageType.RESPONSE.value,
-                {
-                    "response_type": "capability_query",
-                    "response_data": {
-                        "agent_id": self.agent_id,
-                        "agent_type": self.agent_type,
-                        "capabilities": self.capabilities
-                    },
-                    "request_id": message["message_id"]
+        try:
+            # Extract query details
+            query_type = message["content"].get("query_type")
+            query_data = message["content"].get("query_data", {})
+            
+            # Process query based on type
+            if query_type == "capability_query":
+                # Return agent capabilities
+                await self.send_message(
+                    message["sender_id"],
+                    MessageType.RESPONSE.value,
+                    {
+                        "response_type": "capability_query",
+                        "response_data": {
+                            "agent_id": self.agent_id,
+                            "agent_type": self.agent_type,
+                            "capabilities": self.capabilities
+                        },
+                        "request_id": message["message_id"]
+                    }
+                )
+            
+            elif query_type == "status_query":
+                # Return agent status
+                await self.send_message(
+                    message["sender_id"],
+                    MessageType.RESPONSE.value,
+                    {
+                        "response_type": "status_query",
+                        "response_data": {
+                            "agent_id": self.agent_id,
+                            "status": "active",
+                            "current_tasks": []
+                        },
+                        "request_id": message["message_id"]
+                    }
+                )
+            
+            else:
+                logger.warning("Unknown query type: %s", query_type)
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "_handle_query",
+                    "message": message
                 }
             )
-        
-        elif query_type == "status_query":
-            # Return agent status
-            await self.send_message(
-                message["sender_id"],
-                MessageType.RESPONSE.value,
-                {
-                    "response_type": "status_query",
-                    "response_data": {
-                        "agent_id": self.agent_id,
-                        "status": "active",
-                        "current_tasks": []
-                    },
-                    "request_id": message["message_id"]
-                }
-            )
-        
-        else:
-            logger.warning("Unknown query type: %s", query_type)
     
     async def _handle_feedback(self, message: Dict[str, Any]) -> None:
         """
@@ -378,26 +581,37 @@ class AgentInterface:
         Args:
             message: The feedback message
         """
-        # Extract feedback details
-        feedback_type = message["content"].get("feedback_type")
-        feedback_data = message["content"].get("feedback_data", {})
-        
-        # Log feedback
-        logger.info("Received %s feedback from %s", 
-                   feedback_type, message["sender_id"])
-        
-        # Process feedback based on type
-        if feedback_type == "task_result_feedback":
-            # Process feedback on task result
-            task_id = feedback_data.get("task_id")
-            rating = feedback_data.get("rating")
-            comments = feedback_data.get("comments")
+        try:
+            # Extract feedback details
+            feedback_type = message["content"].get("feedback_type")
+            feedback_data = message["content"].get("feedback_data", {})
             
-            logger.info("Received feedback for task %s: rating=%s, comments=%s", 
-                       task_id, rating, comments)
-        
-        else:
-            logger.info("Received feedback: %s", json.dumps(feedback_data))
+            # Log feedback
+            logger.info("Received %s feedback from %s", 
+                       feedback_type, message["sender_id"])
+            
+            # Process feedback based on type
+            if feedback_type == "task_result_feedback":
+                # Process feedback on task result
+                task_id = feedback_data.get("task_id")
+                rating = feedback_data.get("rating")
+                comments = feedback_data.get("comments")
+                
+                logger.info("Received feedback for task %s: rating=%s, comments=%s", 
+                           task_id, rating, comments)
+            
+            else:
+                logger.info("Received feedback: %s", json.dumps(feedback_data))
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "_handle_feedback",
+                    "message": message
+                }
+            )
     
     async def _handle_consensus_vote(self, message: Dict[str, Any]) -> None:
         """
@@ -406,28 +620,39 @@ class AgentInterface:
         Args:
             message: The consensus vote message
         """
-        # Extract vote details
-        decision_id = message["content"].get("decision_id")
-        vote = message["content"].get("vote")
-        confidence = message["content"].get("confidence")
-        
-        # Log vote
-        logger.info("Received consensus vote from %s for decision %s: %s (confidence: %s)", 
-                   message["sender_id"], decision_id, vote, confidence)
-        
-        # This would typically be handled by a consensus mechanism
-        # For now, just acknowledge the vote
-        await self.send_message(
-            message["sender_id"],
-            MessageType.NOTIFICATION.value,
-            {
-                "notification_type": "vote_acknowledged",
-                "notification_data": {
-                    "decision_id": decision_id,
-                    "vote_received": True
+        try:
+            # Extract vote details
+            decision_id = message["content"].get("decision_id")
+            vote = message["content"].get("vote")
+            confidence = message["content"].get("confidence")
+            
+            # Log vote
+            logger.info("Received consensus vote from %s for decision %s: %s (confidence: %s)", 
+                       message["sender_id"], decision_id, vote, confidence)
+            
+            # This would typically be handled by a consensus mechanism
+            # For now, just acknowledge the vote
+            await self.send_message(
+                message["sender_id"],
+                MessageType.NOTIFICATION.value,
+                {
+                    "notification_type": "vote_acknowledged",
+                    "notification_data": {
+                        "decision_id": decision_id,
+                        "vote_received": True
+                    }
                 }
-            }
-        )
+            )
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "_handle_consensus_vote",
+                    "message": message
+                }
+            )
     
     async def _handle_conflict_resolution(self, message: Dict[str, Any]) -> None:
         """
@@ -436,27 +661,38 @@ class AgentInterface:
         Args:
             message: The conflict resolution message
         """
-        # Extract conflict details
-        conflict_id = message["content"].get("conflict_id")
-        resolution = message["content"].get("resolution")
-        
-        # Log resolution
-        logger.info("Received conflict resolution from %s for conflict %s: %s", 
-                   message["sender_id"], conflict_id, resolution)
-        
-        # This would typically update the agent's understanding of a conflict
-        # For now, just acknowledge the resolution
-        await self.send_message(
-            message["sender_id"],
-            MessageType.NOTIFICATION.value,
-            {
-                "notification_type": "resolution_acknowledged",
-                "notification_data": {
-                    "conflict_id": conflict_id,
-                    "acknowledged": True
+        try:
+            # Extract conflict details
+            conflict_id = message["content"].get("conflict_id")
+            resolution = message["content"].get("resolution")
+            
+            # Log resolution
+            logger.info("Received conflict resolution from %s for conflict %s: %s", 
+                       message["sender_id"], conflict_id, resolution)
+            
+            # This would typically update the agent's understanding of a conflict
+            # For now, just acknowledge the resolution
+            await self.send_message(
+                message["sender_id"],
+                MessageType.NOTIFICATION.value,
+                {
+                    "notification_type": "resolution_acknowledged",
+                    "notification_data": {
+                        "conflict_id": conflict_id,
+                        "acknowledged": True
+                    }
                 }
-            }
-        )
+            )
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "_handle_conflict_resolution",
+                    "message": message
+                }
+            )
     
     async def _handle_status_update(self, message: Dict[str, Any]) -> None:
         """
@@ -465,33 +701,44 @@ class AgentInterface:
         Args:
             message: The status update message
         """
-        # Extract status details
-        status_type = message["content"].get("status_type")
-        status_data = message["content"].get("status_data", {})
-        
-        # Log status update
-        logger.info("Received %s status update from %s", 
-                   status_type, message["sender_id"])
-        
-        # Process status update based on type
-        if status_type == "agent_status":
-            # Update agent status in registry
-            agent_id = message["sender_id"]
-            status = status_data.get("status")
+        try:
+            # Extract status details
+            status_type = message["content"].get("status_type")
+            status_data = message["content"].get("status_data", {})
             
-            if agent_id in self.agent_registry:
-                # This would update some status tracking
-                logger.info("Agent %s status updated to %s", agent_id, status)
-        
-        elif status_type == "task_status":
-            # Update task status
-            task_id = status_data.get("task_id")
-            status = status_data.get("status")
+            # Log status update
+            logger.info("Received %s status update from %s", 
+                       status_type, message["sender_id"])
             
-            logger.info("Task %s status updated to %s", task_id, status)
-        
-        else:
-            logger.info("Received status update: %s", json.dumps(status_data))
+            # Process status update based on type
+            if status_type == "agent_status":
+                # Update agent status in registry
+                agent_id = message["sender_id"]
+                status = status_data.get("status")
+                
+                if agent_id in self.agent_registry:
+                    # This would update some status tracking
+                    logger.info("Agent %s status updated to %s", agent_id, status)
+            
+            elif status_type == "task_status":
+                # Update task status
+                task_id = status_data.get("task_id")
+                status = status_data.get("status")
+                
+                logger.info("Task %s status updated to %s", task_id, status)
+            
+            else:
+                logger.info("Received status update: %s", json.dumps(status_data))
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.PROCESSING,
+                severity=ErrorSeverity.ERROR,
+                context={
+                    "action": "_handle_status_update",
+                    "message": message
+                }
+            )
     
     def register_message_handler(self, message_type: str, 
                                handler: Callable[[Dict[str, Any]], Awaitable[None]]) -> None:
