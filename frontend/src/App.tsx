@@ -59,7 +59,7 @@ import {
   InsertChart as InsightsIcon,
 } from '@mui/icons-material';
 import { styled, useTheme, alpha } from '@mui/material/styles';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { theme } from './theme';
@@ -71,14 +71,8 @@ import { TransitionWrapper } from './components/common/TransitionWrapper';
 import Layout from './components/Layout';
 import Home from './routes/Home';
 import ModelDashboard from './components/ModelDashboard';
-import Analytics from './routes/Analytics';
 import Settings from './routes/Settings';
-import CodeAnalyzer from './components/CodeAnalyzer';
-import AgentActivityPanel from './components/agents/AgentActivityPanel';
-import AgentStatusPanel from './components/agents/AgentStatusPanel';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import AdminDashboard from './components/admin/AdminDashboard';
-import ErrorLogsPanel from './components/admin/ErrorLogsPanel';
 import errorLogger from './services/errorLogging';
 
 // Mission Control theme styling
@@ -184,13 +178,8 @@ const TaskProgressBar = styled(Box)(({ theme, progress = 0 }) => ({
 const navigation = [
   { name: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { name: 'Command Hub', icon: <TerminalIcon />, path: '/command-hub' },
-  { name: 'Agent Activities', icon: <AIIcon />, path: '/agent-activities' },
-  { name: 'Code Analysis', icon: <CodeIcon />, path: '/code-analysis' },
   { name: 'Design Hub', icon: <DesignIcon />, path: '/design-hub' },
-  { name: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' },
   { name: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-  { name: 'Admin Dashboard', icon: <SecurityIcon />, path: '/admin' },
-  { name: 'Mission Control', icon: <DashboardIcon />, path: '/mission-control' },
 ];
 
 // Error boundary wrapper for routes
@@ -557,11 +546,11 @@ function App() {
                                     </Button>
                                   </Paper>
                                 </Grid>
-                                <Grid item xs={12} md={4}>
-                                  <AgentStatusPanel onAgentSelect={handleAgentSelect} />
-                                </Grid>
                                 <Grid item xs={12}>
-                                  <AgentActivityPanel maxActivities={5} />
+                                  <Typography variant="h5" gutterBottom>Getting Started</Typography>
+                                  <Typography variant="body1" paragraph>
+                                    This is a temporary placeholder for the getting started section.
+                                  </Typography>
                                 </Grid>
                               </Grid>
                             </Box>
@@ -577,147 +566,10 @@ function App() {
                             />
                           </ErrorBoundary>
                         } />
-                        <Route path="/agent-activities" element={
-                          <ErrorBoundary componentName="AgentActivityPanel">
-                            <Box sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                              <Typography variant="h5" gutterBottom>Agent Activities</Typography>
-                              <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                                <AgentActivityPanel />
-                              </Box>
-                            </Box>
-                          </ErrorBoundary>
-                        } />
-                        <Route path="/analytics" element={
-                          <ErrorBoundary componentName="Analytics">
-                            <Analytics />
-                          </ErrorBoundary>
-                        } />
-                        <Route path="/code-analysis" element={
-                          <ErrorBoundary componentName="CodeAnalyzer">
-                            <CodeAnalyzer />
-                          </ErrorBoundary>
-                        } />
                         <Route path="/settings" element={
                           <ErrorBoundary componentName="Settings">
                             <Settings />
                           </ErrorBoundary>
-                        } />
-                        <Route path="/admin" element={
-                          <ErrorBoundary componentName="AdminDashboard">
-                            <AdminDashboard projectId="default" />
-                          </ErrorBoundary>
-                        } />
-                        <Route path="/mission-control" element={
-                          <Main open={open}>
-                            <DrawerHeader />
-                            <Box sx={{ p: 3 }}>
-                              <Grid container spacing={3}>
-                                <Grid item xs={12}>
-                                  <Paper sx={{ p: 2, mb: 3 }}>
-                                    <Typography variant="h4" gutterBottom>ADE Mission Control</Typography>
-                                    <Typography variant="body1" color="text.secondary">
-                                      Coordinate and monitor specialized AI agents across your development workflow
-                                    </Typography>
-                                  </Paper>
-                                </Grid>
-                                <Grid item xs={12} md={8}>
-                                  <Grid container spacing={3} direction="column">
-                                    <Grid item>
-                                      <Paper 
-                                        sx={{ 
-                                          p: 2, 
-                                          height: '700px', 
-                                          display: 'flex',
-                                          flexDirection: 'column'
-                                        }}
-                                      >
-                                        <Typography variant="h6" sx={{ mb: 2 }}>Agent Communication Hub</Typography>
-                                        <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
-                                          <LiveChat 
-                                            activeAgent="assistant" 
-                                            onError={(error) => {
-                                              errorLogger.logFrontendError(
-                                                `LiveChat error: ${error.message || 'Unknown error'}`,
-                                                'ERROR',
-                                                'LiveChat',
-                                                { error }
-                                              );
-                                              setAlertMessage(`Communication error: ${error.message || 'Unknown error'}`);
-                                              setAlertSeverity('error');
-                                              setAlertOpen(true);
-                                            }}
-                                          />
-                                        </Box>
-                                      </Paper>
-                                    </Grid>
-                                    <Grid item>
-                                      <Paper sx={{ p: 2, mt: 3 }}>
-                                        <CommandHub
-                                          onSave={(design) => {
-                                            console.log('Design saved:', design);
-                                            setAlertMessage('Design saved successfully');
-                                            setAlertSeverity('success');
-                                            setAlertOpen(true);
-                                          }}
-                                          onGenerateCode={(design) => {
-                                            console.log('Generating code from design:', design);
-                                            setAlertMessage('Code generation started');
-                                            setAlertSeverity('info');
-                                            setAlertOpen(true);
-                                          }}
-                                          isGenerating={false}
-                                          activeAgent="developer"
-                                        />
-                                      </Paper>
-                                    </Grid>
-                                  </Grid>
-                                </Grid>
-                                <Grid item xs={12} md={4}>
-                                  <Grid container spacing={3} direction="column">
-                                    <Grid item>
-                                      <AgentStatusPanel 
-                                        onAgentSelect={(agent) => {
-                                          setAlertMessage(`Selected agent: ${agent.name}`);
-                                          setAlertSeverity('info');
-                                          setAlertOpen(true);
-                                        }}
-                                      />
-                                    </Grid>
-                                    <Grid item>
-                                      <AgentActivityPanel 
-                                        onActivitySelect={(activity) => {
-                                          setAlertMessage(`Activity: ${activity.action} by ${activity.agentName}`);
-                                          setAlertSeverity('info');
-                                          setAlertOpen(true);
-                                          
-                                          // Log info about the selected activity
-                                          if (activity.status === 'error') {
-                                            errorLogger.logAgentError(
-                                              `User viewed error activity: ${activity.action}`,
-                                              'INFO',
-                                              'MissionControl',
-                                              { activityId: activity.id }
-                                            );
-                                          }
-                                        }}
-                                      />
-                                    </Grid>
-                                  </Grid>
-                                </Grid>
-                              </Grid>
-                            </Box>
-                          </Main>
-                        } />
-                        <Route path="/admin/error-logs" element={
-                          <ProtectedRoute>
-                            <Main open={open}>
-                              <DrawerHeader />
-                              <Box sx={{ p: 3 }}>
-                                <Typography variant="h4" sx={{ mb: 3 }}>Error Monitoring</Typography>
-                                <ErrorLogsPanel />
-                              </Box>
-                            </Main>
-                          </ProtectedRoute>
                         } />
                         <Route path="*" element={<Navigate to="/" replace />} />
                       </Routes>
@@ -762,7 +614,10 @@ function App() {
                         </Paper>
                       </Grid>
                       <Grid item xs={12} sx={{ height: '35%' }}>
-                        <AgentStatusPanel onAgentSelect={handleAgentSelect} />
+                        <Typography variant="h6" gutterBottom>Agent Status</Typography>
+                        <Typography variant="body1" paragraph>
+                          This is a temporary placeholder for the agent status section.
+                        </Typography>
                       </Grid>
                     </Grid>
                   </Grid>

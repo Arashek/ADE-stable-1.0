@@ -12,11 +12,23 @@ from typing import Dict, List, Any, Optional
 import json
 import asyncio
 import traceback
+import time
+from datetime import datetime
 from pathlib import Path
 
 # Add project root to path for imports
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
+
+# Import services
+try:
+    from backend.services.task_allocator import get_task_allocator, TaskStatus, TaskPriority, TaskComplexity
+    from backend.services.agent_cache import get_agent_cache
+    task_allocator_available = True
+    agent_cache_available = True
+except ImportError:
+    task_allocator_available = False
+    agent_cache_available = False
 
 # Import error logging system
 try:
@@ -61,7 +73,19 @@ class AgentCoordinator:
         self.active_tasks = {}
         self.task_history = []
         self.errors = []
+        
+        # Initialize services if available
+        self.task_allocator = get_task_allocator() if task_allocator_available else None
+        self.agent_cache = get_agent_cache() if agent_cache_available else None
+        
+        # Set up agent statuses
+        self.agent_statuses = {}
+        
         logger.info("Agent Coordinator initialized")
+        if self.task_allocator:
+            logger.info("Task Allocator service connected")
+        if self.agent_cache:
+            logger.info("Agent Cache service connected")
     
     def log_error(self, error: Any, category: str = ErrorCategory.COORDINATION, 
                   severity: str = ErrorSeverity.ERROR, context: Dict[str, Any] = None):
@@ -117,6 +141,19 @@ class AgentCoordinator:
                 return False
                 
             self.agents[agent_type] = agent_instance
+            
+            # Initialize agent status
+            self.agent_statuses[agent_type] = {
+                "type": agent_type,
+                "status": "available",
+                "capabilities": getattr(agent_instance, 'capabilities', []),
+                "specialization": agent_type,
+                "performance": 1.0,
+                "performance_by_type": {},
+                "last_update": datetime.now().isoformat(),
+                "id": agent_type  # Use type as ID for simplicity
+            }
+            
             logger.info(f"Registered agent of type: {agent_type}")
             return True
         except Exception as e:
@@ -139,11 +176,74 @@ class AgentCoordinator:
             Dict: Task information including ID and status
         """
         try:
+            # Generate task ID
             task_id = f"task_{len(self.task_history) + 1}"
             task_type = task_data.get("type", "unknown")
             
-            # Determine which agent should handle this task
-            agent_type = self._determine_agent_type(task_type, task_data)
+            # Check cache if enabled
+            if self.agent_cache:
+                prompt = task_data.get("prompt", "")
+                context = task_data.get("context", {})
+                
+                # Try to get from cache
+                cache_hit, cached_response, processing_time = await self.agent_cache.get(task_type, prompt, context)
+                
+                if cache_hit:
+                    logger.info(f"Cache hit for task type {task_type}, returning cached response")
+                    # Create a completed task entry for the history
+                    task_entry = {
+                        "id": task_id,
+                        "type": task_type,
+                        "agent_type": task_type,  # Use task type as agent type for cached responses
+                        "status": "completed",
+                        "data": task_data,
+                        "result": cached_response,
+                        "cached": True,
+                        "processing_time": processing_time
+                    }
+                    
+                    # Store in task history
+                    self.task_history.append(task_entry)
+                    
+                    return {
+                        "task_id": task_id,
+                        "status": "completed",
+                        "result": cached_response,
+                        "cached": True,
+                        "processing_time": processing_time
+                    }
+            
+            # If not in cache or cache not available, proceed with normal task allocation
+            
+            # If task allocator is available, use it to determine agent type
+            if self.task_allocator:
+                # Prepare task for allocator
+                task_entry = {
+                    "id": task_id,
+                    "type": task_type,
+                    "status": TaskStatus.PENDING,
+                    "priority": task_data.get("priority", TaskPriority.MEDIUM),
+                    "complexity": task_data.get("complexity", TaskComplexity.MODERATE),
+                    "data": task_data,
+                    "required_capabilities": task_data.get("required_capabilities", [])
+                }
+                
+                # Get agent allocations
+                allocations = await self.task_allocator.allocate_tasks([task_entry], list(self.agent_statuses.values()))
+                
+                # Find which agent was allocated this task
+                agent_type = None
+                for agent_id, task_ids in allocations.items():
+                    if task_id in task_ids:
+                        agent_type = agent_id
+                        break
+                
+                # If no agent was allocated, use fallback method
+                if not agent_type:
+                    agent_type = self._determine_agent_type(task_type, task_data)
+            else:
+                # Use fallback method
+                agent_type = self._determine_agent_type(task_type, task_data)
             
             if agent_type not in self.agents:
                 error_msg = f"No agent available for type: {agent_type}"
@@ -166,12 +266,18 @@ class AgentCoordinator:
                 "agent_type": agent_type,
                 "status": "started",
                 "data": task_data,
-                "result": None
+                "result": None,
+                "start_time": time.time()
             }
             
             # Store in active tasks
             self.active_tasks[task_id] = task_entry
             self.task_history.append(task_entry)
+            
+            # Update agent status
+            if agent_type in self.agent_statuses:
+                self.agent_statuses[agent_type]["status"] = "busy"
+                self.agent_statuses[agent_type]["last_update"] = datetime.now().isoformat()
             
             # Log the task start
             logger.info(f"Started task {task_id} of type {task_type} with agent {agent_type}")
@@ -208,6 +314,11 @@ class AgentCoordinator:
         """
         try:
             if task_id not in self.active_tasks:
+                # Check task history
+                for task in self.task_history:
+                    if task["id"] == task_id:
+                        return task
+                
                 logger.warning(f"Task {task_id} not found")
                 return {
                     "task_id": task_id,
@@ -249,6 +360,54 @@ class AgentCoordinator:
             
             if result is not None:
                 self.active_tasks[task_id]["result"] = result
+            
+            # Add processing time if task is completed
+            if status in ["completed", "failed"] and "start_time" in self.active_tasks[task_id]:
+                processing_time = time.time() - self.active_tasks[task_id]["start_time"]
+                self.active_tasks[task_id]["processing_time"] = processing_time
+                
+                # Cache successful results if cache is available
+                if status == "completed" and self.agent_cache:
+                    task_data = self.active_tasks[task_id]["data"]
+                    prompt = task_data.get("prompt", "")
+                    context = task_data.get("context", {})
+                    
+                    if prompt:  # Only cache if there's a prompt
+                        task_type = self.active_tasks[task_id]["type"]
+                        await self.agent_cache.set(
+                            task_type, 
+                            prompt, 
+                            result, 
+                            processing_time,
+                            context
+                        )
+                        logger.info(f"Cached result for task {task_id} of type {task_type}")
+            
+            # Update agent status if task is completed or failed
+            if status in ["completed", "failed"]:
+                agent_type = self.active_tasks[task_id]["agent_type"]
+                if agent_type in self.agent_statuses:
+                    self.agent_statuses[agent_type]["status"] = "available"
+                    self.agent_statuses[agent_type]["last_update"] = datetime.now().isoformat()
+                    
+                    # Update agent performance metrics
+                    if "performance_by_type" not in self.agent_statuses[agent_type]:
+                        self.agent_statuses[agent_type]["performance_by_type"] = {}
+                    
+                    task_type = self.active_tasks[task_id]["type"]
+                    is_success = status == "completed"
+                    
+                    if task_type not in self.agent_statuses[agent_type]["performance_by_type"]:
+                        self.agent_statuses[agent_type]["performance_by_type"][task_type] = 1.0 if is_success else 0.5
+                    else:
+                        # Adjust performance score (success improves, failure reduces)
+                        current = self.agent_statuses[agent_type]["performance_by_type"][task_type]
+                        if is_success:
+                            # Increase performance score (up to 2.0 max)
+                            self.agent_statuses[agent_type]["performance_by_type"][task_type] = min(2.0, current * 1.1)
+                        else:
+                            # Decrease performance score (to min 0.5)
+                            self.agent_statuses[agent_type]["performance_by_type"][task_type] = max(0.5, current * 0.9)
                 
             logger.info(f"Updated task {task_id} status to {status}")
             
@@ -258,6 +417,8 @@ class AgentCoordinator:
                                   if task["id"] == task_id), None)
                 if task_index is not None:
                     self.task_history[task_index] = self.active_tasks[task_id]
+                    # Remove from active tasks
+                    del self.active_tasks[task_id]
                 
                 # Log failed tasks as errors
                 if status == "failed" and result:
@@ -297,13 +458,29 @@ class AgentCoordinator:
                 severity = error.get("severity", "UNKNOWN")
                 error_counts[severity] = error_counts.get(severity, 0) + 1
             
+            # Get cache stats if available
+            cache_stats = None
+            if self.agent_cache:
+                cache_stats = await self.agent_cache.get_stats()
+            
             return {
                 "registered_agents": list(self.agents.keys()),
+                "agent_statuses": self.agent_statuses,
                 "active_tasks": len(self.active_tasks),
                 "total_tasks": len(self.task_history),
                 "errors": {
                     "total": len(self.errors),
                     "by_severity": error_counts
+                },
+                "services": {
+                    "task_allocator": {
+                        "available": task_allocator_available,
+                        "strategy": self.task_allocator.current_strategy_name if self.task_allocator else None
+                    },
+                    "agent_cache": {
+                        "available": agent_cache_available,
+                        "stats": cache_stats
+                    }
                 },
                 "status": "operational"
             }
@@ -319,9 +496,61 @@ class AgentCoordinator:
                 "error": f"Internal error: {str(e)}"
             }
     
+    async def optimize_allocation_strategy(self) -> str:
+        """
+        Optimize the task allocation strategy based on current workload
+        
+        Returns:
+            str: The chosen strategy name
+        """
+        if not self.task_allocator:
+            return "not_available"
+        
+        try:
+            # Convert tasks to format expected by allocator
+            tasks = []
+            for task_id, task in self.active_tasks.items():
+                tasks.append({
+                    "id": task_id,
+                    "type": task.get("type", "unknown"),
+                    "status": task.get("status", "pending"),
+                    "priority": task.get("priority", "medium"),
+                    "complexity": task.get("complexity", "moderate"),
+                    "required_capabilities": task.get("required_capabilities", [])
+                })
+            
+            # Add recent history tasks for better optimization
+            for task in self.task_history[-20:]:  # Last 20 tasks
+                if task["id"] not in self.active_tasks:
+                    tasks.append({
+                        "id": task["id"],
+                        "type": task.get("type", "unknown"),
+                        "status": "completed",  # Already completed
+                        "priority": task.get("priority", "medium"),
+                        "complexity": task.get("complexity", "moderate"),
+                        "required_capabilities": task.get("required_capabilities", [])
+                    })
+            
+            # Get optimal strategy
+            optimal_strategy = await self.task_allocator.suggest_optimal_strategy(tasks, list(self.agent_statuses.values()))
+            
+            # Apply the strategy
+            self.task_allocator.set_strategy(optimal_strategy)
+            logger.info(f"Optimized task allocation strategy to: {optimal_strategy}")
+            
+            return optimal_strategy
+        except Exception as e:
+            self.log_error(
+                error=e,
+                category=ErrorCategory.COORDINATION,
+                severity=ErrorSeverity.WARNING,
+                context={"action": "optimize_allocation_strategy"}
+            )
+            return "error"
+    
     def _determine_agent_type(self, task_type: str, task_data: Dict[str, Any]) -> str:
         """
-        Determine which agent type should handle a given task
+        Determine which agent type should handle a given task (fallback method)
         
         Args:
             task_type: Type of the task
@@ -349,7 +578,7 @@ class AgentCoordinator:
                 severity=ErrorSeverity.ERROR,
                 context={"action": "_determine_agent_type", "task_type": task_type}
             )
-            return "development"  # Default to development agent as fallback
+            return "development"  # Default fallback
 
 # Singleton instance of the agent coordinator
 _coordinator_instance = None
@@ -362,6 +591,8 @@ def get_coordinator() -> AgentCoordinator:
         AgentCoordinator: The singleton instance
     """
     global _coordinator_instance
+    
     if _coordinator_instance is None:
         _coordinator_instance = AgentCoordinator()
+    
     return _coordinator_instance

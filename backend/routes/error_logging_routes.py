@@ -6,13 +6,22 @@ These routes enable capturing frontend errors and providing error analytics.
 from fastapi import APIRouter, Depends, Query, HTTPException, Body
 from typing import Dict, List, Optional, Any
 from datetime import datetime
-from pydantic import BaseModel, Field
 from auth.auth import get_current_user, require_admin
 from utils.error_logging import (
     log_error, get_recent_errors, get_error_by_id, 
     ErrorCategory, ErrorSeverity
 )
 from config.logging_config import logger
+
+# Import API models
+from models.api_models import (
+    ErrorLogRequest,
+    ErrorLogResponse,
+    ErrorDetailResponse,
+    ErrorFilterRequest,
+    ErrorCategory,
+    ErrorSeverity
+)
 
 router = APIRouter(prefix="/error-logging", tags=["error-logging"])
 
@@ -25,50 +34,6 @@ async def error_logging_health():
         "system": "error-logging",
         "timestamp": datetime.utcnow().isoformat()
     }
-
-# Request/Response Models
-class ErrorLogRequest(BaseModel):
-    """Request model for logging errors from frontend or other sources"""
-    message: str
-    error_type: Optional[str] = None
-    category: str = ErrorCategory.UNKNOWN
-    severity: str = ErrorSeverity.ERROR
-    component: str = "frontend"
-    source: Optional[str] = None
-    stack_trace: Optional[str] = None
-    user_id: Optional[str] = None
-    request_id: Optional[str] = None
-    context: Dict[str, Any] = Field(default_factory=dict)
-
-class ErrorLogResponse(BaseModel):
-    """Response model for logged errors"""
-    error_id: str
-    timestamp: str
-    status: str = "recorded"
-
-class ErrorDetailResponse(BaseModel):
-    """Detailed error information response"""
-    error_id: str
-    timestamp: str
-    error_type: str
-    message: str
-    traceback: str
-    category: str
-    severity: str
-    component: str
-    source: Optional[str] = None
-    user_id: Optional[str] = None
-    request_id: Optional[str] = None
-    context: Dict[str, Any] = Field(default_factory=dict)
-
-class ErrorStatsResponse(BaseModel):
-    """Error statistics response"""
-    total_errors: int
-    by_category: Dict[str, int]
-    by_severity: Dict[str, int]
-    by_component: Dict[str, int]
-    recent_trend: List[Dict[str, Any]]
-
 
 # Error Logging Routes
 @router.post("/log", response_model=ErrorLogResponse)
@@ -113,19 +78,16 @@ async def create_error_log(
 
 @router.get("/recent", response_model=List[ErrorDetailResponse])
 async def get_recent_error_logs(
-    limit: int = Query(100, ge=1, le=1000),
-    category: Optional[str] = None,
-    severity: Optional[str] = None,
-    component: Optional[str] = None,
+    filter_params: ErrorFilterRequest = Depends(),
     current_user: Dict = Depends(require_admin)
 ):
     """Get recent error logs with optional filtering (admin only)"""
     try:
         errors = get_recent_errors(
-            limit=limit,
-            category=category,
-            severity=severity,
-            component=component
+            limit=filter_params.limit,
+            category=filter_params.category,
+            severity=filter_params.severity,
+            component=filter_params.component
         )
         return errors
     except Exception as e:

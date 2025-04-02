@@ -74,6 +74,9 @@ from services.coordination.agent_coordinator import AgentCoordinator
 from utils.error_logging import log_error, ErrorCategory, ErrorSeverity
 from routes.error_logging_routes import router as error_logging_router
 
+# Import validation middleware
+from middleware import add_validation_middleware
+
 # Configure logging
 logging.basicConfig(
     level=settings.LOG_LEVEL,
@@ -146,6 +149,15 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Allow exceptions to propagate to middleware
+app.middleware("http")
+async def catch_exceptions_middleware(request, call_next):
+    try:
+        return await call_next(request)
+    except Exception as e:
+        # Let the validation middleware handle this
+        raise
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -154,6 +166,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add validation middleware
+add_validation_middleware(app, debug_mode=settings.DEBUG)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")

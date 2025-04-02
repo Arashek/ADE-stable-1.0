@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from typing import List, Dict, Any, Optional
-from pydantic import BaseModel
 import asyncio
 import logging
 import uuid
@@ -13,27 +12,31 @@ from pathlib import Path
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+# Import API models
+from models.api_models import (
+    AgentStatusResponse, 
+    ConflictResolutionResponse,
+    ConsensusVoteRequest,
+    ConsensusDecisionResponse,
+    CoordinationStatusResponse,
+    CreateConsensusDecisionRequest,
+    ConflictResolutionRequest,
+    ErrorCategory,
+    ErrorSeverity,
+    ConsensusStatus
+)
+
 # Import error logging system
 try:
-    from scripts.basic_error_logging import log_error, ErrorCategory, ErrorSeverity
+    from scripts.basic_error_logging import log_error
     error_logging_available = True
 except ImportError:
     error_logging_available = False
-    # Define fallback error categories and severities
-    class ErrorCategory:
-        API = "API"
-        COORDINATION = "COORDINATION"
-        AGENT = "AGENT"
-        COMMUNICATION = "COMMUNICATION"
-        PROCESSING = "PROCESSING"
-        SYSTEM = "SYSTEM"
-        VALIDATION = "VALIDATION"
-    
-    class ErrorSeverity:
-        CRITICAL = "CRITICAL"
-        ERROR = "ERROR"
-        WARNING = "WARNING"
-        INFO = "INFO"
+    # Define fallback log_error function
+    def log_error(error, category=ErrorCategory.API, severity=ErrorSeverity.ERROR, 
+                 component="coordination_api", source=None, context=None):
+        logging.error(f"Error [{category}][{severity}]: {error}")
+        return str(uuid.uuid4())
 
 from services.coordination.agent_coordinator import AgentCoordinator
 from services.coordination.agent_registry import AgentRegistry
@@ -49,55 +52,12 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-# Models for API requests and responses
-class AgentStatusResponse(BaseModel):
-    id: str
-    type: str
-    status: str
-    capabilities: List[str]
-    last_activity: Optional[str] = None
-
-
-class ConflictResolutionResponse(BaseModel):
-    attribute: str
-    values: Dict[str, Any]
-    selected_value: Any
-    selected_agent: str
-    confidence: float
-
-
-class ConsensusVoteRequest(BaseModel):
-    option: Any
-    confidence: float
-    reasoning: str
-
-
-class ConsensusDecisionResponse(BaseModel):
-    id: str
-    key: str
-    description: str
-    options: List[Any]
-    selected_option: Optional[Any] = None
-    votes: List[Dict[str, Any]] = []
-    confidence: float = 0.0
-    status: str = "pending"
-
-
-class CoordinationStatusResponse(BaseModel):
-    active: bool
-    agents: List[AgentStatusResponse]
-    conflicts: List[ConflictResolutionResponse] = []
-    consensus_decisions: List[ConsensusDecisionResponse] = []
-    errors: Dict[str, Any] = {}
-
-
 # In-memory storage for active conflicts and consensus decisions
 # In a production environment, this would be stored in a database
 active_conflicts = []
 active_consensus_decisions = []
 coordination_active = False
 api_errors = []
-
 
 # Helper function to get agent coordinator instance
 def get_coordinator():
@@ -288,7 +248,7 @@ async def stop_coordination():
 
 @router.post("/consensus", response_model=ConsensusDecisionResponse)
 async def create_consensus_decision(
-    decision: Dict[str, Any] = Body(...),
+    decision: CreateConsensusDecisionRequest,
     coordinator: AgentCoordinator = Depends(get_coordinator)
 ):
     """
@@ -307,36 +267,23 @@ async def create_consensus_decision(
             )
             raise HTTPException(status_code=400, detail=error_msg)
         
-        # Validate required fields
-        required_fields = ["key", "description", "options"]
-        for field in required_fields:
-            if field not in decision:
-                error_msg = f"Missing required field: {field}"
-                log_api_error(
-                    error_msg,
-                    category=ErrorCategory.VALIDATION,
-                    severity=ErrorSeverity.ERROR,
-                    context={"action": "create_consensus_decision", "decision": decision}
-                )
-                raise HTTPException(status_code=400, detail=error_msg)
-        
         # Create decision object
         decision_id = str(uuid.uuid4())
         new_decision = {
             "id": decision_id,
-            "key": decision["key"],
-            "description": decision["description"],
-            "options": decision["options"],
+            "key": decision.key,
+            "description": decision.description,
+            "options": decision.options,
             "votes": [],
-            "status": "pending",
+            "status": ConsensusStatus.PENDING,
             "created_at": datetime.now().isoformat()
         }
         
         active_consensus_decisions.append(new_decision)
         
         # Start async process to collect votes if agents are specified
-        if "agents" in decision and isinstance(decision["agents"], list) and len(decision["agents"]) > 0:
-            asyncio.create_task(process_consensus_decision(decision_id, decision["agents"], coordinator))
+        if decision.agents and len(decision.agents) > 0:
+            asyncio.create_task(process_consensus_decision(decision_id, decision.agents, coordinator))
         
         return ConsensusDecisionResponse(
             id=new_decision["id"],
@@ -351,7 +298,7 @@ async def create_consensus_decision(
         raise
     
     except Exception as e:
-        error_context = {"action": "create_consensus_decision", "decision": decision}
+        error_context = {"action": "create_consensus_decision", "decision": decision.dict()}
         log_api_error(e, context=error_context)
         raise HTTPException(status_code=500, detail=f"Failed to create consensus decision: {str(e)}")
 
@@ -561,7 +508,7 @@ async def process_consensus_decision(decision_id: str, agents: List[str], coordi
 
 @router.post("/conflict")
 async def record_conflict_resolution(
-    conflict: Dict[str, Any] = Body(...),
+    conflict: ConflictResolutionRequest,
     coordinator: AgentCoordinator = Depends(get_coordinator)
 ):
     """
@@ -580,24 +527,11 @@ async def record_conflict_resolution(
             )
             raise HTTPException(status_code=400, detail=error_msg)
         
-        # Validate required fields
-        required_fields = ["attribute", "values", "selected_value", "selected_agent", "confidence"]
-        for field in required_fields:
-            if field not in conflict:
-                error_msg = f"Missing required field: {field}"
-                log_api_error(
-                    error_msg,
-                    category=ErrorCategory.VALIDATION,
-                    severity=ErrorSeverity.ERROR,
-                    context={"action": "record_conflict_resolution", "conflict": conflict}
-                )
-                raise HTTPException(status_code=400, detail=error_msg)
-        
         # Add timestamp
-        conflict["timestamp"] = datetime.now().isoformat()
+        conflict.timestamp = datetime.now().isoformat()
         
         # Add to active conflicts
-        active_conflicts.append(conflict)
+        active_conflicts.append(conflict.dict())
         
         return {"success": True, "message": "Conflict resolution recorded"}
     
@@ -606,7 +540,7 @@ async def record_conflict_resolution(
         raise
     
     except Exception as e:
-        error_context = {"action": "record_conflict_resolution", "conflict": conflict}
+        error_context = {"action": "record_conflict_resolution", "conflict": conflict.dict()}
         log_api_error(e, context=error_context)
         raise HTTPException(status_code=500, detail=f"Failed to record conflict resolution: {str(e)}")
 

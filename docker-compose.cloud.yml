@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "80:80"
+    restart: always
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    expose:
+      - "8000"
+    restart: always
+    environment:
+      - REDIS_URI=redis://redis:6379/0
+      - MONGODB_URI=mongodb://mongodb:27017/ade
+      - MONGODB_USER=${MONGODB_USER:-admin}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD:-changeme}
+      - MONGODB_DATABASE=ade
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-changeme}
+      - JWT_SECRET=${JWT_SECRET:-changeme}
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRATION=3600
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      - DEFAULT_OPENAI_MODEL=gpt-4
+      - DEFAULT_ANTHROPIC_MODEL=claude-3-opus-20240229
+      - DEFAULT_GOOGLE_MODEL=gemini-pro
+      - DEFAULT_PROVIDER_TIER=standard
+      - OLLAMA_SERVER_URL=http://ollama:11434
+      - RATE_LIMIT_REQUESTS=100
+      - RATE_LIMIT_PERIOD=60
+      - ENABLE_METRICS=true
+      - API_KEY_HEADER=X-API-Key
+      - ADE_PROJECT_DIR=projects
+      - USAGE_RETENTION_DAYS=90
+      - MODEL_SELECTION_STRATEGY=balanced
+      - DEFAULT_MODEL=llama2
+      - MAX_TOKENS=1000
+      - TEMPERATURE=0.7
+      - TOP_P=0.9
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - GITHUB_CALLBACK_URL=${GITHUB_CALLBACK_URL:-https://cloudev.ai/auth/github/callback}
+      - ENABLE_EMAIL_NOTIFICATIONS=${ENABLE_EMAIL_NOTIFICATIONS:-True}
+      - ENABLE_WAITLIST=${ENABLE_WAITLIST:-True}
+      - ENABLE_INVITATION_CODES=${ENABLE_INVITATION_CODES:-True}
+      - SKIP_AUTHENTICATION=${SKIP_AUTHENTICATION:-False}
+      - ALLOW_CORS=${ALLOW_CORS:-True}
+      - CORS_ORIGINS=${CORS_ORIGINS:-https://cloudev.ai}
+      - MAX_MEMORY_USAGE=0.8
+    depends_on:
+      - redis
+      - mongodb
+      - ollama
+
+  redis:
+    image: redis:alpine
+    command: redis-server --requirepass ${REDIS_PASSWORD:-changeme}
+    volumes:
+      - redis_data:/data
+    restart: always
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD:-changeme}
+      - MONGO_INITDB_DATABASE=ade
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  redis_data:
+  mongodb_data:
+  ollama_models:
