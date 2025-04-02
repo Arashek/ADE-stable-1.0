@@ -53,7 +53,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({ projectId }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ projectId }) => {
   const [tabValue, setTabValue] = React.useState(0);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -194,3 +194,5 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ projectId }) => 
     </Container>
   );
 };
+
+export default AdminDashboard;
