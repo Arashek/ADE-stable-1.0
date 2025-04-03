@@ -72,6 +72,7 @@ interface Task {
   id: string;
   title: string;
   description: string;
+  type: string;
   priority: 'high' | 'medium' | 'low';
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
   assignedAgent?: string;
@@ -118,7 +119,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
       const response = await fetch(`/api/agents?projectId=${projectId}`);
       const data = await response.json();
       setAgents(data.agents);
-    } catch (err) {
+    } catch (err: any) {
       setError('Failed to fetch agents');
     } finally {
       setLoading(false);
@@ -131,7 +132,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
       const response = await fetch(`/api/tasks?projectId=${projectId}`);
       const data = await response.json();
       setTasks(data.tasks);
-    } catch (err) {
+    } catch (err: any) {
       setError('Failed to fetch tasks');
     } finally {
       setLoading(false);
@@ -167,7 +168,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
       } else {
         throw new Error('Failed to create task');
       }
-    } catch (err) {
+    } catch (err: any) {
       setError('Failed to create task');
     }
   };
@@ -185,7 +186,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
       } else {
         throw new Error('Failed to start task');
       }
-    } catch (err) {
+    } catch (err: any) {
       setError('Failed to start task');
     }
   };
@@ -203,7 +204,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
       } else {
         throw new Error('Failed to stop task');
       }
-    } catch (err) {
+    } catch (err: any) {
       setError('Failed to stop task');
     }
   };
@@ -225,7 +226,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
       } else {
         throw new Error('Failed to assign agent');
       }
-    } catch (err) {
+    } catch (err: any) {
       setError('Failed to assign agent');
     }
   };
@@ -254,7 +255,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
           ? { ...task, coordinationFlow: flowId, status: 'in_progress' }
           : task
       ));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error starting coordination flow:', error);
       setError('Failed to start coordination flow');
     }
@@ -282,7 +283,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
           ? { ...task, coordinationFlow: undefined, status: 'pending' }
           : task
       ));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error stopping coordination flow:', error);
       setError('Failed to stop coordination flow');
     }

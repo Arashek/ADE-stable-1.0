@@ -317,7 +317,7 @@ const CodeReviewPanel: React.FC<{
       const result = await agentService.reviewCode({
         project_id: projectId,
         file_path: formData.filePath,
-        review_types: formData.reviewTypes,
+        review_types: formData.reviewTypes.map(type => type as ReviewType),
         focus_areas: formData.focusAreas.split('\n').filter(a => a.trim()),
       });
 
@@ -422,7 +422,7 @@ const TestingPanel: React.FC<{
       const result = await agentService.generateTests({
         project_id: projectId,
         file_path: formData.filePath,
-        test_types: formData.testTypes,
+        test_types: formData.testTypes.map(type => type as TestType),
         framework: formData.framework,
         coverage_target: formData.coverageTarget,
       });
@@ -534,7 +534,7 @@ const DocumentationPanel: React.FC<{
       const agentService = new AgentService();
       const result = await agentService.generateDocumentation({
         project_id: projectId,
-        doc_types: formData.docTypes,
+        doc_types: formData.docTypes.map(type => type as DocumentationType),
         format: formData.format,
         style: formData.style,
         include_examples: formData.includeExamples,

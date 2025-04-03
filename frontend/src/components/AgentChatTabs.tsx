@@ -11,7 +11,7 @@ import {
   Fade,
 } from '@mui/material';
 import {
-  Design as DesignIcon,
+  Palette as DesignIcon,
   Code as CodeIcon,
   Architecture as ArchitectureIcon,
   BugReport as BugReportIcon,

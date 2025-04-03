@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADE Platform Error Debug</title>
+  <script>
+    // Store original console methods
+    const originalConsole = {
+      log: console.log,
+      error: console.error,
+      warn: console.warn,
+      info: console.info
+    };
+
+    // Storage for captured logs
+    const capturedLogs = [];
+
+    // Override console methods to capture logs
+    console.log = function() {
+      capturedLogs.push({type: 'log', args: Array.from(arguments), time: new Date()});
+      originalConsole.log.apply(console, arguments);
+    };
+
+    console.error = function() {
+      capturedLogs.push({type: 'error', args: Array.from(arguments), time: new Date()});
+      originalConsole.error.apply(console, arguments);
+    };
+
+    console.warn = function() {
+      capturedLogs.push({type: 'warn', args: Array.from(arguments), time: new Date()});
+      originalConsole.warn.apply(console, arguments);
+    };
+
+    console.info = function() {
+      capturedLogs.push({type: 'info', args: Array.from(arguments), time: new Date()});
+      originalConsole.info.apply(console, arguments);
+    };
+
+    // Global error handler
+    window.onerror = function(message, source, lineno, colno, error) {
+      capturedLogs.push({
+        type: 'uncaught',
+        args: [{
+          message,
+          source,
+          lineno,
+          colno,
+          stack: error ? error.stack : ''
+        }],
+        time: new Date()
+      });
+      return false; // Let default error handling continue
+    };
+
+    // Function to display logs on page
+    function displayLogs() {
+      const logsContainer = document.getElementById('logs-container');
+      logsContainer.innerHTML = '';
+
+      capturedLogs.forEach(log => {
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry log-${log.type}`;
+        
+        // Log header with type and timestamp
+        const logHeader = document.createElement('div');
+        logHeader.className = 'log-header';
+        logHeader.innerHTML = `<span class="log-type">${log.type.toUpperCase()}</span> <span class="log-time">${log.time.toLocaleTimeString()}</span>`;
+        
+        // Log content
+        const logContent = document.createElement('div');
+        logContent.className = 'log-content';
+        
+        if (log.type === 'uncaught') {
+          const error = log.args[0];
+          logContent.innerHTML = `
+            <div><strong>Message:</strong> ${error.message}</div>
+            <div><strong>Source:</strong> ${error.source}</div>
+            <div><strong>Line:Column:</strong> ${error.lineno}:${error.colno}</div>
+            <div><strong>Stack:</strong> <pre>${error.stack || 'No stack trace available'}</pre></div>
+          `;
+        } else {
+          let content = '';
+          log.args.forEach(arg => {
+            if (typeof arg === 'object') {
+              try {
+                content += `<pre>${JSON.stringify(arg, null, 2)}</pre>`;
+              } catch (e) {
+                content += `<pre>${String(arg)}</pre>`;
+              }
+            } else {
+              content += `<div>${String(arg)}</div>`;
+            }
+          });
+          logContent.innerHTML = content;
+        }
+        
+        logEntry.appendChild(logHeader);
+        logEntry.appendChild(logContent);
+        logsContainer.appendChild(logEntry);
+      });
+    }
+
+    // Update logs every second
+    setInterval(displayLogs, 1000);
+
+    // Function to test frontend by loading React app
+    function testReactApp() {
+      try {
+        // Create an iframe to load the React app
+        const iframe = document.createElement('iframe');
+        iframe.src = 'http://localhost:3002';
+        iframe.style.width = '1px';
+        iframe.style.height = '1px';
+        iframe.style.position = 'absolute';
+        iframe.style.opacity = '0.01';
+        iframe.style.pointerEvents = 'none';
+        document.body.appendChild(iframe);
+
+        console.log('React app frame loaded for testing');
+        
+        // Access the iframe content to check for errors
+        setTimeout(() => {
+          try {
+            if (iframe.contentWindow && iframe.contentWindow.document) {
+              console.log('Successfully accessed React app iframe content');
+            }
+          } catch (err) {
+            console.error('Error accessing React app iframe:', err);
+          }
+        }, 5000);
+      } catch (err) {
+        console.error('Error creating test iframe:', err);
+      }
+    }
+
+    // Function to manually simulate errors
+    function simulateErrors() {
+      console.log('Starting error simulation');
+      
+      // 1. Regular console logs
+      console.log('This is a regular log message');
+      console.info('This is an info message');
+      console.warn('This is a warning message');
+      console.error('This is an error message');
+      
+      // 2. Object logging
+      console.log('Logging object:', { name: 'Test Object', value: 42, nested: { foo: 'bar' }});
+      
+      // 3. Error with stack trace
+      try {
+        throw new Error('This is a simulated error with stack trace');
+      } catch (err) {
+        console.error('Caught error:', err);
+      }
+      
+      // 4. Reference error (uncomment to test)
+      // nonExistentFunction();
+      
+      // 5. Type error
+      try {
+        const nullObj = null;
+        nullObj.someProperty = 'test';
+      } catch (err) {
+        console.error('Caught TypeError:', err);
+      }
+      
+      console.log('Error simulation complete');
+    }
+
+    // Initialize once DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Auto-run tests if query param is present
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('autorun') === 'true') {
+        simulateErrors();
+        testReactApp();
+      }
+    });
+  </script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    h1, h2 {
+      margin-top: 0;
+      color: #1976d2;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    
+    .button-row {
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 8px 16px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #1565c0;
+    }
+    
+    .logs-section {
+      margin-top: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .logs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      background-color: #f5f5f5;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .logs-container {
+      max-height: 600px;
+      overflow-y: auto;
+      background-color: #fafafa;
+    }
+    
+    .log-entry {
+      margin: 0;
+      padding: 10px 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+    
+    .log-type {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+    
+    .log-log .log-type {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+    
+    .log-info .log-type {
+      background-color: #e8f5e9;
+      color: #388e3c;
+    }
+    
+    .log-warn .log-type {
+      background-color: #fff8e1;
+      color: #f57f17;
+    }
+    
+    .log-error .log-type, .log-uncaught .log-type {
+      background-color: #ffebee;
+      color: #d32f2f;
+    }
+    
+    .log-time {
+      color: #757575;
+    }
+    
+    .log-content {
+      font-family: 'Consolas', 'Monaco', monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    
+    .log-content pre {
+      margin: 5px 0;
+      padding: 8px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    
+    .log-error .log-content, .log-uncaught .log-content {
+      color: #d32f2f;
+    }
+    
+    .instructions {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #e3f2fd;
+      border-left: 4px solid #1976d2;
+      border-radius: 2px;
+    }
+    
+    .code-block {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 10px 0;
+      overflow-x: auto;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .button-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ADE Platform Error Debug</h1>
+    
+    <div class="instructions">
+      <h2>Instructions</h2>
+      <p>This page helps diagnose errors in the ADE Platform frontend by capturing and displaying console logs and errors. You can use it to identify TypeScript errors and other issues.</p>
+      <p>The logs are automatically captured from the browser console and displayed below.</p>
+    </div>
+    
+    <div class="button-row">
+      <button onclick="simulateErrors()">Simulate Test Errors</button>
+      <button onclick="testReactApp()">Test React App</button>
+      <button onclick="capturedLogs.length = 0; displayLogs()">Clear Logs</button>
+    </div>
+    
+    <div class="logs-section">
+      <div class="logs-header">
+        <h2 style="margin: 0;">Console Logs</h2>
+        <span id="log-count"></span>
+      </div>
+      <div id="logs-container" class="logs-container">
+        <div class="log-entry log-info">
+          <div class="log-header">
+            <span class="log-type">INFO</span>
+            <span class="log-time">Waiting for logs...</span>
+          </div>
+          <div class="log-content">
+            Click "Simulate Test Errors" to generate test logs or "Test React App" to capture React errors.
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="code-block">
+      <h3>Quick References</h3>
+      <pre>
+// Common TypeScript import errors:
+- Using named imports when default exports exist
+- Using default imports when named exports exist
+- Incorrect file paths
+- Missing type definitions
+
+// Common React errors:
+- Props validation failures
+- Missing required props
+- Component state issues
+- Invalid JSX structure
+</pre>
+    </div>
+  </div>
+</body>
+</html>

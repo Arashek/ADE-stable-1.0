@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADE Error Logging Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      color: #333;
+    }
+    h1 { color: #1976d2; margin-bottom: 10px; }
+    h2 { color: #333; margin-top: 30px; font-size: 1.5em; }
+    .card {
+      background: #fff;
+      border-radius: 4px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-left: 4px solid #1976d2;
+    }
+    button {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+    }
+    button:hover { background: #1565c0; }
+    button.warning { background: #ff9800; }
+    button.warning:hover { background: #f57c00; }
+    button.error { background: #f44336; }
+    button.error:hover { background: #d32f2f; }
+    button.critical { background: #7b1fa2; }
+    button.critical:hover { background: #6a1b9a; }
+    
+    pre {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow: auto;
+    }
+    .status { margin-top: 10px; font-size: 14px; }
+    #errorLogs {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .log-item {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+      border-left: 3px solid #ddd;
+    }
+    .log-severity-INFO { 
+      background-color: #e3f2fd; 
+      border-left-color: #2196f3;
+    }
+    .log-severity-WARNING { 
+      background-color: #fff3e0; 
+      border-left-color: #ff9800;
+    }
+    .log-severity-ERROR { 
+      background-color: #ffebee; 
+      border-left-color: #f44336;
+    }
+    .log-severity-CRITICAL { 
+      background-color: #f3e5f5; 
+      border-left-color: #9c27b0;
+    }
+    .timestamp {
+      font-size: 12px;
+      color: #666;
+    }
+    .category-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+      margin-left: 5px;
+      background: #e0e0e0;
+    }
+    .tab-container {
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    .tab {
+      display: inline-block;
+      padding: 10px 15px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      margin-bottom: -1px;
+    }
+    .tab.active {
+      border-color: #ddd;
+      border-bottom-color: white;
+      background: white;
+      border-radius: 4px 4px 0 0;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>ADE Error Logging Test</h1>
+  <p>Test interface for ADE platform error logging and monitoring system</p>
+  
+  <div class="tab-container">
+    <div class="tab active" data-tab="error-generator">Error Generator</div>
+    <div class="tab" data-tab="error-logs">Error Logs</div>
+    <div class="tab" data-tab="api-test">API Test</div>
+  </div>
+  
+  <div id="error-generator" class="tab-content active">
+    <div class="card">
+      <h2>Generate Test Errors</h2>
+      <p>Use these buttons to generate different types of test errors in the system</p>
+      
+      <button type="button" class="info" data-severity="INFO" data-category="FRONTEND">
+        Log Info Message
+      </button>
+      <button type="button" class="warning" data-severity="WARNING" data-category="SYSTEM">
+        Log Warning Message
+      </button>
+      <button type="button" class="error" data-severity="ERROR" data-category="API">
+        Log Error Message
+      </button>
+      <button type="button" class="critical" data-severity="CRITICAL" data-category="DATABASE">
+        Log Critical Error
+      </button>
+      
+      <button type="button" id="generateTestData">
+        Generate Test Dataset
+      </button>
+      
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+  
+  <div id="error-logs" class="tab-content">
+    <div class="card">
+      <h2>Error Logs</h2>
+      <div class="actions">
+        <button type="button" id="refreshLogs">Refresh Logs</button>
+        <button type="button" id="clearLogs" class="warning">Clear All Logs</button>
+      </div>
+      <div id="errorLogs">Loading logs...</div>
+    </div>
+  </div>
+  
+  <div id="api-test" class="tab-content">
+    <div class="card">
+      <h2>Test API Endpoints</h2>
+      
+      <h3>Health Check</h3>
+      <button id="healthCheck">Check API Health</button>
+      <pre id="healthResult"></pre>
+      
+      <h3>Submit Test Prompt</h3>
+      <textarea id="promptInput" rows="3" style="width: 100%; margin-bottom: 10px;" placeholder="Enter a prompt here...">Create a simple calculator app</textarea>
+      <button id="submitPrompt">Submit Prompt</button>
+      <pre id="promptResult"></pre>
+    </div>
+  </div>
+
+  <script>
+    // API URL
+    const API_URL = 'http://localhost:8000';
+    
+    // Error message templates
+    const ERROR_MESSAGES = {
+      'INFO': [
+        'User logged in successfully',
+        'Configuration loaded',
+        'Cache refreshed',
+        'Background task completed'
+      ],
+      'WARNING': [
+        'Slow query detected',
+        'API rate limit approaching',
+        'High memory usage detected',
+        'Connection retry attempt'
+      ],
+      'ERROR': [
+        'Database connection failed',
+        'API request timed out',
+        'Invalid user input',
+        'Failed to process request'
+      ],
+      'CRITICAL': [
+        'System crash detected',
+        'Database corruption',
+        'Security breach detected',
+        'Fatal error in critical component'
+      ]
+    };
+    
+    // Components
+    const COMPONENTS = [
+      'UserInterface', 'APIClient', 'DatabaseConnector',
+      'AuthService', 'DataProcessor', 'ErrorHandler'
+    ];
+    
+    // Tab functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Set active tab
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Show active content
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(tab.dataset.tab).classList.add('active');
+        
+        // Load logs if error logs tab selected
+        if (tab.dataset.tab === 'error-logs') {
+          refreshErrorLogs();
+        }
+      });
+    });
+    
+    // Setup error buttons
+    document.querySelectorAll('button[data-severity]').forEach(button => {
+      button.addEventListener('click', () => {
+        const severity = button.dataset.severity;
+        const category = button.dataset.category;
+        const messages = ERROR_MESSAGES[severity] || ['Error occurred'];
+        const message = messages[Math.floor(Math.random() * messages.length)];
+        const component = COMPONENTS[Math.floor(Math.random() * COMPONENTS.length)];
+        
+        logError(message, category, severity, component);
+      });
+    });
+    
+    // Generate test data
+    document.getElementById('generateTestData').addEventListener('click', async () => {
+      setStatus('Generating test data...');
+      
+      try {
+        const response = await fetch(`${API_URL}/api/errors/generate-test-data`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ count: 20 })
+        });
+        
+        const data = await response.json();
+        setStatus(`Generated ${data.count} test errors`);
+      } catch (error) {
+        setStatus(`Error: ${error.message}`);
+      }
+    });
+    
+    // Refresh logs
+    document.getElementById('refreshLogs').addEventListener('click', () => {
+      refreshErrorLogs();
+    });
+    
+    // Clear logs
+    document.getElementById('clearLogs').addEventListener('click', async () => {
+      if (confirm('Are you sure you want to clear all error logs? This cannot be undone.')) {
+        setStatus('Clearing logs...');
+        
+        try {
+          const response = await fetch(`${API_URL}/api/errors`, {
+            method: 'DELETE'
+          });
+          
+          await response.json();
+          refreshErrorLogs();
+          setStatus('Logs cleared successfully');
+        } catch (error) {
+          setStatus(`Error: ${error.message}`);
+        }
+      }
+    });
+    
+    // Health check
+    document.getElementById('healthCheck').addEventListener('click', async () => {
+      const resultEl = document.getElementById('healthResult');
+      resultEl.textContent = 'Checking API health...';
+      
+      try {
+        const response = await fetch(`${API_URL}/health`);
+        const data = await response.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        resultEl.textContent = `Error: ${error.message}`;
+      }
+    });
+    
+    // Submit prompt
+    document.getElementById('submitPrompt').addEventListener('click', async () => {
+      const promptInput = document.getElementById('promptInput').value;
+      const resultEl = document.getElementById('promptResult');
+      
+      if (!promptInput.trim()) {
+        resultEl.textContent = 'Error: Prompt cannot be empty';
+        return;
+      }
+      
+      resultEl.textContent = 'Submitting prompt...';
+      
+      try {
+        const response = await fetch(`${API_URL}/api/prompt`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ prompt: promptInput })
+        });
+        
+        const data = await response.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+        
+        if (data.task_id) {
+          // Start polling for status updates
+          pollPromptStatus(data.task_id, resultEl);
+        }
+      } catch (error) {
+        resultEl.textContent = `Error: ${error.message}`;
+      }
+    });
+    
+    // Poll prompt status
+    async function pollPromptStatus(taskId, resultEl) {
+      let attempts = 0;
+      const maxAttempts = 60; // 2 minutes max (2s interval)
+      
+      const checkStatus = async () => {
+        try {
+          const response = await fetch(`${API_URL}/api/prompt/${taskId}`);
+          const data = await response.json();
+          
+          resultEl.textContent = JSON.stringify(data, null, 2);
+          
+          // Continue polling if not done
+          if (['submitted', 'analyzing', 'designing', 'generating', 'finalizing'].includes(data.status) && attempts < maxAttempts) {
+            attempts++;
+            setTimeout(checkStatus, 2000);
+          }
+        } catch (error) {
+          resultEl.textContent = `Error: ${error.message}`;
+        }
+      };
+      
+      // Start polling
+      setTimeout(checkStatus, 2000);
+    }
+    
+    // Log error
+    async function logError(message, category, severity, component) {
+      setStatus(`Logging ${severity} message...`);
+      
+      try {
+        const context = {
+          browser: navigator.userAgent,
+          url: window.location.href,
+          timestamp: new Date().toISOString()
+        };
+        
+        const response = await fetch(`${API_URL}/api/errors`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message,
+            category,
+            severity,
+            component,
+            context
+          })
+        });
+        
+        const data = await response.json();
+        setStatus(`${severity} message logged successfully`);
+      } catch (error) {
+        setStatus(`Error: ${error.message}`);
+      }
+    }
+    
+    // Refresh error logs
+    async function refreshErrorLogs() {
+      const logsContainer = document.getElementById('errorLogs');
+      logsContainer.innerHTML = 'Loading logs...';
+      
+      try {
+        const response = await fetch(`${API_URL}/api/errors`);
+        const data = await response.json();
+        
+        if (!data.errors || data.errors.length === 0) {
+          logsContainer.innerHTML = '<p>No error logs found</p>';
+          return;
+        }
+        
+        // Sort by timestamp (newest first)
+        data.errors.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        // Render logs
+        logsContainer.innerHTML = data.errors.map(error => `
+          <div class="log-item log-severity-${error.severity}">
+            <div class="timestamp">
+              ${formatTimestamp(error.timestamp)}
+              <span class="category-badge">${error.category}</span>
+              <span class="category-badge">${error.component}</span>
+            </div>
+            <div class="message">
+              <strong>${error.severity}:</strong> ${error.message}
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        logsContainer.innerHTML = `<p>Error loading logs: ${error.message}</p>`;
+      }
+    }
+    
+    // Set status
+    function setStatus(message) {
+      document.getElementById('status').textContent = message;
+    }
+    
+    // Format timestamp
+    function formatTimestamp(timestamp) {
+      try {
+        const date = new Date(timestamp);
+        return date.toLocaleString();
+      } catch (error) {
+        return timestamp;
+      }
+    }
+    
+    // Initial log refresh
+    if (document.querySelector('.tab.active').dataset.tab === 'error-logs') {
+      refreshErrorLogs();
+    }
+  </script>
+</body>
+</html>

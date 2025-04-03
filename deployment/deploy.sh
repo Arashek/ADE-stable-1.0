@@ -9,6 +9,18 @@ echo "         ADE Platform Cloud Deployment Script         "
 echo "======================================================"
 echo ""
 
+# Run pre-deployment checks first
+echo "Running pre-deployment checks..."
+chmod +x ./deployment/pre_deployment_check.sh
+./deployment/pre_deployment_check.sh
+if [ $? -ne 0 ]; then
+    echo "Pre-deployment checks failed. Please fix the issues before proceeding."
+    exit 1
+fi
+
+echo "Pre-deployment checks passed. Continuing with deployment..."
+echo ""
+
 # Check if .env.cloud file exists
 if [ ! -f ".env.cloud" ]; then
     echo "Error: .env.cloud file not found!"

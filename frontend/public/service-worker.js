@@ -1,9 +1,4 @@
-/// <reference lib="webworker" />
-/// <reference path="./service-worker.d.ts" />
-
-// This service worker is meant to run in a worker context, not in the browser window
-// eslint-disable-next-line no-restricted-globals
-const workerSelf = self as unknown as ServiceWorkerGlobalScopeExtension;
+// ADE Platform Service Worker
 
 const CACHE_NAME = 'ade-platform-v1';
 const STATIC_ASSETS = [
@@ -15,8 +10,8 @@ const STATIC_ASSETS = [
 ];
 
 // Performance tracking function
-const trackPerformance = (metricName: string, value: number) => {
-  workerSelf.clients.matchAll().then(clients => {
+const trackPerformance = (metricName, value) => {
+  self.clients.matchAll().then(clients => {
     clients.forEach(client => {
       client.postMessage({
         type: 'PERFORMANCE_METRIC',
@@ -31,7 +26,7 @@ const trackPerformance = (metricName: string, value: number) => {
 };
 
 // Install event - cache static assets
-workerSelf.addEventListener('install', (event: ExtendableEvent) => {
+self.addEventListener('install', (event) => {
   const startTime = performance.now();
   
   event.waitUntil(
@@ -45,7 +40,7 @@ workerSelf.addEventListener('install', (event: ExtendableEvent) => {
 });
 
 // Activate event - clean up old caches
-workerSelf.addEventListener('activate', (event: ExtendableEvent) => {
+self.addEventListener('activate', (event) => {
   const startTime = performance.now();
 
   event.waitUntil(
@@ -63,11 +58,11 @@ workerSelf.addEventListener('activate', (event: ExtendableEvent) => {
 });
 
 // Fetch event - serve from cache, falling back to network
-workerSelf.addEventListener('fetch', (event: FetchEvent) => {
+self.addEventListener('fetch', (event) => {
   const startTime = performance.now();
 
   // Skip cross-origin requests
-  if (!event.request.url.startsWith(workerSelf.location.origin)) {
+  if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
@@ -130,8 +125,8 @@ workerSelf.addEventListener('fetch', (event: FetchEvent) => {
 });
 
 // Handle messages from clients
-workerSelf.addEventListener('message', (event) => {
+self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
-    workerSelf.skipWaiting();
+    self.skipWaiting();
   }
 });

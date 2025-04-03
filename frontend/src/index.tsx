@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme, Theme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import './serviceWorker.js';
 
 declare module '@mui/material/styles' {
   interface Theme {

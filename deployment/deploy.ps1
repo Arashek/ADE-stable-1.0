@@ -7,6 +7,17 @@ Write-Host "         ADE Platform Cloud Deployment Script         " -ForegroundC
 Write-Host "======================================================" -ForegroundColor Cyan
 Write-Host ""
 
+# Run pre-deployment checks first
+Write-Host "Running pre-deployment checks..." -ForegroundColor Cyan
+& ".\deployment\pre_deployment_check.ps1"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Pre-deployment checks failed. Please fix the issues before proceeding." -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "Pre-deployment checks passed. Continuing with deployment..." -ForegroundColor Green
+Write-Host ""
+
 # Check if .env.cloud file exists
 if (-not (Test-Path -Path ".env.cloud")) {
     Write-Host "Error: .env.cloud file not found!" -ForegroundColor Red

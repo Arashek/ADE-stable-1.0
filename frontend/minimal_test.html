@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADE Platform Test Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            margin: 10px 0;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .log-entry {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .log-critical {
+            border-left: 5px solid #ff0000;
+        }
+        .log-error {
+            border-left: 5px solid #ff7700;
+        }
+        .log-warning {
+            border-left: 5px solid #ffcc00;
+        }
+        .log-info {
+            border-left: 5px solid #0099ff;
+        }
+        .tab-container {
+            margin-top: 20px;
+        }
+        .tab-buttons {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        .tab-buttons button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 16px;
+            transition: 0.3s;
+            font-size: 16px;
+            margin: 0;
+            color: #333;
+        }
+        .tab-buttons button:hover {
+            background-color: #ddd;
+        }
+        .tab-buttons button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>ADE Platform Test Dashboard</h1>
+    
+    <div class="tab-container">
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="openTab(event, 'api-test')">API Test</button>
+            <button class="tab-button" onclick="openTab(event, 'error-logs')">Error Logs</button>
+            <button class="tab-button" onclick="openTab(event, 'prompt-workflow')">Prompt Workflow</button>
+        </div>
+        
+        <div id="api-test" class="tab-content active">
+            <div id="health-check">
+                <h2>Health Check</h2>
+                <button id="check-health">Check Health</button>
+                <div id="health-result"></div>
+            </div>
+            
+            <div id="prompt-test">
+                <h2>Prompt Test</h2>
+                <textarea id="prompt-input" placeholder="Enter your prompt here..."></textarea>
+                <button id="submit-prompt">Submit Prompt</button>
+                <div id="prompt-result"></div>
+            </div>
+            
+            <div id="status-test">
+                <h2>Check Status</h2>
+                <input type="text" id="task-id" placeholder="Enter task ID">
+                <button id="check-status">Check Status</button>
+                <div id="status-result"></div>
+            </div>
+        </div>
+        
+        <div id="error-logs" class="tab-content">
+            <h2>Error Logs</h2>
+            <div>
+                <button id="refresh-logs">Refresh Logs</button>
+                <select id="filter-severity">
+                    <option value="all">All Severities</option>
+                    <option value="CRITICAL">Critical</option>
+                    <option value="ERROR">Error</option>
+                    <option value="WARNING">Warning</option>
+                    <option value="INFO">Info</option>
+                </select>
+                <select id="filter-category">
+                    <option value="all">All Categories</option>
+                    <option value="AGENT">Agent</option>
+                    <option value="API">API</option>
+                    <option value="FRONTEND">Frontend</option>
+                    <option value="SYSTEM">System</option>
+                </select>
+            </div>
+            
+            <div id="error-logs-container">
+                <!-- Error logs will be displayed here -->
+                <div class="log-entry log-error">
+                    <strong>Error:</strong> Failed to process prompt (API)<br>
+                    <strong>Time:</strong> 2025-04-02 23:15:30<br>
+                    <strong>Component:</strong> promptService<br>
+                    <button onclick="toggleDetails(this)">Show Details</button>
+                    <div class="log-details" style="display:none;">
+                        <pre>{ "promptPreview": "Create a weather app", "statusCode": 500 }</pre>
+                    </div>
+                </div>
+                
+                <div class="log-entry log-warning">
+                    <strong>Warning:</strong> Slow response time (SYSTEM)<br>
+                    <strong>Time:</strong> 2025-04-02 23:10:15<br>
+                    <strong>Component:</strong> agentCoordinator<br>
+                    <button onclick="toggleDetails(this)">Show Details</button>
+                    <div class="log-details" style="display:none;">
+                        <pre>{ "responseTime": 5.2, "threshold": 3.0 }</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="prompt-workflow" class="tab-content">
+            <h2>Prompt-to-Application Workflow</h2>
+            
+            <div>
+                <h3>Enter Prompt</h3>
+                <textarea id="workflow-prompt" placeholder="Describe the application you want to create..." rows="5"></textarea>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                    <button id="reset-workflow">Reset</button>
+                    <button id="start-workflow">Start Processing</button>
+                </div>
+            </div>
+            
+            <div id="workflow-status" style="display: none; margin-top: 20px;">
+                <h3>Processing Status</h3>
+                <div id="workflow-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Analyze Requirements</div>
+                            <div class="step-status">Waiting...</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Design Architecture</div>
+                            <div class="step-status">Waiting...</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Generate Code</div>
+                            <div class="step-status">Waiting...</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Finalize</div>
+                            <div class="step-status">Waiting...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="workflow-result" style="margin-top: 20px; display: none;">
+                    <h3>Generated Application</h3>
+                    <div id="result-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        function openTab(evt, tabName) {
+            // Hide all tab content
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            // Deactivate all tab buttons
+            const tabButtons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            // Show the specific tab content
+            document.getElementById(tabName).classList.add("active");
+            
+            // Activate the button that opened the tab
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // Toggle details visibility
+        function toggleDetails(button) {
+            const details = button.nextElementSibling;
+            if (details.style.display === "none") {
+                details.style.display = "block";
+                button.textContent = "Hide Details";
+            } else {
+                details.style.display = "none";
+                button.textContent = "Show Details";
+            }
+        }
+        
+        // Health check
+        document.getElementById('check-health').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.innerHTML = 'Loading...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">Success!</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">Error: ${error.message}</div>
+                `;
+            }
+        });
+        
+        // Submit prompt
+        document.getElementById('submit-prompt').addEventListener('click', async () => {
+            const promptInput = document.getElementById('prompt-input').value;
+            const resultDiv = document.getElementById('prompt-result');
+            
+            if (!promptInput) {
+                resultDiv.innerHTML = '<div class="error">Please enter a prompt</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Submitting...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: promptInput })
+                });
+                
+                const data = await response.json();
+                
+                // Auto-fill the task ID field
+                if (data.task_id) {
+                    document.getElementById('task-id').value = data.task_id;
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="success">Prompt submitted!</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">Error: ${error.message}</div>
+                `;
+            }
+        });
+        
+        // Check status
+        document.getElementById('check-status').addEventListener('click', async () => {
+            const taskId = document.getElementById('task-id').value;
+            const resultDiv = document.getElementById('status-result');
+            
+            if (!taskId) {
+                resultDiv.innerHTML = '<div class="error">Please enter a task ID</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Checking...';
+            
+            try {
+                const response = await fetch(`http://localhost:8000/api/prompt/${taskId}`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">Status retrieved!</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">Error: ${error.message}</div>
+                `;
+            }
+        });
+        
+        // Workflow simulation
+        document.getElementById('start-workflow').addEventListener('click', () => {
+            const prompt = document.getElementById('workflow-prompt').value;
+            
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+            
+            // Show workflow status
+            document.getElementById('workflow-status').style.display = 'block';
+            
+            // Reset steps
+            const steps = document.querySelectorAll('.step-status');
+            steps.forEach(step => {
+                step.textContent = 'Waiting...';
+                step.parentElement.parentElement.classList.remove('active');
+            });
+            
+            // Hide result
+            document.getElementById('workflow-result').style.display = 'none';
+            
+            // Simulate workflow
+            simulateWorkflow();
+        });
+        
+        // Reset workflow
+        document.getElementById('reset-workflow').addEventListener('click', () => {
+            document.getElementById('workflow-prompt').value = '';
+            document.getElementById('workflow-status').style.display = 'none';
+            document.getElementById('workflow-result').style.display = 'none';
+        });
+        
+        // Simulate workflow steps
+        function simulateWorkflow() {
+            const steps = document.querySelectorAll('.step');
+            const prompt = document.getElementById('workflow-prompt').value;
+            
+            // Process steps with delays
+            let currentStep = 0;
+            
+            const processNextStep = () => {
+                if (currentStep < steps.length) {
+                    // Update step
+                    const step = steps[currentStep];
+                    const statusElement = step.querySelector('.step-status');
+                    step.classList.add('active');
+                    statusElement.textContent = 'Processing...';
+                    
+                    // Simulate processing time (2-4 seconds per step)
+                    const processingTime = 2000 + Math.random() * 2000;
+                    
+                    setTimeout(() => {
+                        statusElement.textContent = 'Completed';
+                        currentStep++;
+                        processNextStep();
+                    }, processingTime);
+                } else {
+                    // All steps completed
+                    showResult(prompt);
+                }
+            };
+            
+            // Start processing
+            processNextStep();
+        }
+        
+        // Show simulated result
+        function showResult(prompt) {
+            const resultDiv = document.getElementById('workflow-result');
+            const contentDiv = document.getElementById('result-content');
+            
+            // Generate a simple "application" based on the prompt
+            const title = prompt.split(' ').slice(0, 3).join(' ') + '...';
+            
+            contentDiv.innerHTML = `
+                <h4>${title}</h4>
+                <p>Application has been generated based on your prompt:</p>
+                <pre>console.log("Hello from ADE Platform!");
+console.log("This application was generated from your prompt.");
+console.log("Prompt: ${prompt.substring(0, 50)}${prompt.length > 50 ? '...' : ''}");</pre>
+                <button>Download Generated Code</button>
+            `;
+            
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -11,7 +11,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  ThemeProvider,
   CssBaseline,
   Divider,
   Tooltip,
@@ -25,6 +24,7 @@ import {
   Chip,
   Snackbar,
   Alert,
+  AlertColor,
   Grid,
 } from '@mui/material';
 import {
@@ -59,10 +59,22 @@ import {
   InsertChart as InsightsIcon,
 } from '@mui/icons-material';
 import { styled, useTheme, alpha } from '@mui/material/styles';
-import { createTheme, ThemeProvider } from '@mui/material';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { createTheme, Theme } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 
-import { theme } from './theme';
+// Define prop interfaces for styled components
+interface AppBarStyledProps {
+  open?: boolean;
+}
+
+interface MainProps {
+  open?: boolean;
+}
+
+interface TaskProgressBarProps {
+  progress?: number;
+}
+
 import CommandHub from './components/CommandHub';
 import LiveChat from './components/LiveChat';
 import { LoadingStates } from './components/common/LoadingStates';
@@ -74,11 +86,15 @@ import ModelDashboard from './components/ModelDashboard';
 import Settings from './routes/Settings';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import errorLogger from './services/errorLogging';
+import TestApi from './TestApi';
+import PromptProcessor from './components/PromptProcessor';
+import ErrorMonitoringDashboard from './components/ErrorMonitoringDashboard';
+import ConsoleCapture from './components/debug/ConsoleCapture';
 
 // Mission Control theme styling
 const drawerWidth = 260;
 
-const openedMixin = (theme) => ({
+const openedMixin = (theme: Theme) => ({
   width: drawerWidth,
   transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
@@ -89,7 +105,7 @@ const openedMixin = (theme) => ({
   borderRight: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
 });
 
-const closedMixin = (theme) => ({
+const closedMixin = (theme: Theme) => ({
   transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -110,7 +126,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 const AppBarStyled = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
+})<AppBarStyledProps>(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
   boxShadow: 'none',
   backdropFilter: 'blur(8px)',
@@ -130,7 +146,11 @@ const AppBarStyled = styled(AppBar, {
   }),
 }));
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+interface MainProps {
+  open?: boolean;
+}
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<MainProps>(
   ({ theme, open }) => ({
     flexGrow: 1,
     transition: theme.transitions.create('margin', {
@@ -158,7 +178,9 @@ const StatusBar = styled(Box)(({ theme }) => ({
   backdropFilter: 'blur(8px)',
 }));
 
-const TaskProgressBar = styled(Box)(({ theme, progress = 0 }) => ({
+const TaskProgressBar = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'progress',
+})<TaskProgressBarProps>(({ theme, progress = 0 }) => ({
   position: 'relative',
   height: '3px',
   width: '100%',
@@ -194,18 +216,19 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   const [open, setOpen] = useState(true);
-  const [activeAgent, setActiveAgent] = useState('assistant');
+  const [activeAgent, setActiveAgent] = useState('assistant'); // assistant, designer, developer, or advisor
   const [isGenerating, setIsGenerating] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [notificationsCount, setNotificationsCount] = useState(3);
   const [currentProject, setCurrentProject] = useState('ADE Frontend');
   const [buildProgress, setBuildProgress] = useState(0);
   const [systemStatus, setSystemStatus] = useState('idle');
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const [alertSeverity, setAlertSeverity] = useState('info');
+  const [alertSeverity, setAlertSeverity] = useState<AlertColor>('info');
+  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   // Auto-close drawer on mobile
@@ -238,7 +261,7 @@ function App() {
     }
   }, [isGenerating]);
 
-  const showAlert = (message, severity = 'info') => {
+  const showAlert = (message: string, severity: AlertColor = 'info') => {
     setAlertMessage(message);
     setAlertSeverity(severity);
     setAlertOpen(true);
@@ -297,459 +320,474 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-          <AppBarStyled position="fixed" open={open} color="transparent">
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="toggle drawer"
-                onClick={handleDrawerToggle}
-                edge="start"
-                sx={{ mr: 2 }}
-              >
-                {open ? <ChevronLeftIcon /> : <MenuIcon />}
-              </IconButton>
-              
-              <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: 'text.primary' }}>
-                ADE Platform <Chip label={currentProject} size="small" sx={{ ml: 1 }} />
-              </Typography>
-              
-              <ButtonGroup variant="outlined" size="small" sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}>
-                {isGenerating ? (
-                  <Button 
-                    startIcon={<StopIcon />} 
-                    color="error"
-                    onClick={handleStopGeneration}
-                  >
-                    Stop Build
-                  </Button>
-                ) : (
-                  <Button 
-                    startIcon={<RunIcon />} 
-                    color="primary"
-                    onClick={() => handleCodeGeneration({})}
-                  >
-                    Build MVP
-                  </Button>
-                )}
-                <Button startIcon={<SaveIcon />} onClick={() => handleDesignSave({})}>
-                  Save
-                </Button>
-              </ButtonGroup>
-              
-              <Tooltip title="Toggle chat">
-                <IconButton color="inherit" onClick={handleToggleChatPanel} sx={{ color: 'text.primary' }}>
-                  <Badge color="error" variant="dot" invisible={!chatOpen}>
-                    <ChatIcon />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-              
-              <Tooltip title="Notifications">
-                <IconButton color="inherit" sx={{ ml: 1, color: 'text.primary' }}>
-                  <Badge badgeContent={notificationsCount} color="error">
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-              
-              <Tooltip title="Switch agent">
-                <IconButton 
-                  onClick={handleMenuOpen}
-                  sx={{ 
-                    ml: 1,
-                    color: 'text.primary',
-                    bgcolor: 'action.selected',
-                    '&:hover': { bgcolor: 'action.hover' }
-                  }}
+    <Router>
+      <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+        <AppBarStyled position="fixed" open={open} color="transparent">
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="toggle drawer"
+              onClick={handleDrawerToggle}
+              edge="start"
+              sx={{ mr: 2 }}
+            >
+              {open ? <ChevronLeftIcon /> : <MenuIcon />}
+            </IconButton>
+            
+            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: 'text.primary' }}>
+              ADE Platform <Chip label={currentProject} size="small" sx={{ ml: 1 }} />
+            </Typography>
+            
+            <ButtonGroup variant="outlined" size="small" sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}>
+              {isGenerating ? (
+                <Button 
+                  startIcon={<StopIcon />} 
+                  color="error"
+                  onClick={handleStopGeneration}
                 >
-                  {activeAgent === 'assistant' && <AIIcon />}
-                  {activeAgent === 'designer' && <DesignIcon />}
-                  {activeAgent === 'developer' && <CodeIcon />}
-                  {activeAgent === 'advisor' && <AdvisorIcon />}
-                </IconButton>
-              </Tooltip>
-              
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                  Stop Build
+                </Button>
+              ) : (
+                <Button 
+                  startIcon={<RunIcon />} 
+                  color="primary"
+                  onClick={() => handleCodeGeneration({})}
+                >
+                  Build MVP
+                </Button>
+              )}
+              <Button startIcon={<SaveIcon />} onClick={() => handleDesignSave({})}>
+                Save
+              </Button>
+            </ButtonGroup>
+            
+            <Tooltip title="Toggle chat">
+              <IconButton color="inherit" onClick={handleToggleChatPanel} sx={{ color: 'text.primary' }}>
+                <Badge color="error" variant="dot" invisible={!chatOpen}>
+                  <ChatIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+            
+            <Tooltip title="Notifications">
+              <IconButton color="inherit" sx={{ ml: 1, color: 'text.primary' }}>
+                <Badge badgeContent={notificationsCount} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+            
+            <Tooltip title="Switch agent">
+              <IconButton 
+                onClick={handleMenuOpen}
+                sx={{ 
+                  ml: 1,
+                  color: 'text.primary',
+                  bgcolor: 'action.selected',
+                  '&:hover': { bgcolor: 'action.hover' }
+                }}
               >
-                <MenuItem onClick={() => handleAgentSwitch('assistant')}>
-                  <ListItemIcon><AIIcon fontSize="small" /></ListItemIcon>
-                  Assistant Agent
-                </MenuItem>
-                <MenuItem onClick={() => handleAgentSwitch('designer')}>
-                  <ListItemIcon><DesignIcon fontSize="small" /></ListItemIcon>
-                  Designer Agent
-                </MenuItem>
-                <MenuItem onClick={() => handleAgentSwitch('developer')}>
-                  <ListItemIcon><CodeIcon fontSize="small" /></ListItemIcon>
-                  Developer Agent
-                </MenuItem>
-                <MenuItem onClick={() => handleAgentSwitch('advisor')}>
-                  <ListItemIcon><AdvisorIcon fontSize="small" /></ListItemIcon>
-                  Advisor Agent
-                </MenuItem>
-              </Menu>
-              
-              <Tooltip title={darkMode ? "Switch to light mode" : "Switch to dark mode"}>
-                <IconButton color="inherit" onClick={handleThemeToggle} sx={{ ml: 1, color: 'text.primary' }}>
-                  {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
-                </IconButton>
-              </Tooltip>
-            </Toolbar>
-            {isGenerating && (
-              <TaskProgressBar progress={buildProgress} />
-            )}
-          </AppBarStyled>
-          
-          <Drawer
-            variant={isMobile ? "temporary" : "permanent"}
-            open={open}
-            onClose={isMobile ? handleDrawerToggle : undefined}
-            sx={{
-              width: drawerWidth,
-              flexShrink: 0,
-              whiteSpace: 'nowrap',
-              boxSizing: 'border-box',
+                {activeAgent === 'assistant' && <AIIcon />}
+                {activeAgent === 'designer' && <DesignIcon />}
+                {activeAgent === 'developer' && <CodeIcon />}
+                {activeAgent === 'advisor' && <AdvisorIcon />}
+              </IconButton>
+            </Tooltip>
+            
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+              <MenuItem onClick={() => handleAgentSwitch('assistant')}>
+                <ListItemIcon><AIIcon fontSize="small" /></ListItemIcon>
+                Assistant Agent
+              </MenuItem>
+              <MenuItem onClick={() => handleAgentSwitch('designer')}>
+                <ListItemIcon><DesignIcon fontSize="small" /></ListItemIcon>
+                Designer Agent
+              </MenuItem>
+              <MenuItem onClick={() => handleAgentSwitch('developer')}>
+                <ListItemIcon><CodeIcon fontSize="small" /></ListItemIcon>
+                Developer Agent
+              </MenuItem>
+              <MenuItem onClick={() => handleAgentSwitch('advisor')}>
+                <ListItemIcon><AdvisorIcon fontSize="small" /></ListItemIcon>
+                Advisor Agent
+              </MenuItem>
+            </Menu>
+            
+            <Tooltip title={darkMode ? "Switch to light mode" : "Switch to dark mode"}>
+              <IconButton color="inherit" onClick={handleThemeToggle} sx={{ ml: 1, color: 'text.primary' }}>
+                {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
+              </IconButton>
+            </Tooltip>
+          </Toolbar>
+          {isGenerating && (
+            <TaskProgressBar progress={buildProgress} />
+          )}
+        </AppBarStyled>
+        
+        <Drawer
+          variant={isMobile ? "temporary" : "permanent"}
+          open={open}
+          onClose={isMobile ? handleDrawerToggle : undefined}
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
+            boxSizing: 'border-box',
+            ...(open && { ...openedMixin(theme) }),
+            ...(!open && { ...closedMixin(theme) }),
+            '& .MuiDrawer-paper': {
               ...(open && { ...openedMixin(theme) }),
               ...(!open && { ...closedMixin(theme) }),
-              '& .MuiDrawer-paper': {
-                ...(open && { ...openedMixin(theme) }),
-                ...(!open && { ...closedMixin(theme) }),
-              },
-            }}
-          >
-            <DrawerHeader>
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                width: '100%', 
-                justifyContent: 'space-between',
-                p: 1
-              }}>
-                {open && (
-                  <Typography variant="h6" color="text.primary" sx={{ fontWeight: 600 }}>
-                    ADE Platform
-                  </Typography>
-                )}
-              </Box>
-            </DrawerHeader>
-            <Divider />
-            <List>
-              {navigation.map((item) => (
-                <ListItem 
-                  button 
-                  key={item.name}
-                  component={Link}
-                  to={item.path}
-                  sx={{ 
-                    minHeight: 48,
-                    justifyContent: open ? 'initial' : 'center',
-                    px: 2.5,
+            },
+          }}
+        >
+          <DrawerHeader>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              width: '100%', 
+              justifyContent: 'space-between',
+              p: 1
+            }}>
+              {open && (
+                <Typography variant="h6" color="text.primary" sx={{ fontWeight: 600 }}>
+                  ADE Platform
+                </Typography>
+              )}
+            </Box>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            {navigation.map((item) => (
+              <ListItem 
+                button 
+                key={item.name}
+                component={Link}
+                to={item.path}
+                sx={{ 
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                  color: 'text.primary'
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : 'auto',
+                    justifyContent: 'center',
                     color: 'text.primary'
                   }}
                 >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : 'auto',
-                      justifyContent: 'center',
-                      color: 'text.primary'
-                    }}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
-                  {open && <ListItemText primary={item.name} />}
-                </ListItem>
-              ))}
-            </List>
-            <Divider />
-            {open && (
-              <Box sx={{ p: 2, mt: 'auto' }}>
-                <Typography variant="body2" color="text.secondary" align="center">
-                  ADE Platform v1.0
-                </Typography>
-              </Box>
-            )}
-          </Drawer>
-          
-          <Main open={open}>
-            <DrawerHeader />
-            <Box 
-              component="div" 
-              sx={{ 
-                p: { xs: 1, sm: 2, md: 3 },
-                display: 'flex',
-                flexDirection: 'column',
-                height: 'calc(100vh - 64px)'
-              }}
-            >
-              <Grid container spacing={2} sx={{ height: '100%', mb: 2 }}>
-                {/* Main content area - takes up all available space minus the right panel */}
-                <Grid item xs={12} md={chatOpen ? 8 : 12} sx={{ height: '100%' }}>
-                  <Paper 
-                    elevation={1} 
-                    sx={{ 
-                      height: '100%', 
-                      borderRadius: 2, 
-                      overflow: 'hidden', 
-                      display: 'flex',
-                      flexDirection: 'column'
-                    }}
-                  >
-                    <Box sx={{ flex: 1, overflow: 'auto' }}>
-                      <Routes>
-                        <Route path="/" element={
-                          <ErrorBoundary componentName="Home">
-                            <Box sx={{ p: 3 }}>
-                              <Grid container spacing={3}>
-                                <Grid item xs={12} md={8}>
-                                  <Paper 
-                                    elevation={2} 
+                  {item.icon}
+                </ListItemIcon>
+                {open && <ListItemText primary={item.name} />}
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          {open && (
+            <Box sx={{ p: 2, mt: 'auto' }}>
+              <Typography variant="body2" color="text.secondary" align="center">
+                ADE Platform v1.0
+              </Typography>
+            </Box>
+          )}
+        </Drawer>
+        
+        <Main open={open}>
+          <DrawerHeader />
+          <Box 
+            component="div" 
+            sx={{ 
+              p: { xs: 1, sm: 2, md: 3 },
+              display: 'flex',
+              flexDirection: 'column',
+              height: 'calc(100vh - 64px)'
+            }}
+          >
+            <Grid container spacing={2} sx={{ height: '100%', mb: 2 }}>
+              {/* Main content area - takes up all available space minus the right panel */}
+              <Grid item xs={12} md={chatOpen ? 8 : 12} sx={{ height: '100%' }}>
+                <Paper 
+                  elevation={1} 
+                  sx={{ 
+                    height: '100%', 
+                    borderRadius: 2, 
+                    overflow: 'hidden', 
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                >
+                  <Box sx={{ flex: 1, overflow: 'auto' }}>
+                    <Routes>
+                      <Route path="/" element={
+                        <ErrorBoundary componentName="Home">
+                          <Box sx={{ p: 3 }}>
+                            <Grid container spacing={3}>
+                              <Grid item xs={12} md={8}>
+                                <Paper 
+                                  elevation={2} 
+                                  sx={{ 
+                                    p: 3, 
+                                    borderRadius: 2, 
+                                    height: '100%',
+                                    background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                                    color: 'white'
+                                  }}
+                                >
+                                  <Typography variant="h4" gutterBottom fontWeight="bold">
+                                    Welcome to ADE Platform
+                                  </Typography>
+                                  <Typography variant="body1" paragraph>
+                                    Use specialized AI agents to build your application faster than ever before.
+                                  </Typography>
+                                  <Button 
+                                    variant="contained" 
+                                    color="primary" 
+                                    size="large"
+                                    component={Link}
+                                    to="/command-hub"
                                     sx={{ 
-                                      p: 3, 
-                                      borderRadius: 2, 
-                                      height: '100%',
-                                      background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                                      color: 'white'
+                                      mt: 2, 
+                                      bgcolor: 'white', 
+                                      color: '#2196F3',
+                                      '&:hover': {
+                                        bgcolor: 'rgba(255,255,255,0.9)',
+                                      }
                                     }}
                                   >
-                                    <Typography variant="h4" gutterBottom fontWeight="bold">
-                                      Welcome to ADE Platform
-                                    </Typography>
-                                    <Typography variant="body1" paragraph>
-                                      Use specialized AI agents to build your application faster than ever before.
-                                    </Typography>
-                                    <Button 
-                                      variant="contained" 
-                                      color="primary" 
-                                      size="large"
-                                      component={Link}
-                                      to="/command-hub"
-                                      sx={{ 
-                                        mt: 2, 
-                                        bgcolor: 'white', 
-                                        color: '#2196F3',
-                                        '&:hover': {
-                                          bgcolor: 'rgba(255,255,255,0.9)',
-                                        }
-                                      }}
-                                    >
-                                      Launch Command Hub
-                                    </Button>
-                                  </Paper>
-                                </Grid>
-                                <Grid item xs={12}>
-                                  <Typography variant="h5" gutterBottom>Getting Started</Typography>
-                                  <Typography variant="body1" paragraph>
-                                    This is a temporary placeholder for the getting started section.
-                                  </Typography>
-                                </Grid>
+                                    Launch Command Hub
+                                  </Button>
+                                </Paper>
                               </Grid>
-                            </Box>
-                          </ErrorBoundary>
-                        } />
-                        <Route path="/command-hub/*" element={
-                          <ErrorBoundary componentName="CommandHub">
-                            <CommandHub 
-                              onSave={handleDesignSave} 
-                              onGenerateCode={handleCodeGeneration} 
-                              isGenerating={isGenerating} 
-                              activeAgent={activeAgent} 
-                            />
-                          </ErrorBoundary>
-                        } />
-                        <Route path="/settings" element={
-                          <ErrorBoundary componentName="Settings">
-                            <Settings />
-                          </ErrorBoundary>
-                        } />
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                      </Routes>
-                    </Box>
-                  </Paper>
-                </Grid>
-                
-                {/* Right side panel with chat and agent status - only visible when chatOpen is true */}
-                {chatOpen && (
-                  <Grid item xs={12} md={4} sx={{ height: '100%', display: { xs: 'none', md: 'block' } }}>
-                    <Grid container spacing={2} sx={{ height: '100%' }}>
-                      <Grid item xs={12} sx={{ height: '65%' }}>
-                        <Paper 
-                          elevation={1} 
-                          sx={{ 
-                            height: '100%', 
-                            borderRadius: 2, 
-                            overflow: 'hidden',
-                            display: 'flex',
-                            flexDirection: 'column'
-                          }}
-                        >
-                          <Box sx={{ 
-                            p: 2, 
-                            borderBottom: 1, 
-                            borderColor: 'divider',
-                            display: 'flex',
-                            justifyContent: 'space-between'
-                          }}>
-                            <Typography variant="h6">
-                              Agent Communication
-                            </Typography>
-                            <Tooltip title="Close chat">
-                              <IconButton size="small" onClick={handleToggleChatPanel}>
-                                <CloseIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
+                              <Grid item xs={12}>
+                                <Typography variant="h5" gutterBottom>Getting Started</Typography>
+                                <Typography variant="body1" paragraph>
+                                  This is a temporary placeholder for the getting started section.
+                                </Typography>
+                              </Grid>
+                            </Grid>
                           </Box>
-                          <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                            <LiveChat activeAgent={activeAgent} />
-                          </Box>
-                        </Paper>
-                      </Grid>
-                      <Grid item xs={12} sx={{ height: '35%' }}>
-                        <Typography variant="h6" gutterBottom>Agent Status</Typography>
-                        <Typography variant="body1" paragraph>
-                          This is a temporary placeholder for the agent status section.
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                )}
+                        </ErrorBoundary>
+                      } />
+                      <Route path="/command-hub/*" element={
+                        <ErrorBoundary componentName="CommandHub">
+                          <CommandHub 
+                            onSave={handleDesignSave} 
+                            onGenerateCode={handleCodeGeneration} 
+                            isGenerating={isGenerating} 
+                            activeAgent={activeAgent} 
+                          />
+                        </ErrorBoundary>
+                      } />
+                      <Route path="/settings" element={
+                        <ErrorBoundary componentName="Settings">
+                          <Settings />
+                        </ErrorBoundary>
+                      } />
+                      <Route path="/test-api" element={
+                        <ErrorBoundary componentName="TestApi">
+                          <TestApi />
+                        </ErrorBoundary>
+                      } />
+                      <Route path="/prompt-processor" element={
+                        <ErrorBoundary componentName="PromptProcessor">
+                          <PromptProcessor />
+                        </ErrorBoundary>
+                      } />
+                      <Route path="/error-monitoring" element={
+                        <ErrorBoundary componentName="ErrorMonitoringDashboard">
+                          <ErrorMonitoringDashboard />
+                        </ErrorBoundary>
+                      } />
+                      <Route path="*" element={<Navigate to="/" />} />
+                    </Routes>
+                  </Box>
+                </Paper>
               </Grid>
               
-              {/* Status bar at the bottom */}
-              <StatusBar>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Tooltip title="System status">
-                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                      <Box
-                        sx={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          mr: 1,
-                          backgroundColor: 
-                            systemStatus === 'building' ? 'primary.main' :
-                            systemStatus === 'completed' ? 'success.main' :
-                            systemStatus === 'error' ? 'error.main' :
-                            systemStatus === 'stopped' ? 'warning.main' :
-                            'text.disabled',
+              {/* Right side panel with chat and agent status - only visible when chatOpen is true */}
+              {chatOpen && (
+                <Grid item xs={12} md={4} sx={{ height: '100%', display: { xs: 'none', md: 'block' } }}>
+                  <Grid container spacing={2} sx={{ height: '100%' }}>
+                    <Grid item xs={12} sx={{ height: '65%' }}>
+                      <Paper 
+                        elevation={1} 
+                        sx={{ 
+                          height: '100%', 
+                          borderRadius: 2, 
+                          overflow: 'hidden',
+                          display: 'flex',
+                          flexDirection: 'column'
                         }}
-                      />
-                      <Typography variant="caption" color="text.secondary">
-                        {systemStatus === 'building' ? 'Building...' :
-                         systemStatus === 'completed' ? 'Build completed' :
-                         systemStatus === 'error' ? 'Build failed' :
-                         systemStatus === 'stopped' ? 'Build stopped' : 'Ready'}
+                      >
+                        <Box sx={{ 
+                          p: 2, 
+                          borderBottom: 1, 
+                          borderColor: 'divider',
+                          display: 'flex',
+                          justifyContent: 'space-between'
+                        }}>
+                          <Typography variant="h6">
+                            Agent Communication
+                          </Typography>
+                          <Tooltip title="Close chat">
+                            <IconButton size="small" onClick={handleToggleChatPanel}>
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                        <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                          <LiveChat activeAgent={activeAgent} />
+                        </Box>
+                      </Paper>
+                    </Grid>
+                    <Grid item xs={12} sx={{ height: '35%' }}>
+                      <Typography variant="h6" gutterBottom>Agent Status</Typography>
+                      <Typography variant="body1" paragraph>
+                        This is a temporary placeholder for the agent status section.
                       </Typography>
-                    </Box>
-                  </Tooltip>
-                  <Typography variant="caption" color="text.secondary">
-                    {isGenerating && `Build progress: ${Math.round(buildProgress)}%`}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Tooltip title="Active agent">
-                    <Chip 
-                      size="small" 
-                      icon={
-                        activeAgent === 'assistant' ? <AIIcon fontSize="small" /> :
-                        activeAgent === 'designer' ? <DesignIcon fontSize="small" /> :
-                        activeAgent === 'developer' ? <CodeIcon fontSize="small" /> :
-                        <AdvisorIcon fontSize="small" />
-                      } 
-                      label={`${activeAgent.charAt(0).toUpperCase() + activeAgent.slice(1)} Agent`}
-                      onClick={handleMenuOpen}
-                      sx={{ mr: 1 }}
+                    </Grid>
+                  </Grid>
+                </Grid>
+              )}
+            </Grid>
+            
+            {/* Status bar at the bottom */}
+            <StatusBar>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Tooltip title="System status">
+                  <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                    <Box
+                      sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        mr: 1,
+                        backgroundColor: 
+                          systemStatus === 'building' ? 'primary.main' :
+                          systemStatus === 'completed' ? 'success.main' :
+                          systemStatus === 'error' ? 'error.main' :
+                          systemStatus === 'stopped' ? 'warning.main' :
+                          'text.disabled',
+                      }}
                     />
-                  </Tooltip>
-                  <Tooltip title="Current project">
-                    <Chip size="small" label={currentProject} variant="outlined" />
-                  </Tooltip>
-                </Box>
-              </StatusBar>
-            </Box>
-          </Main>
-          
-          {/* Mobile chat toggle button */}
-          {!chatOpen && (
-            <Fab 
-              color="primary" 
-              aria-label="open chat"
-              onClick={handleToggleChatPanel}
-              sx={{ 
-                position: 'fixed', 
-                bottom: 16, 
-                right: 16,
-                display: { xs: 'flex', md: 'none' }
-              }}
-            >
-              <ChatIcon />
-            </Fab>
-          )}
-          
-          {/* Mobile format chat overlay */}
-          {chatOpen && (
-            <Box 
-              sx={{ 
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                bgcolor: 'background.paper',
-                zIndex: 9999,
-                display: { xs: 'flex', md: 'none' },
-                flexDirection: 'column',
-              }}
-            >
-              <Box sx={{ 
-                p: 2, 
-                borderBottom: 1, 
-                borderColor: 'divider',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
-                <Typography variant="h6">
-                  Agent Communication
+                    <Typography variant="caption" color="text.secondary">
+                      {systemStatus === 'building' ? 'Building...' :
+                       systemStatus === 'completed' ? 'Build completed' :
+                       systemStatus === 'error' ? 'Build failed' :
+                       systemStatus === 'stopped' ? 'Build stopped' : 'Ready'}
+                    </Typography>
+                  </Box>
+                </Tooltip>
+                <Typography variant="caption" color="text.secondary">
+                  {isGenerating && `Build progress: ${Math.round(buildProgress)}%`}
                 </Typography>
-                <IconButton onClick={handleToggleChatPanel}>
-                  <CloseIcon />
-                </IconButton>
               </Box>
-              <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                <LiveChat activeAgent={activeAgent} />
+              <Box>
+                <Tooltip title="Active agent">
+                  <Chip 
+                    size="small" 
+                    icon={
+                      activeAgent === 'assistant' ? <AIIcon fontSize="small" /> :
+                      activeAgent === 'designer' ? <DesignIcon fontSize="small" /> :
+                      activeAgent === 'developer' ? <CodeIcon fontSize="small" /> :
+                      <AdvisorIcon fontSize="small" />
+                    } 
+                    label={`${activeAgent.charAt(0).toUpperCase() + activeAgent.slice(1)} Agent`}
+                    onClick={handleMenuOpen}
+                    sx={{ mr: 1 }}
+                  />
+                </Tooltip>
+                <Tooltip title="Current project">
+                  <Chip size="small" label={currentProject} variant="outlined" />
+                </Tooltip>
               </Box>
-            </Box>
-          )}
-          
-          {/* Alert system */}
-          <Snackbar
-            open={alertOpen}
-            autoHideDuration={6000}
-            onClose={() => setAlertOpen(false)}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            </StatusBar>
+          </Box>
+        </Main>
+        
+        {/* Mobile chat toggle button */}
+        {!chatOpen && (
+          <Fab 
+            color="primary" 
+            aria-label="open chat"
+            onClick={handleToggleChatPanel}
+            sx={{ 
+              position: 'fixed', 
+              bottom: 16, 
+              right: 16,
+              display: { xs: 'flex', md: 'none' }
+            }}
           >
-            <Alert 
-              onClose={() => setAlertOpen(false)} 
-              severity={alertSeverity} 
-              variant="filled"
-              sx={{ width: '100%' }}
-            >
-              {alertMessage}
-            </Alert>
-          </Snackbar>
-        </Box>
-      </Router>
-    </ThemeProvider>
+            <ChatIcon />
+          </Fab>
+        )}
+        
+        {/* Mobile format chat overlay */}
+        {chatOpen && (
+          <Box 
+            sx={{ 
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              bgcolor: 'background.paper',
+              zIndex: 9999,
+              display: { xs: 'flex', md: 'none' },
+              flexDirection: 'column',
+            }}
+          >
+            <Box sx={{ 
+              p: 2, 
+              borderBottom: 1, 
+              borderColor: 'divider',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <Typography variant="h6">
+                Agent Communication
+              </Typography>
+              <IconButton onClick={handleToggleChatPanel}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <Box sx={{ flex: 1, overflow: 'hidden' }}>
+              <LiveChat activeAgent={activeAgent} />
+            </Box>
+          </Box>
+        )}
+        
+        {/* Debug Console Capture - displays errors in the UI */}
+        {process.env.NODE_ENV === 'development' && <ConsoleCapture />}
+        
+        {/* Alert system */}
+        <Snackbar
+          open={alertOpen}
+          autoHideDuration={6000}
+          onClose={() => setAlertOpen(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert 
+            onClose={() => setAlertOpen(false)} 
+            severity={alertSeverity} 
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            {alertMessage}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </Router>
   );
 }
 

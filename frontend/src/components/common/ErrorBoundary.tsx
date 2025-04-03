@@ -1,7 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Box, Typography, Button, Paper, Divider } from '@mui/material';
 import { Warning as WarningIcon } from '@mui/icons-material';
-import errorLoggingService, { ErrorCategory } from '../../services/error-logging.service';
+import { logError, ErrorCategory, ErrorSeverity } from '../../services/errorHandling';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -40,17 +40,17 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log the error to our error logging service
-    errorLoggingService.logError({
-      message: error.message,
-      error_type: error.name,
-      category: ErrorCategory.RENDERING,
-      severity: 'ERROR',
-      component: this.props.componentName,
-      stack_trace: error.stack,
-      context: {
+    logError(
+      error.message,
+      ErrorCategory.FRONTEND,
+      ErrorSeverity.ERROR,
+      this.props.componentName,
+      {
         componentStack: errorInfo.componentStack,
+        error_type: error.name
       },
-    });
+      error.stack
+    );
   }
 
   handleRetry = (): void => {
