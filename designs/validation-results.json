@@ -1,9 +1,0 @@
-{
-  "isValid": true,
-  "issues": [],
-  "warnings": [],
-  "suggestions": [
-    "Consider adding more components to create a richer user interface",
-    "Consider using consistent naming conventions for component IDs"
-  ]
-}
