@@ -6,7 +6,8 @@ These models provide strong type checking and validation for API interactions.
 """
 
 from typing import List, Dict, Any, Optional, Union, Literal
-from pydantic import BaseModel, Field, validator, root_validator
+from pydantic import BaseModel, Field, validator, model_validator, field_validator
+from pydantic_core import PydanticCustomError
 from datetime import datetime
 import uuid
 from enum import Enum
@@ -56,10 +57,11 @@ class BaseResponse(BaseModel):
     success: bool = True
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     
-    class Config:
-        json_encoders = {
+    model_config = {
+        "json_encoders": {
             datetime: lambda v: v.isoformat()
         }
+    }
 
 
 class ErrorResponse(BaseResponse):
@@ -171,8 +173,8 @@ class ConflictResolutionRequest(BaseModel):
             raise ValueError('At least one value must be provided')
         return v
     
-    @root_validator
-    def validate_selected_value(cls, values):
+    @model_validator(mode='after')
+    def validate_selected_value(cls, values) -> 'ConflictResolutionRequest':
         selected_agent = values.get('selected_agent')
         values_dict = values.get('values', {})
         

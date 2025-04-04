@@ -1,243 +1,197 @@
+# backend/main.py - Rewritten for clarity and Pydantic v2 compatibility
+
 import logging
 import logging.handlers
 import sys
 import os
-
-# Add the current directory to the Python path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse, Response
-from fastapi.exceptions import RequestValidationError
-from contextlib import asynccontextmanager
-import uvicorn
-
-# Import routes
+from pathlib import Path
+from dotenv import load_dotenv
 try:
-    from routes import error_logging_routes
-except ImportError:
-    logging.warning("Error logging routes could not be imported")
-    error_logging_routes = None
+    from config.settings import settings
+except ImportError as e:
+    print(f"FATAL: Error importing settings: {e}")
+    print("Ensure backend/config/settings.py exists and is configured correctly.")
+    sys.exit(1)
+except Exception as e: 
+    print(f"FATAL: Unexpected error during settings import/init: {e}")
+    sys.exit(1)
 
-try:
-    from routes import coordination_api
-except ImportError:
-    logging.warning("Coordination API routes could not be imported")
-    coordination_api = None
+# Settings import successful (or program exited)
 
-# Import services
-try:
-    from services.owner_panel_service import owner_panel_service
-except ImportError:
-    logging.warning("Owner panel service could not be imported")
-    owner_panel_service = None
-
-try:
-    from services.auth_service import auth_service
-except ImportError:
-    logging.warning("Auth service could not be imported")
-    auth_service = None
-
-# Import settings
-try:
-    from config.settings import CORS_ORIGINS, API_VERSION
-except ImportError:
-    logging.warning("Settings module could not be imported, using defaults")
-    CORS_ORIGINS = [
-        "http://localhost:3000",
-        "http://localhost:3001", 
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001"
-    ]
-    API_VERSION = "v1"
-
-from typing import Dict, Any
-import asyncio
-import psutil
-
-from config.settings import settings
-from routes.owner_panel_routes import router as owner_panel_router
-from routes.coordination_api import router as coordination_router
-from services.owner_panel_service import OwnerPanelService
-from services.coordination.agent_coordinator import AgentCoordinator
-# Temporarily disabled memory services for initial Owner Panel testing
-# from services.memory.memory_service import memory_service
-# from services.memory.api.memory_api import router as memory_router
-# Temporarily disabled visual perception for initial Owner Panel testing
-# from services.mcp.visual_perception_mcp import get_visual_perception_router
-# Temporarily disabled for local testing
-# from services.monitoring import metrics_middleware, metrics_endpoint, update_resource_metrics
-
-# Import error logging system
-from utils.error_logging import log_error, ErrorCategory, ErrorSeverity
-from routes.error_logging_routes import router as error_logging_router
-
-# Import validation middleware
-from middleware import add_validation_middleware
-
-# Configure logging
-logging.basicConfig(
-    level=settings.LOG_LEVEL,
-    format=settings.LOG_FORMAT,
-    handlers=[
-        logging.handlers.RotatingFileHandler(
-            settings.get_log_file_path(),
+# Logging setup (using logger)
+logger = logging.getLogger()
+logger.setLevel(settings.LOG_LEVEL.upper())
+# Hardcoding format string *again* as a temporary measure until env var is fully cleared
+log_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+# Revert to using settings.LOG_FORMAT now that env var conflict is resolved
+# log_formatter = logging.Formatter(settings.LOG_FORMAT)
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setFormatter(log_formatter)
+logger.addHandler(console_handler)
+# Ensure log directory exists and add file handler if LOG_FILE is set
+if settings.LOG_FILE:
+    log_dir = os.path.dirname(settings.LOG_FILE)
+    if log_dir:
+        os.makedirs(log_dir, exist_ok=True)
+    try:
+        file_handler = logging.handlers.RotatingFileHandler(
+            settings.LOG_FILE,
             maxBytes=settings.LOG_MAX_SIZE,
             backupCount=settings.LOG_BACKUP_COUNT
-        ),
-        logging.StreamHandler()
-    ]
-)
-
-logger = logging.getLogger(__name__)
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Handle application startup and shutdown"""
-    # Startup
-    try:
-        # Initialize services
-        app.state.owner_service = OwnerPanelService()
-        
-        # Initialize agent coordinator
-        app.state.agent_coordinator = AgentCoordinator()
-        # Initialize agents asynchronously
-        asyncio.create_task(app.state.agent_coordinator._initialize_agents())
-        
-        # Initialize memory service if enabled
-        if settings.MEMORY_ENABLED:
-            # await memory_service.initialize()
-            # app.state.memory_service = memory_service
-            logger.info("Memory service initialization skipped")
-        
-        # Initialize Visual Perception MCP
-        # app.state.visual_perception_router = get_visual_perception_router(
-        #     # memory_service=app.state.memory_service if settings.MEMORY_ENABLED else None,
-        #     memory_service=None,
-        #     agent_coordinator=app.state.agent_coordinator
-        # )
-        logger.info("Visual Perception MCP initialization skipped")
-        
-        logger.info("Application services initialized successfully")
+        )
+        file_handler.setFormatter(log_formatter)
+        logger.addHandler(file_handler)
+        logger.info(f"Logging to console and file: {settings.LOG_FILE}")
     except Exception as e:
-        logger.error(f"Error initializing application services: {str(e)}")
-        raise
+        logger.error(f"Failed to set up file logging: {e}")
+else:
+    logger.info("Logging to console only (LOG_FILE not set).")
 
-    yield
+# --- Core Application Imports ---
+from fastapi import FastAPI, Request, status 
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+import uvicorn
 
-    # Shutdown
-    try:
-        # Cleanup services
-        await app.state.owner_service.cleanup()
-        
-        # Shutdown memory service if enabled
-        if settings.MEMORY_ENABLED:
-            # await memory_service.shutdown()
-            logger.info("Memory service shutdown skipped")
-            
-        logger.info("Application services cleaned up successfully")
-    except Exception as e:
-        logger.error(f"Error cleaning up application services: {str(e)}")
+# --- Project-Specific Imports ---
+# Services
+try:
+    from services.owner_panel_service import OwnerPanelService
+except ImportError as e:
+    # logger.warning(f"OwnerPanelService could not be imported: {e}")
+    OwnerPanelService = None
 
-# Create FastAPI application
+try:
+    from services.coordination.agent_coordinator import AgentCoordinator
+except ImportError as e:
+    # logger.error(f"FATAL: AgentCoordinator could not be imported: {e}")
+    sys.exit(1) 
+
+# Routers (Import necessary routers)
+try:
+    from routes.coordination_api import router as coordination_router
+except ImportError as e:
+    # logger.error(f"FATAL: Coordination API routes could not be imported: {e}")
+    sys.exit(1) 
+
+try:
+    from routes.error_logging_routes import router as error_logging_router
+except ImportError as e:
+    # logger.error(f"Error logging routes could not be imported: {e}. Error logging API will be unavailable.")
+    error_logging_router = None
+except Exception as e:
+    # logger.error(f"Unexpected error importing error logging routes: {e}")
+    error_logging_router = None
+
+# --- FastAPI Application Setup ---
+logger.info(f"Creating FastAPI app: {settings.APP_NAME} v{settings.APP_VERSION}")
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="API for ADE Platform",
-    lifespan=lifespan
+    description="ADE Platform Backend API",
+    debug=settings.DEBUG 
 )
 
-# Allow exceptions to propagate to middleware
-app.middleware("http")
-async def catch_exceptions_middleware(request, call_next):
+# --- Static Files ---
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+    # logger.info(f"Mounted static files directory: {static_dir}")
+else:
     try:
-        return await call_next(request)
-    except Exception as e:
-        # Let the validation middleware handle this
-        raise
+        os.makedirs(static_dir, exist_ok=True)
+        if os.path.exists(static_dir):
+             app.mount("/static", StaticFiles(directory=static_dir), name="static")
+             # logger.info(f"Created and mounted static files directory: {static_dir}")
+        else:
+             # logger.warning(f"Failed to create static directory: {static_dir}")
+             pass
+    except OSError as e:
+        # logger.warning(f"Static files directory not found and could not be created: {static_dir}. Error: {e}")
+        pass
 
-# Configure CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.get_cors_origins(),
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Add validation middleware
-add_validation_middleware(app, debug_mode=settings.DEBUG)
-
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# Add a simple health check route for testing
-@app.get("/health")
-async def health_check():
-    return {"status": "ok", "owner_panel_enabled": True}
-
-# Include routers
-# Temporarily disabled: app.include_router(owner_panel_router, prefix=settings.API_PREFIX)
-app.include_router(coordination_router)
-# Include error logging router without additional prefix since it already has one
-app.include_router(error_logging_router)
-
-# Include memory router if enabled
-if settings.MEMORY_ENABLED:
-    # app.include_router(memory_router, prefix=settings.API_PREFIX)
-    logger.info("Memory API routes registration skipped")
-    logger.info("Memory API is disabled")
-
-# Include Visual Perception MCP router
-# app.include_router(app.state.visual_perception_router)
-logger.info("Visual Perception MCP routes registration skipped")
-
-# Error handlers
+# --- Default Error Handlers ---
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc):
-    """Handle validation errors"""
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    request_id = getattr(request.state, 'request_id', str(uuid.uuid4())) 
+    # logger.warning(f"Validation Error (Request ID: {request_id}): {exc.errors()}")
+    try:
+        from utils.error_logging import log_error, ErrorCategory, ErrorSeverity
+        if log_error: 
+            log_error(error=str(exc.errors()), category=ErrorCategory.VALIDATION, severity=ErrorSeverity.WARNING,
+                      component="api", source=str(request.url.path), request_id=request_id, context={"validation_details": exc.errors()})
+    except Exception as log_exc:
+        # logger.error(f"Failed to log validation error details: {log_exc}")
+        pass
+
     return JSONResponse(
-        status_code=422,
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
+            "success": False,
+            "message": "Validation Error",
             "detail": exc.errors(),
-            "message": "Validation error"
-        }
+            "request_id": request_id
+        },
     )
 
 @app.exception_handler(Exception)
-async def general_exception_handler(request, exc):
-    """Handle general exceptions"""
-    logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
+async def general_exception_handler(request: Request, exc: Exception):
+    request_id = getattr(request.state, 'request_id', str(uuid.uuid4())) 
+    # logger.error(f"Unhandled Exception (Request ID: {request_id}): {exc}", exc_info=True)
+    try:
+        from utils.error_logging import log_error, ErrorCategory, ErrorSeverity
+        if log_error: 
+             log_error(error=exc, category=ErrorCategory.API, severity=ErrorSeverity.ERROR,
+                       component="api", source=str(request.url.path), request_id=request_id, context={"exception_type": type(exc).__name__})
+    except Exception as log_exc:
+        # logger.error(f"Failed to log general exception details: {log_exc}")
+        pass
+
     return JSONResponse(
-        status_code=500,
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
-            "detail": str(exc),
-            "message": "Internal server error"
-        }
+            "success": False,
+            "message": "Internal Server Error",
+            "detail": str(exc) if settings.DEBUG else "An unexpected error occurred.",
+            "request_id": request_id
+        },
     )
 
-# API documentation
-@app.get("/docs")
-async def get_api_docs():
-    """Get API documentation"""
-    return app.openapi()
+# --- Health Check Endpoint ---
+@app.get("/health", tags=["Health"])
+async def health_check():
+    return {
+        "status": "ok",
+        "timestamp": datetime.utcnow().isoformat(),
+        "app_name": "Minimal ADE App",
+        "app_version": "0.0.1"
+    }
 
-def start():
-    """Start the application"""
+@app.get("/", tags=["Root"])
+async def root():
+    return {
+        "status": "ok",
+        "timestamp": datetime.utcnow().isoformat(),
+        "app_name": settings.APP_NAME, 
+        "app_version": settings.APP_VERSION 
+    }
+
+# --- Main Execution ---
+if __name__ == "__main__":
+    logger.info(f"Starting Uvicorn server on {settings.HOST}:{settings.PORT}...") 
+    logger.debug(f"Detected Settings - Host: {settings.HOST}, Port: {settings.PORT}, Reload: {settings.RELOAD}, Workers: {settings.WORKERS}")
+
     try:
         uvicorn.run(
             "main:app",
-            host=settings.HOST,
-            port=settings.PORT,
-            workers=settings.WORKERS,
+            host=settings.HOST, 
+            port=settings.PORT, 
             reload=settings.RELOAD,
+            workers=settings.WORKERS,
             log_level=settings.LOG_LEVEL.lower()
         )
     except Exception as e:
-        logger.error(f"Error starting application: {str(e)}")
-        raise
-
-if __name__ == "__main__":
-    start()
+        logger.critical(f"Failed to start Uvicorn: {e}", exc_info=True) 
+        sys.exit(1)

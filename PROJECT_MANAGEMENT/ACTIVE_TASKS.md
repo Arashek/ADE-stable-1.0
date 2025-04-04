@@ -383,6 +383,28 @@ The current focus is on ensuring the ADE platform can properly receive and proce
   - 2025-04-02: Defined color palette and typography for the design system
   - 2025-04-02: Started creating reusable component library
 
+## Local Frontend & Prompt Processing (Phase 1 Focus)
+
+- [ ] **Backend Setup & Verification:**
+    - [ ] Ensure all necessary backend services (FastAPI server, Agent Coordinator, specialized agents) can be started locally.
+    - [ ] Verify the API endpoints needed for prompt submission and status updates are functional.
+- [ ] **Frontend Setup & Basic Rendering:**
+    - [ ] Confirm the frontend development environment (`npm install`, etc.) is set up correctly.
+    - [ ] Start the frontend development server (`npm run start` or similar).
+    - [ ] Debug any critical rendering errors preventing the main layout (including the chat input) from appearing.
+- [ ] **Frontend-Backend Integration:**
+    - [ ] Implement or verify the frontend logic to send the user's prompt from the chat input to the correct backend API endpoint.
+- [ ] **Backend Workflow Implementation/Verification:**
+    - [ ] Ensure the backend Agent Coordinator correctly receives the prompt and initiates the agent workflow.
+    - [ ] Verify that agents process the request and (at minimum) simulate the application building process, providing status updates.
+- [ ] **Frontend Status Display:**
+    - [ ] Implement frontend logic to poll or receive status updates from the backend regarding the prompt processing (e.g., "Processing prompt...", "Generating code...", "Building application...").
+    - [ ] Display these status updates clearly to the user in the UI.
+- [ ] **Result Display (Initial):**
+    - [ ] Implement a basic way for the frontend to display the outcome, even if it's just a confirmation message or a link to generated artifacts initially.
+- [ ] **End-to-End Testing:**
+    - [ ] Test the entire flow locally: enter a prompt, see status updates, and view the final result/confirmation.
+
 ## Verification and Testing Plan
 
 ### Automated Test Suite

@@ -19,7 +19,8 @@ import uuid
 
 # Try to import error logging system
 try:
-    from scripts.basic_error_logging import log_error, ErrorCategory, ErrorSeverity
+    # Corrected import path
+    from utils.error_logging import log_error, ErrorCategory, ErrorSeverity
     from models.api_models import ErrorCategory as ModelErrorCategory
     from models.api_models import ErrorSeverity as ModelErrorSeverity
     
