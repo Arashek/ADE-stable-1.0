@@ -2,9 +2,9 @@ from typing import Dict, List, Optional
 import yaml
 import logging
 from dataclasses import dataclass
-from .gpu_manager import GPUManager
-from .fallback_manager import FallbackManager
-from .language_manager import LanguageManager
+from services.model_service.gpu_manager import GPUManager
+from services.model_service.fallback_manager import FallbackManager
+from services.model_service.language_manager import LanguageManager
 
 logger = logging.getLogger(__name__)
 

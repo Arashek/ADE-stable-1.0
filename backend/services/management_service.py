@@ -1,13 +1,13 @@
 from typing import Dict, List, Optional
 from datetime import datetime
 import logging
-from ..models.management_components import (
-    Permission, Role, AuthSettings, AuditLog,
+from models.management_components import (
+    Permission, Role, AdminSettings, UserActivity,
     Component, Model, ServiceConfig, InfrastructureSettings,
     ExternalService, APIConfig, WebhookConfig,
     MarketplaceItem, MarketplaceOrder
 )
-from ..database.management_db import ManagementDB
+from database.management_db import ManagementDB
 
 logger = logging.getLogger(__name__)
 
@@ -63,25 +63,25 @@ class ManagementService:
             logger.error(f"Error creating role: {str(e)}")
             raise
 
-    async def get_auth_settings(self) -> List[AuthSettings]:
-        """Get authentication settings"""
+    async def get_admin_settings(self) -> List[AdminSettings]:
+        """Get admin settings"""
         try:
-            settings = await self.db.get_auth_settings()
-            return [AuthSettings(**setting) for setting in settings]
+            settings = await self.db.get_admin_settings()
+            return [AdminSettings(**setting) for setting in settings]
         except Exception as e:
-            logger.error(f"Error getting auth settings: {str(e)}")
+            logger.error(f"Error getting admin settings: {str(e)}")
             raise
 
-    async def update_auth_setting(self, setting_id: str, setting: AuthSettings) -> AuthSettings:
-        """Update authentication setting"""
+    async def update_admin_setting(self, setting_id: str, setting: AdminSettings) -> AdminSettings:
+        """Update admin setting"""
         try:
-            updated_setting = await self.db.update_auth_setting(setting_id, setting.dict())
-            return AuthSettings(**updated_setting)
+            updated_setting = await self.db.update_admin_setting(setting_id, setting.dict())
+            return AdminSettings(**updated_setting)
         except Exception as e:
-            logger.error(f"Error updating auth setting: {str(e)}")
+            logger.error(f"Error updating admin setting: {str(e)}")
             raise
 
-    async def get_audit_logs(
+    async def get_user_activity(
         self,
         user_id: Optional[str] = None,
         action: Optional[str] = None,
@@ -90,10 +90,10 @@ class ManagementService:
         end_date: Optional[datetime] = None,
         page: int = 1,
         limit: int = 10
-    ) -> List[AuditLog]:
-        """Get audit logs"""
+    ) -> List[UserActivity]:
+        """Get user activity"""
         try:
-            logs = await self.db.get_audit_logs(
+            logs = await self.db.get_user_activity(
                 user_id=user_id,
                 action=action,
                 resource_type=resource_type,
@@ -102,9 +102,9 @@ class ManagementService:
                 page=page,
                 limit=limit
             )
-            return [AuditLog(**log) for log in logs]
+            return [UserActivity(**log) for log in logs]
         except Exception as e:
-            logger.error(f"Error getting audit logs: {str(e)}")
+            logger.error(f"Error getting user activity: {str(e)}")
             raise
 
     # Architecture Management Methods

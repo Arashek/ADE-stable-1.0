@@ -21,10 +21,10 @@ except Exception as e:
 # Logging setup (using logger)
 logger = logging.getLogger()
 logger.setLevel(settings.LOG_LEVEL.upper())
-# Hardcoding format string *again* as a temporary measure until env var is fully cleared
-log_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-# Revert to using settings.LOG_FORMAT now that env var conflict is resolved
+# Revert to using settings.LOG_FORMAT now that env var conflict is confirmed removed
 # log_formatter = logging.Formatter(settings.LOG_FORMAT)
+# Temporarily hardcode the format due to system env var interference
+log_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 console_handler = logging.StreamHandler(sys.stdout)
 console_handler.setFormatter(log_formatter)
 logger.addHandler(console_handler)
@@ -54,6 +54,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 import uvicorn
+from contextlib import asynccontextmanager
 
 # --- Project-Specific Imports ---
 # Services
@@ -87,12 +88,94 @@ except Exception as e:
 
 # --- FastAPI Application Setup ---
 logger.info(f"Creating FastAPI app: {settings.APP_NAME} v{settings.APP_VERSION}")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic: Initialize services
+    logger.info("Application startup: Initializing services...")
+
+    # Ensure global AgentCoordinator instance is created
+    # await AgentCoordinator.get_instance()
+    # logger.info("AgentCoordinator initialized.")
+
+    # Example: Initialize database connection pool if needed
+    # await initialize_database()
+
+    # Initialize OwnerPanelService
+    # await OwnerPanelService.get_instance()
+    # logger.info("OwnerPanelService initialized.")
+
+    logger.info("Service initialization complete.")
+    yield
+    # Shutdown logic: Cleanup services
+    logger.info("Application shutdown: Cleaning up services...")
+    # Example: Close database connections
+    # await close_database()
+    # Add cleanup for AgentCoordinator, OwnerPanelService if necessary
+    logger.info("Service cleanup complete.")
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="ADE Platform Backend API",
-    debug=settings.DEBUG 
+    debug=settings.DEBUG,
+    lifespan=lifespan # Assign the lifespan context manager
 )
+
+logger.info(f"FastAPI app created: {settings.APP_NAME} v{settings.APP_VERSION}")
+
+# --- Middleware Registration ---
+logger.info("Registering middleware...")
+# Security Headers
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.BACKEND_CORS_ORIGINS, # Use the existing setting
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Custom Middleware
+# Uncomment these as needed/developed
+# from middleware.request_logging_middleware import RequestLoggingMiddleware
+# app.add_middleware(RequestLoggingMiddleware)
+# from middleware.validation_middleware import RequestValidationMiddleware
+# app.add_middleware(RequestValidationMiddleware)
+# from middleware.error_handling_middleware import ErrorHandlingMiddleware
+# app.add_middleware(ErrorHandlingMiddleware)
+logger.info("Middleware registration complete.")
+
+# --- API Routers Inclusion ---
+logger.info("Including API routers...")
+# Placeholder: Include your actual routers here
+# Example:
+# from api.v1.endpoints import auth, users, agents
+# app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+# app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
+# app.include_router(agents.router, prefix="/api/v1/agents", tags=["agents"])
+
+# Include Admin and Core routers
+from routes.management_routes import router as admin_router
+from routes.core_routes import router as core_router
+app.include_router(admin_router, prefix=settings.API_V1_STR + "/admin", tags=["admin"])
+app.include_router(core_router, prefix=settings.API_V1_STR + "/core", tags=["core"])
+
+# Include Agent router
+from routes.agent_routes import router as agent_router
+app.include_router(agent_router, prefix=settings.API_V1_STR + "/agents", tags=["agents"])
+
+# Include Project router
+from routes.project_management_routes import router as project_router
+app.include_router(project_router, prefix=settings.API_V1_STR + "/projects", tags=["projects"])
+
+# Include Coordination router
+from routes.coordination_api import router as coordination_router
+app.include_router(coordination_router, prefix=settings.API_V1_STR + "/coordination", tags=["coordination"])
+
+# Include Error Logging router
+from routes.error_logging_routes import router as error_logging_router
+app.include_router(error_logging_router, prefix=settings.API_V1_STR + "/error-logging", tags=["error-logging"])
+
+logger.info("API routers included.")
 
 # --- Static Files ---
 static_dir = os.path.join(os.path.dirname(__file__), "static")
@@ -109,10 +192,11 @@ else:
              # logger.warning(f"Failed to create static directory: {static_dir}")
              pass
     except OSError as e:
-        # logger.warning(f"Static files directory not found and could not be created: {static_dir}. Error: {e}")
-        pass
+        logger.error(f"Static directory not found: {static_dir}")
 
-# --- Default Error Handlers ---
+# --- Exception Handlers ---
+# (Add custom exception handlers here if needed)
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     request_id = getattr(request.state, 'request_id', str(uuid.uuid4())) 

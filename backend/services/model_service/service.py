@@ -6,11 +6,11 @@ from uuid import uuid4
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from .config import ModelConfig
-from .types import ModelRequest, ModelResponse
-from ..utils.llm import LLMClient
-from ..utils.cache import ModelCache
-from ..utils.telemetry import track_event
+from services.model_service.config import ModelConfig
+from services.model_service.types import ModelRequest, ModelResponse
+from services.utils.llm import LLMClient
+from services.utils.cache import ModelCache
+from services.utils.telemetry import track_event
 
 logger = logging.getLogger(__name__)
 

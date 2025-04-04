@@ -200,71 +200,108 @@ class ConsensusManager:
             state.phase = "init"
             
     def _is_critical_decision(self, value: Any) -> bool:
-        """Determine if a decision is critical enough for PBFT"""
-        if isinstance(value, dict):
-            # Check for critical operations
-            critical_keywords = {'security', 'payment', 'authentication', 'authorization'}
-            value_str = str(value).lower()
-            return any(keyword in value_str for keyword in critical_keywords)
+        """Determine if a decision is critical based on its value and context"""
+        if isinstance(value, dict) and value.get('priority') == 'critical':
+            return True
+        if isinstance(value, dict) and value.get('impact', '').lower() == 'high':
+            return True
         return False
         
-    async def _broadcast(self, participants: List[str], message: Dict) -> List[Dict]:
-        """Broadcast message to all participants"""
-        # Simulate network communication
-        responses = []
+    async def _broadcast(self, participants: List[str], message: Dict[str, Any]) -> Dict[str, Any]:
+        """Broadcast a message to all participants and collect responses"""
+        responses = {}
         for participant in participants:
-            if random.random() > 0.2:  # 80% success rate
-                responses.append({'from': participant, 'status': 'accepted'})
+            try:
+                await asyncio.sleep(random.uniform(0.01, 0.1))
+                if random.random() > 0.2:  
+                    responses[participant] = {
+                        'participant': participant,
+                        'acknowledged': True,
+                        'timestamp': datetime.now().isoformat()
+                    }
+            except Exception as e:
+                pass
         return responses
         
-    async def _get_participant_vote(self, participant: str, value: Any) -> Any:
-        """Get vote from a participant"""
-        # Simulate participant voting
-        return value
+    def _select_new_leader(self, participants: Set[str]) -> Optional[str]:
+        """Select a new leader based on reliability and weights"""
+        if not participants:
+            return None
+            
+        participant_list = list(participants)
+        
+        if self.historical_reliability:
+            candidates = []
+            for p in participant_list:
+                reliability = self.historical_reliability.get(p, 0.5)
+                score = reliability + random.uniform(0, 0.3)
+                candidates.append((p, score))
+            return max(candidates, key=lambda x: x[1])[0]
+        
+        return random.choice(participant_list)
         
     async def _elect_leader(self, participants: List[str]) -> Optional[str]:
-        """Elect a leader using a weighted random selection"""
-        weights = []
-        for p in participants:
-            base_weight = self.agent_weights.get(p, 1.0)
-            reliability = self.historical_reliability.get(p, 0.5)
-            weights.append(base_weight * reliability)
-            
-        total = sum(weights)
-        if total == 0:
-            return random.choice(participants)
-            
-        r = random.uniform(0, total)
-        upto = 0
-        for i, w in enumerate(weights):
-            upto += w
-            if upto >= r:
-                return participants[i]
-        return participants[-1]
+        """Run leader election protocol"""
+        term = int(time.time())  
+        votes = {}
         
-    async def _send_proposal(self, participant: str, proposal: Dict) -> Dict:
-        """Send proposal to a participant"""
-        # Simulate proposal sending
-        return {'accepted': random.random() > 0.2}
+        for participant in participants:
+            vote = random.choice(participants)
+            if vote in votes:
+                votes[vote] += 1
+            else:
+                votes[vote] = 1
+                
+        for candidate, vote_count in votes.items():
+            if vote_count > len(participants) / 2:
+                return candidate
+                
+        return None
         
-    def _select_new_leader(self, participants: Set[str]) -> str:
-        """Select new leader based on reliability and weights"""
-        return max(
-            participants,
-            key=lambda p: self.agent_weights.get(p, 1.0) * 
-                        self.historical_reliability.get(p, 0.5)
-        )
+    async def _send_proposal(self, participant: str, proposal: Dict[str, Any]) -> Dict[str, Any]:
+        """Send a proposal to a participant and get response"""
+        await asyncio.sleep(random.uniform(0.01, 0.05))
         
+        if random.random() > 0.1:  
+            return {
+                'participant': participant,
+                'accepted': True,
+                'term': proposal['term'],
+                'timestamp': datetime.now().isoformat()
+            }
+        else:
+            return {
+                'participant': participant,
+                'accepted': False,
+                'term': proposal['term'],
+                'reason': 'simulated rejection',
+                'timestamp': datetime.now().isoformat()
+            }
+        
+    async def _get_participant_vote(self, participant: str, value: Any) -> Any:
+        """Get a vote from a participant on a value"""
+        
+        if random.random() > 0.2:
+            return value
+        else:
+            if isinstance(value, dict):
+                modified = value.copy()
+                if 'confidence' in modified:
+                    modified['confidence'] = round(modified['confidence'] * random.uniform(0.8, 1.2), 2)
+                return modified
+            elif isinstance(value, (int, float)):
+                return value * random.uniform(0.9, 1.1)
+            else:
+                return value
+                
     def update_agent_weight(self, agent: str, performance: float):
         """Update agent's voting weight based on performance"""
         current_weight = self.agent_weights.get(agent, 1.0)
-        # Exponential moving average with 0.1 learning rate
         self.agent_weights[agent] = 0.9 * current_weight + 0.1 * performance
         
     def update_reliability(self, agent: str, success: bool):
         """Update agent's reliability score"""
         current = self.historical_reliability.get(agent, 0.5)
-        # Exponential moving average with 0.05 learning rate
         self.historical_reliability[agent] = (
             0.95 * current + 0.05 * (1.0 if success else 0.0)
         )

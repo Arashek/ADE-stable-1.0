@@ -2,12 +2,12 @@ from typing import Dict, List, Optional
 from datetime import datetime
 import psutil
 import logging
-from ..models.core_components import (
+from models.core_components import (
     UserProfile, Notification, DashboardMetrics, NavigationItem,
     UserSettings, SystemHealth, ResourceUsage, DeploymentStatus,
     UserManagement, SystemOverview, SystemStatus
 )
-from ..database.core_db import CoreDB
+from database.core_db import CoreDB
 
 logger = logging.getLogger(__name__)
 

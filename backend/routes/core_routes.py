@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Dict, List, Optional
 from datetime import datetime
-from ..models.core_components import (
+from models.core_components import (
     UserProfile, Notification, DashboardMetrics, NavigationItem,
     UserSettings, SystemHealth, ResourceUsage, DeploymentStatus,
     UserManagement, SystemOverview
 )
-from ..auth.auth import get_current_user, require_admin
-from ..services.core_service import CoreService
+from auth.auth import get_current_user, require_admin
+from services.core_service import CoreService
 
 router = APIRouter(prefix="/api/core", tags=["core"])
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, Optional, List
-from ..services.agent_orchestrator import agent_orchestrator
+from services.agent_orchestrator import agent_orchestrator
 import logging
 
 router = APIRouter()

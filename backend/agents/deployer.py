@@ -3,12 +3,12 @@ import asyncio
 import logging
 from uuid import uuid4
 
-from ..models.codebase import Codebase, File
-from ..models.deployment import DeploymentConfig, Environment
-from ..utils.llm import LLMClient
-from ..utils.docker import DockerBuilder
-from ..utils.kubernetes import KubernetesManager
-from ..utils.telemetry import track_event
+from models.codebase import Codebase, File
+from models.deployment import DeploymentConfig, Environment
+from services.utils.llm import LLMClient
+from services.utils.docker import DockerBuilder
+from services.utils.kubernetes import KubernetesManager
+from services.utils.telemetry import track_event
 
 logger = logging.getLogger(__name__)
 

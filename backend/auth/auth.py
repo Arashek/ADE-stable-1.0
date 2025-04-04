@@ -271,5 +271,14 @@ async def require_admin(current_user: User = Depends(get_current_user)):
         )
     return current_user
 
+# Dependency to require system role
+async def require_system(current_user: User = Depends(get_current_user)):
+    if not current_user.is_system:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="System privileges required"
+        )
+    return current_user
+
 # Create a global instance of AuthManager
 auth_manager = AuthManager()

@@ -1,14 +1,18 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Dict, List, Optional
 from datetime import datetime
-from ..models.management_components import (
-    Permission, Role, AuthSettings, AuditLog,
+
+print("DEBUG: Attempting to import from models.management_components in routes/management_routes.py")
+from models.management_components import (
+    Permission, Role, AdminSettings, UserActivity,
     Component, Model, ServiceConfig, InfrastructureSettings,
     ExternalService, APIConfig, WebhookConfig,
     MarketplaceItem, MarketplaceOrder
 )
-from ..auth.auth import get_current_user, require_admin, require_system
-from ..services.management_service import ManagementService
+print("DEBUG: Successfully imported from models.management_components in routes/management_routes.py")
+
+from auth.auth import get_current_user, require_admin, require_system
+from services.management_service import ManagementService
 
 router = APIRouter(prefix="/api/management", tags=["management"])
 
@@ -58,7 +62,7 @@ async def create_role(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/security/auth-settings", response_model=List[AuthSettings])
+@router.get("/security/auth-settings", response_model=List[AdminSettings])
 async def get_auth_settings(
     current_user: Dict = Depends(require_admin)
 ):
@@ -68,10 +72,10 @@ async def get_auth_settings(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.put("/security/auth-settings/{setting_id}", response_model=AuthSettings)
+@router.put("/security/auth-settings/{setting_id}", response_model=AdminSettings)
 async def update_auth_setting(
     setting_id: str,
-    setting: AuthSettings,
+    setting: AdminSettings,
     current_user: Dict = Depends(require_system)
 ):
     """Update authentication setting"""
@@ -80,7 +84,7 @@ async def update_auth_setting(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/security/audit-logs", response_model=List[AuditLog])
+@router.get("/security/audit-logs", response_model=List[UserActivity])
 async def get_audit_logs(
     user_id: Optional[str] = None,
     action: Optional[str] = None,

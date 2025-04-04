@@ -10,6 +10,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import uuid
 
+print("DEBUG: Loading models/management_components.py")
 
 class Permission(BaseModel):
     """Permission model defining what users can do within the system"""
@@ -131,3 +132,126 @@ class Team(BaseModel):
     updated_at: Optional[datetime] = None
     visibility: str = "private"  # "private", "public", etc.
     settings: Optional[Dict[str, Any]] = None
+
+
+class Component(BaseModel):
+    """Model representing a system component"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    type: str # e.g., 'service', 'database', 'library'
+    description: Optional[str] = None
+    version: str
+    status: str # e.g., 'active', 'inactive', 'deprecated'
+    configuration: Optional[Dict[str, Any]] = None
+    dependencies: Optional[List[Dict[str, Any]]] = None # List of dependency info
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None
+
+
+class Model(BaseModel):
+    """Data model definition"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    schema: Dict[str, Any]
+    description: Optional[str] = None
+    version: str
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None
+
+
+class ServiceConfig(BaseModel):
+    """Service configuration settings"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    service_id: str
+    environment: str  # dev, test, prod
+    config_data: Dict[str, Any]
+    version: str
+    active: bool = True
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None
+
+
+class InfrastructureSettings(BaseModel):
+    """Infrastructure configuration"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    setting_key: str
+    setting_value: Any
+    description: Optional[str] = None
+    environment: str  # dev, test, prod
+    updated_by: str
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+
+class ExternalService(BaseModel):
+    """External service integration"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    type: str  # API, database, messaging, etc.
+    url: str
+    auth_type: Optional[str] = None
+    auth_data: Optional[Dict[str, Any]] = None
+    status: str = "active"
+    config: Dict[str, Any] = {}
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None
+
+
+class APIConfig(BaseModel):
+    """API configuration"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    base_url: str
+    version: str
+    auth_type: Optional[str] = None
+    rate_limit: Optional[int] = None
+    timeout: int = 30
+    retry_policy: Optional[Dict[str, Any]] = None
+    headers: Optional[Dict[str, str]] = None
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None
+
+
+class WebhookConfig(BaseModel):
+    """Webhook configuration"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    url: str
+    events: List[str]
+    secret: Optional[str] = None
+    active: bool = True
+    failure_count: int = 0
+    last_triggered: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None
+
+
+class MarketplaceItem(BaseModel):
+    """Marketplace item for agent components and services"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    type: str  # agent, component, service, template
+    price: float
+    author: str
+    version: str
+    tags: List[str] = []
+    preview_url: Optional[str] = None
+    documentation_url: Optional[str] = None
+    download_count: int = 0
+    rating: Optional[float] = None
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None
+
+
+class MarketplaceOrder(BaseModel):
+    """Marketplace order record"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    item_id: str
+    quantity: int = 1
+    total_price: float
+    status: str  # pending, completed, failed, refunded
+    payment_id: Optional[str] = None
+    license_key: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None

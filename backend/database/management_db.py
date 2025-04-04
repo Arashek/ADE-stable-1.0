@@ -32,8 +32,8 @@ class RoleDB(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-class AuthSettingsDB(Base):
-    __tablename__ = "auth_settings"
+class AdminSettingsDB(Base):
+    __tablename__ = "admin_settings"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     setting_key = Column(String, unique=True, nullable=False)
@@ -42,8 +42,8 @@ class AuthSettingsDB(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-class AuditLogDB(Base):
-    __tablename__ = "audit_logs"
+class UserActivityDB(Base):
+    __tablename__ = "user_activity"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), nullable=False)
@@ -216,20 +216,20 @@ class ManagementDB:
             await session.commit()
             return dict(role)
 
-    async def get_auth_settings(self) -> List[Dict[str, Any]]:
+    async def get_admin_settings(self) -> List[Dict[str, Any]]:
         async with self.async_session() as session:
-            result = await session.query(AuthSettingsDB).all()
+            result = await session.query(AdminSettingsDB).all()
             return [dict(row) for row in result]
 
-    async def update_auth_setting(self, setting_id: str, setting_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def update_admin_setting(self, setting_id: str, setting_data: Dict[str, Any]) -> Dict[str, Any]:
         async with self.async_session() as session:
-            setting = await session.query(AuthSettingsDB).filter(AuthSettingsDB.id == setting_id).first()
+            setting = await session.query(AdminSettingsDB).filter(AdminSettingsDB.id == setting_id).first()
             for key, value in setting_data.items():
                 setattr(setting, key, value)
             await session.commit()
             return dict(setting)
 
-    async def get_audit_logs(
+    async def get_user_activity(
         self,
         user_id: Optional[str] = None,
         action: Optional[str] = None,
@@ -240,18 +240,18 @@ class ManagementDB:
         limit: int = 10
     ) -> List[Dict[str, Any]]:
         async with self.async_session() as session:
-            query = session.query(AuditLogDB)
+            query = session.query(UserActivityDB)
             
             if user_id:
-                query = query.filter(AuditLogDB.user_id == user_id)
+                query = query.filter(UserActivityDB.user_id == user_id)
             if action:
-                query = query.filter(AuditLogDB.action == action)
+                query = query.filter(UserActivityDB.action == action)
             if resource_type:
-                query = query.filter(AuditLogDB.resource_type == resource_type)
+                query = query.filter(UserActivityDB.resource_type == resource_type)
             if start_date:
-                query = query.filter(AuditLogDB.created_at >= start_date)
+                query = query.filter(UserActivityDB.created_at >= start_date)
             if end_date:
-                query = query.filter(AuditLogDB.created_at <= end_date)
+                query = query.filter(UserActivityDB.created_at <= end_date)
             
             query = query.offset((page - 1) * limit).limit(limit)
             result = await query.all()

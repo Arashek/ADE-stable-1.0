@@ -3,12 +3,12 @@ import asyncio
 import logging
 from uuid import uuid4
 
-from ..models.codebase import Codebase, File
-from ..utils.llm import LLMClient
-from ..utils.code_analysis import CodeAnalyzer
-from ..utils.security_scanner import SecurityScanner
-from ..utils.performance_analyzer import PerformanceAnalyzer
-from ..utils.telemetry import track_event
+from models.codebase import Codebase, File
+from services.utils.llm import LLMClient
+from services.utils.code_analysis import CodeAnalyzer
+from services.utils.security_scanner import SecurityScanner
+from services.utils.performance_analyzer import PerformanceAnalyzer
+from services.utils.telemetry import track_event
 
 logger = logging.getLogger(__name__)
 

@@ -4,15 +4,15 @@ from datetime import datetime
 import logging
 from uuid import uuid4
 
-from .base import BaseAgent
-from .architecture import ArchitectureAgent
-from .code_generator import CodeGeneratorAgent
-from .test_writer import TestWriterAgent
-from .reviewer import ReviewerAgent
-from .deployer import DeployerAgent
-from ..models.project import Project, ProjectStatus
-from ..models.task import Task, TaskStatus
-from ..utils.telemetry import track_event
+from agents.base import BaseAgent
+from agents.architecture import ArchitectureAgent
+from agents.code_generator import CodeGeneratorAgent
+from agents.test_writer import TestWriterAgent
+from agents.reviewer import ReviewerAgent
+from agents.deployer import DeployerAgent
+from models.project import Project, ProjectStatus
+from models.task import Task, TaskStatus
+from services.utils.telemetry import track_event
 
 logger = logging.getLogger(__name__)
 

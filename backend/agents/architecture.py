@@ -4,10 +4,10 @@ from datetime import datetime
 import logging
 from uuid import uuid4
 
-from ..models.architecture import SystemArchitecture, Component
-from ..utils.llm import LLMClient
-from ..utils.code_analysis import CodeAnalyzer
-from ..utils.telemetry import track_event
+from models.architecture import SystemArchitecture, Component
+from services.utils.llm import LLMClient
+from services.utils.code_analysis import CodeAnalyzer
+from services.utils.telemetry import track_event
 
 logger = logging.getLogger(__name__)
 

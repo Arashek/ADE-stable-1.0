@@ -2,10 +2,10 @@ from typing import Dict, List, Any, Optional
 import logging
 import asyncio
 from datetime import datetime
-from .model_service.model_selector import ModelSelector
-from .agent_service.evaluation_manager import EvaluationManager, EvaluationCriteria
-from .agent_service.consensus_manager import ConsensusManager, ConsensusType
-from ..core.models.agent_communication import AgentCommunicationSystem, CoordinationPattern
+from services.model_service.model_selector import ModelSelector
+from services.agent_service.evaluation_manager import EvaluationManager, EvaluationCriteria
+from services.agent_service.consensus_manager import ConsensusManager, ConsensusType
+from core.models.agent_communication import AgentCommunicationSystem, CoordinationPattern
 
 class AgentOrchestrator:
     def __init__(self):

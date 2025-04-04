@@ -6,10 +6,10 @@ from uuid import uuid4
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from .config import AgentConfig
-from .types import AgentRequest, AgentResponse
-from ...agents.coordinator import AgentCoordinator
-from ..utils.telemetry import track_event
+from services.agent_service.config import AgentConfig
+from services.agent_service.types import AgentRequest, AgentResponse
+from agents.coordinator import AgentCoordinator
+from services.utils.telemetry import track_event
 
 logger = logging.getLogger(__name__)
 
