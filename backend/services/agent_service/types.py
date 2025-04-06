@@ -24,8 +24,8 @@ class AgentRequest(BaseModel):
     changes: Optional[Dict] = Field(None, description="Changes for project update")
     code: Optional[str] = Field(None, description="Code for analysis")
     
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "request_type": "create_project",
                 "project": {
@@ -39,6 +39,7 @@ class AgentRequest(BaseModel):
                 }
             }
         }
+    }
 
 class AgentResponse(BaseModel):
     """
@@ -49,8 +50,8 @@ class AgentResponse(BaseModel):
     result: Optional[Dict] = Field(None, description="Task result when completed")
     error: Optional[str] = Field(None, description="Error message if task failed")
     
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "task_id": "123e4567-e89b-12d3-a456-426614174000",
                 "status": "completed",
@@ -62,3 +63,4 @@ class AgentResponse(BaseModel):
                 }
             }
         }
+    }

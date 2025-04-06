@@ -1,12 +1,10 @@
 # ADE Platform - Active Tasks
 
-*Last Updated: 2025-04-02*
+*Last Updated: 2025-04-06*
 
-This document tracks all active tasks for the ADE platform development. It should be reviewed at the beginning of each development session and updated at the end of each session.
+## Current Development Phase: Strategic Enhancement for Market Leadership
 
-## Current Development Phase: Local Testing with Core Functionality Focus
-
-The current focus is on ensuring the ADE platform can properly receive and process prompts locally, with an error-free frontend, before advancing with additional dashboard components and visualizations. Our goal is to have ADE autonomously create simple applications based on user prompts.
+The primary focus is evolving ADE beyond core functionality towards establishing market leadership. We are enhancing the multi-agent system for **deep collaboration, proactive assistance, and full lifecycle automation**, integrating **superior codebase comprehension** and **deep cloud-native capabilities**, all delivered through a **refined developer experience**. The goal is to create an AI-powered development ecosystem significantly more powerful and autonomous than current competitors.
 
 ## Task Status Legend
 
@@ -16,396 +14,236 @@ The current focus is on ensuring the ADE platform can properly receive and proce
 - ⏸️ **On Hold**: Task is temporarily paused
 - 🔄 **Needs Review**: Task is complete but requires review
 
-## Current Sprint (Sprint 1: 2025-03-31 to 2025-04-14)
+## Strategic Pillars & Active Tasks
 
-### High Priority Tasks
+### Pillar 1: Deep Multi-Agent Collaboration & Workflows
+*Goal: Enable synergistic, iterative interactions between agents for superior problem-solving.*
 
-#### 1. Complete Specialized Agent Integration
-- **Status**: 🟢 Completed
-- **Assigned**: Backend Team
-- **Description**: Ensure all specialized agents are properly integrated and can collaborate effectively
-- **Subtasks**:
-  - 🟢 Implement agent coordination system for collaborative decision-making
-  - 🟢 Create unified interface for agent interactions
-  - 🟢 Implement consensus mechanism for conflicting agent recommendations
-- **Dependencies**: None
-- **Estimated Completion**: 2025-04-01
-- **Progress Notes**:
-  - 2025-03-31: Initial architecture for agent coordination defined
-  - 2025-03-31: Implemented core agent coordination system with support for different collaboration patterns (sequential, parallel, iterative, consensus), task management, and conflict resolution mechanisms
-  - 2025-03-31: Created unified interface for agent interactions with standardized message types and agent registry
-  - 2025-04-01: Implemented comprehensive consensus mechanism for resolving conflicts between agent recommendations, with multiple resolution strategies and consensus building capabilities
-  - 2025-04-01: Created integration tests for the consensus mechanism with actual agent implementations
-  - 2025-04-01: Set up local testing environment for the agent coordination system
+- **Task**: Define & Implement Advanced Collaborative Agent Workflows
+  - **Status**: 🔴 Not Started
+  - **Assigned**: Backend Team / AI Core Team
+  - **Description**: Design and implement workflows where agents (CodeGenerator, Reviewer, Debugger, Optimizer, etc.) interact iteratively, negotiate solutions, and perform joint refinement of code and architecture. Move beyond simple sequential handoffs.
+  - **Subtasks**:
+    - [ ] Define interaction protocols for negotiation and refinement.
+    - [ ] Implement iterative feedback loops between agents (e.g., Code -> Review -> Refactor -> Test cycle).
+    - [ ] Develop advanced consensus mechanisms for complex decision-making.
+    - [ ] Create visualization for collaborative workflows in the dashboard.
+  - **Dependencies**: Foundational Agent Integration (Completed).
+  - **Estimated Completion**: Sprint 3+
 
-#### 2. Enhance Command Hub Interface
-- **Status**: 🟢 Completed
-- **Assigned**: Frontend Team
-- **Description**: Improve the user interface for interacting with the agent system
-- **Subtasks**:
-  - 🟢 Add agent status visualization
-  - 🟢 Implement consensus visualization
-  - 🟢 Add conflict resolution visualization
-  - 🟢 Create agent coordination controls
-- **Dependencies**: None
-- **Estimated Completion**: 2025-04-01
-- **Progress Notes**:
-  - 2025-04-01: Enhanced Command Hub interface with agent status visualization, consensus building visualization, and conflict resolution visualization
-  - 2025-04-01: Added agent coordination controls for starting/stopping coordination and triggering consensus processes
+- **Task**: Verify Foundational Agent Integration & Coordination
+  - **Status**: 🟢 Completed (as per previous Task 1)
+  - **Notes**: Ensure existing coordination system supports the foundation for advanced collaboration.
 
-#### 3. Local Testing Setup
-- **Status**: 🟢 Completed
-- **Assigned**: DevOps Team
-- **Description**: Prepare the environment for comprehensive local testing before cloud deployment
-- **Subtasks**:
-  - 🟢 Create local testing script
-  - 🟢 Set up test data generation
-  - 🟢 Implement API endpoints for coordination
-  - 🟢 Configure backend for local testing
-- **Dependencies**: None
-- **Estimated Completion**: 2025-04-01
-- **Progress Notes**:
-  - 2025-04-01: Created local testing setup script with support for running the backend and frontend servers
-  - 2025-04-01: Implemented test data generation for consensus and conflict resolution testing
-  - 2025-04-01: Added API endpoints for agent coordination, consensus building, and conflict resolution
-  - 2025-04-01: Updated main application to integrate the coordination system
+### Pillar 2: Proactive & Autonomous Capabilities
+*Goal: Empower ADE to anticipate needs and act autonomously, reducing developer overhead.*
 
-#### 4. Comprehensive Local Testing
-- **Status**: 🟠 In Progress
-- **Assigned**: QA Team
-- **Description**: Test all aspects of the ADE platform locally
-- **Subtasks**:
-  - 🟢 Test agent coordination system
-  - 🟠 Test consensus mechanism
-  - 🟠 Test application creation workflow
-  - 🔴 Test deployment workflow
-- **Dependencies**: Tasks 1-3
-- **Estimated Completion**: 2025-04-07
-- **Progress Notes**:
-  - 2025-04-01: Started testing of agent coordination system and consensus mechanism
-  - 2025-04-02: Completed initial testing of agent coordination system with positive results
+- **Task**: Develop Proactive Monitoring & Suggestion Framework
+  - **Status**: 🔴 Not Started
+  - **Assigned**: Backend Team / AI Core Team
+  - **Description**: Implement capabilities for agents to monitor codebase health (performance, security, dependencies, style) and proactively suggest improvements or flag potential issues.
+  - **Subtasks**:
+    - [ ] Integrate performance analyzer agent for continuous monitoring.
+    - [ ] Integrate security scanner agent for vulnerability detection.
+    - [ ] Develop mechanism for dependency update checks and suggestions.
+    - [ ] Define heuristics for identifying refactoring opportunities.
+  - **Dependencies**: Specialized Agents (Performance, Security).
+  - **Estimated Completion**: Sprint 3+
 
-#### 5. Prepare for Cloud Deployment
-- **Status**: 🟠 In Progress
-- **Assigned**: DevOps Team
-- **Description**: Prepare the ADE platform for deployment to cloudev.ai
-- **Subtasks**:
-  - 🟠 Configure cloud infrastructure
-  - 🔴 Set up CI/CD pipeline
-  - 🔴 Implement cloud-specific features
-  - 🔴 Test cloud deployment
-- **Dependencies**: Task 4
-- **Estimated Completion**: 2025-04-15
-- **Progress Notes**:
-  - 2025-04-02: Started configuration of cloud infrastructure on cloudev.ai
+- **Task**: Implement Autonomous Routine Fixes/Refactoring
+  - **Status**: 🔴 Not Started
+  - **Assigned**: Backend Team / AI Core Team
+  - **Description**: Enable trusted agents (e.g., Optimizer, Debugger) to autonomously apply well-defined fixes or refactorings based on monitoring or user configuration.
+  - **Subtasks**:
+    - [ ] Define safety protocols and confidence thresholds for autonomous actions.
+    - [ ] Implement agent capability to apply fixes (e.g., dependency updates, simple bug fixes).
+    - [ ] Integrate with version control for safe application of changes.
+    - [ ] Provide user controls for enabling/disabling autonomous actions.
+  - **Dependencies**: Proactive Monitoring Framework.
+  - **Estimated Completion**: Sprint 4+
 
-#### 6. Implement Project Containerization Architecture
-- **Status**: 🟠 In Progress
-- **Assigned**: DevOps Team
-- **Description**: Implement a nested containerization architecture where each user's projects are containerized for isolation, security, and deployment readiness
-- **Subtasks**:
-  - 🟢 Design containerization architecture
-  - 🟠 Implement Container Management Service
-  - 🔴 Create Container Template Repository
-  - 🔴 Set up Container Orchestration Layer
-  - 🔴 Implement Container Registry
-  - 🔴 Develop Deployment Pipeline Service
-  - 🔴 Integrate with Agent Coordination System
-  - 🔴 Enhance Command Hub with container management UI
-- **Dependencies**: Agent Coordination System
-- **Estimated Completion**: 2025-04-10
-- **Progress Notes**:
-  - 2025-04-01: Completed initial architecture design for project containerization
-  - 2025-04-01: Defined core principles and components of the workflow
-  - 2025-04-01: Identified integration points with existing agent coordination system
+### Pillar 3: Fully Automated End-to-End Pipelines
+*Goal: Orchestrate the entire development lifecycle from high-level requirements to deployment.*
 
-#### 7. Frontend Mission Control Implementation
-- **Status**: 🟠 In Progress
-- **Assigned**: Frontend Team
-- **Description**: Create a comprehensive Mission Control frontend interface for the ADE platform with multi-agent monitoring and communication capabilities
-- **Subtasks**:
-  - 🟢 Design Mission Control layout and component architecture
-  - 🟢 Implement responsive grid-based layout framework
-  - 🟢 Create LiveChat component for multi-agent communication
-  - 🟢 Develop AgentStatusPanel for real-time agent monitoring
-  - 🟢 Build AgentActivityPanel for logging agent activities
-  - 🟢 Implement error logging and monitoring system
-  - 🟢 Create Command Controls for build/save operations
-  - 🟠 Connect frontend to backend agent coordination API
-  - 🟠 Implement integration tests for all frontend components
-  - 🟠 Add user authentication and session management
-  - 🟠 Create comprehensive error handling and reporting UI
-  - 🔴 Optimize performance for complex agent interactions
-- **Dependencies**: Task 1 (Specialized Agent Integration)
-- **Estimated Completion**: 2025-04-10
-- **Progress Notes**:
-  - 2025-04-02: Completed basic implementation of Mission Control layout with LiveChat, AgentStatusPanel, and AgentActivityPanel
-  - 2025-04-02: Fixed initial integration issues between components and TypeScript errors
-  - 2025-04-02: Added simulation data for testing agent interactions in the UI
-  - 2025-04-02: Integrated error logging system across all components in Mission Control
-  - 2025-04-02: Enhanced CommandHub component and integrated it into Mission Control interface
+- **Task**: Design & Implement End-to-End Orchestration Service
+  - **Status**: 🔴 Not Started
+  - **Assigned**: Backend Team / Coordinator Agent Lead
+  - **Description**: Develop the high-level orchestration logic within the Coordinator agent (or a dedicated service) to manage the full workflow: requirement intake -> architecture -> coding -> testing -> review -> deployment.
+  - **Subtasks**:
+    - [ ] Define the schema/language for specifying high-level project requirements.
+    - [ ] Map requirements to agent tasks and workflows.
+    - [ ] Implement state management for long-running, multi-stage projects.
+    - [ ] Integrate deployment agent and cloud infrastructure (Kubernetes).
+  - **Dependencies**: All specialized agents, Cloud-Native Integration pillar.
+  - **Estimated Completion**: Sprint 4+
 
-#### 8. Intelligent Agent Orchestration Dashboard Implementation
-- **Status**: ⏸️ On Hold
-- **Assigned**: Frontend Team
-- **Description**: Develop comprehensive dashboard components for monitoring and managing agent relationships, workflows, and performance
-- **Subtasks**:
-  - 🟢 Create main dashboard component structure and layout
-  - 🟢 Implement Agent List Panel with search and filter capabilities
-  - 🟢 Develop Agent Network Visualization for agent relationships
-  - 🟢 Build Agent Activity Timeline for chronological activity tracking
-  - 🟢 Implement Agent Control Panel for system-wide actions
-  - 🟢 Create WorkflowControlTabs component for tabbed workflow views
-  - 🟢 Implement Task Queue Panel for agent task management
-  - 🟢 Build Resource Monitor Panel for resource usage visualization
-  - 🟢 Develop Consensus Builder Panel for agent decision-making
-  - 🟢 Implement Error Analytics Panel for agent error monitoring
-  - ⏸️ Create Performance Metrics Panel for agent performance tracking
-  - ⏸️ Integrate all dashboard components with backend services
-  - ⏸️ Add real-time data updates and WebSocket connections
-  - ⏸️ Implement comprehensive dashboard testing
-- **Dependencies**: Task 7 (Frontend Mission Control Implementation)
-- **Estimated Completion**: On hold until core functionality is stable
-- **Progress Notes**:
-  - 2025-04-02: Created main dashboard component structure with TabPanel navigation
-  - 2025-04-02: Implemented Agent List Panel with status indicators and filtering
-  - 2025-04-02: Developed custom SVG-based Agent Network Visualization
-  - 2025-04-02: Built comprehensive Agent Activity Timeline with filtering
-  - 2025-04-02: Created Agent Control Panel with system-wide actions
-  - 2025-04-02: Implemented WorkflowControlTabs component for workflow management
-  - 2025-04-02: Created Task Queue Panel with mock task generation and management
-  - 2025-04-02: Built Resource Monitor Panel with system and agent resource visualization
-  - 2025-04-02: Implemented Consensus Builder Panel for agent voting and decision-making
-  - 2025-04-02: Created Error Analytics Panel integrated with error logging system, including filtering, visualization, and error resolution capabilities
-  - 2025-04-02: Put further dashboard development on hold to focus on ensuring core local prompt processing functionality works properly
+- **Task**: Enhance Containerization Architecture (was Task 5)
+  - **Status**: 🟠 In Progress
+  - **Assigned**: DevOps Team
+  - **Description**: Implement a nested containerization architecture for project isolation, security, and deployment readiness, supporting the automated pipelines.
+  - **Subtasks**:
+    - [ ] 🟢 Design containerization architecture
+    - [ ] 🟠 Implement Container Management Service
+    - [ ] 🔴 Create Container Template Repository
+    - [ ] 🔴 Set up Container Orchestration Layer (Kubernetes Integration)
+    - [ ] 🔴 Implement Container Registry
+  - **Dependencies**: None
+  - **Estimated Completion**: Sprint 2
+  - **Progress Notes**:
+    - 2025-04-01: Initial design completed. Implementation of management service underway.
 
-#### NEW: Core Prompt Processing Functionality
-- **Status**: 🟠 In Progress
-- **Assigned**: Full-Stack Team
-- **Description**: Ensure ADE can effectively process prompts locally and autonomously create simple applications
-- **Subtasks**:
-  - 🟠 Verify local development environment setup
-  - 🟠 Fix any frontend errors affecting prompt processing
-  - 🟠 Test prompt-to-application generation workflow
-  - 🔴 Implement robust error handling for prompt processing
-  - 🔴 Optimize agent response time for local processing
-  - 🔴 Create simple end-to-end test suite for prompt processing
-- **Dependencies**: None
-- **Estimated Completion**: 2025-04-07
-- **Progress Notes**:
-  - 2025-04-02: Shifted priority from dashboard components to ensuring core prompt processing functionality
-  - 2025-04-02: Started verification of local development environment and frontend error checking
+### Pillar 4: Specialized Domain Expertise
+*Goal: Allow ADE agents to develop deep expertise in specific technologies.*
 
-#### 9. Frontend Integration Testing
-- **Status**: 🟠 In Progress
-- **Assigned**: Frontend Team & QA Team
-- **Description**: Test the integration of all frontend components with the backend systems
-- **Subtasks**:
-  - 🟠 Create test scenarios for different user prompts and workflows
-  - 🟠 Test agent communication through LiveChat component
-  - 🟠 Verify real-time updates in AgentStatusPanel
-  - 🟠 Validate activity logging in AgentActivityPanel
-  - 🔴 Test notification system for agent activities
-  - 🔴 Verify build progress visualization
-  - 🔴 Test responsive design on different screen sizes
-  - 🔴 Perform accessibility testing
-  - 🔴 Conduct user experience testing with developers
-- **Dependencies**: Tasks 1, 4, 7
-- **Estimated Completion**: 2025-04-12
-- **Progress Notes**:
-  - 2025-04-02: Started creating test scenarios and conducting initial component integration tests
+- **Task**: Framework for Agent Specialization & Fine-tuning
+  - **Status**: 🔴 Not Started
+  - **Assigned**: AI Core Team
+  - **Description**: Design and implement a mechanism to train, fine-tune, or configure agents with specialized knowledge bases and skills for specific domains, frameworks (e.g., React, PyTorch, AWS), or APIs.
+  - **Subtasks**:
+    - [ ] Research methods for domain-specific LLM fine-tuning or RAG enhancement.
+    - [ ] Design agent profiles for loading specialized knowledge/skills.
+    - [ ] Implement tooling for managing specialized agent configurations.
+  - **Dependencies**: Foundational Agent architecture.
+  - **Estimated Completion**: Sprint 4+
 
-#### 10. Frontend Performance Optimization
-- **Status**: 🟠 In Progress
-- **Assigned**: Frontend Team
-- **Description**: Optimize frontend performance for complex agent interactions and real-time updates
-- **Subtasks**:
-  - 🟠 Implement efficient state management
-  - 🔴 Optimize component rendering
-  - 🔴 Add pagination for large activity logs
-  - 🔴 Implement virtual scrolling for chat history
-  - 🔴 Optimize asset loading and bundling
-  - 🔴 Add caching strategies for frequent API calls
-  - 🔴 Implement WebSocket connections for real-time updates
-- **Dependencies**: Task 7
-- **Estimated Completion**: 2025-04-14
-- **Progress Notes**:
-  - 2025-04-02: Started implementing more efficient state management in Mission Control components
+### Pillar 5: Superior Codebase Comprehension
+*Goal: Provide agents with a deep, contextual understanding of the user's codebase.*
 
-#### 11. Develop Innovative Project Management Workflow
-- **Status**: 🟠 In Progress
-- **Assigned**: Product Team
-- **Description**: Create an AI-driven, container-aware project management workflow that adapts to project needs, provides intelligent insights, and automates routine tasks
-- **Subtasks**:
-  - 🟢 Design project management workflow architecture
-  - 🟠 Implement Project Intelligence Engine
-  - 🔴 Develop Container-Aware Task Management
-  - 🔴 Create Adaptive Workflow Generator
-  - 🔴 Enhance Collaborative Decision Hub
-  - 🔴 Build Project Knowledge Graph
-  - 🔴 Integrate with containerization architecture
-- **Dependencies**: Project Containerization Architecture
-- **Estimated Completion**: 2025-04-14
-- **Progress Notes**:
-  - 2025-04-01: Completed initial architecture design for innovative project management workflow
-  - 2025-04-01: Defined core principles and components of the workflow
-  - 2025-04-01: Identified integration points with containerization architecture
+- **Task**: Design & Implement Dynamic Codebase Knowledge Graph
+  - **Status**: 🔴 Not Started
+  - **Assigned**: Backend Team / AI Core Team
+  - **Description**: Develop a system to parse user codebases and build a dynamic knowledge graph representing code structures, dependencies, data flow, and potentially architectural patterns. This graph will provide deep context to agents.
+  - **Subtasks**:
+    - [ ] Evaluate code parsing and analysis libraries (e.g., tree-sitter).
+    - [ ] Design the knowledge graph schema.
+    - [ ] Implement graph construction and update mechanisms.
+    - [ ] Develop APIs for agents to query the knowledge graph.
+  - **Dependencies**: None.
+  - **Estimated Completion**: Sprint 3+
 
-#### 12. Implement Enhanced Mission Control Interface
-- **Status**: 🟠 In Progress
-- **Assigned**: Frontend Team
-- **Description**: Develop advanced visualization and monitoring tools for the Mission Control interface
-- **Subtasks**:
-  - 🟢 Define architecture for enhanced Mission Control components
-  - 🟠 Implement Intelligent Agent Orchestration Dashboard
-  - 🟠 Develop Advanced Error Analytics System
-  - 🔴 Create Resource Optimization Monitor
-  - 🔴 Build Workflow Visualization Map
-  - 🔴 Implement Project Management Dashboard
-  - 🔴 Integrate with backend services and APIs
-  - 🔴 Perform comprehensive testing of all components
-- **Dependencies**: Task 7 (Frontend Mission Control Implementation)
-- **Estimated Completion**: 2025-04-15
-- **Progress Notes**:
-  - 2025-04-02: Completed architecture design for enhanced Mission Control components
-  - 2025-04-02: Started implementation of Intelligent Agent Orchestration Dashboard
-  - 2025-04-02: Began development of Advanced Error Analytics System with AI-powered resolution suggestions
+### Pillar 6: Deep Cloud-Native Integration (cloudev.ai)
+*Goal: Integrate tightly with cloud infrastructure for deployment, monitoring, and optimization.*
 
-#### 13. Intelligent Agent Orchestration Dashboard Implementation
-- **Status**: ⏸️ On Hold
-- **Assigned**: Frontend Team
-- **Description**: Implement a comprehensive visual interface for monitoring and managing agent relationships, workflows, and performance
-- **Subtasks**:
-  - 🟢 Create detailed design mockup with layout and component specifications
-  - 🟢 Create basic layout component structure for the dashboard
-  - 🟢 Implement Agent List Panel with status indicators
-  - 🟢 Build Agent Network Visualization with force-directed graph
-  - 🔴 Develop Agent Activity Timeline for real-time updates
-  - 🔴 Create Control Panel with system-wide actions
-  - 🔴 Implement tabbed Workflow Control Panel
-    - 🔴 Build Task Queue with drag-and-drop functionality
-    - 🔴 Create Resource Monitor with usage visualizations
-    - 🔴 Implement Consensus Builder for conflict resolution
-    - 🔴 Develop Error Analytics dashboard with AI-powered analysis
-    - 🔴 Add Performance Metrics tracking and visualization
-  - 🔴 Add interaction flows for agent selection, task management, and error handling
-  - 🔴 Implement color scheme and visual design elements
-  - 🔴 Integrate with existing components (Command Hub, LiveChat, Error Logging)
-  - 🔴 Add responsive design adaptations for different screen sizes
-  - 🔴 Implement performance optimizations for large agent networks
-  - 🔴 Conduct usability testing and refinement
-- **Dependencies**: Task 11 (Enhanced Mission Control Interface)
-- **Estimated Completion**: 2025-04-10
-- **Progress Notes**:
-  - 2025-04-02: Completed detailed design mockup with layout and component specifications
-  - 2025-04-02: Identified technical requirements and recommended libraries for implementation
+- **Task**: Integrate Runtime Monitoring, Auto-scaling, Self-healing
+  - **Status**: 🔴 Not Started
+  - **Assigned**: DevOps Team / Backend Team
+  - **Description**: Leverage agents (Optimizer, Debugger) and telemetry data to integrate with cloud provider APIs (initially targeting cloudev.ai / Kubernetes) for runtime application monitoring, performance-based auto-scaling, and automated responses to failures (self-healing).
+  - **Subtasks**:
+    - [ ] Integrate Telemetry system with runtime metrics collection.
+    - [ ] Implement Optimizer agent logic for triggering auto-scaling actions.
+    - [ ] Implement Debugger agent logic for identifying runtime failures and triggering remediation (e.g., restarts, rollbacks).
+    - [ ] Enhance Kubernetes Manager utility for these operations.
+  - **Dependencies**: Telemetry system, Kubernetes Manager, Optimizer/Debugger Agents.
+  - **Estimated Completion**: Sprint 4+
 
-### Medium Priority Tasks
+- **Task**: Cloud Deployment Planning (was Task 4 in old plan)
+  - **Status**: 🔴 Not Started -> 🟠 In Progress (assuming some thought started)
+  - **Assigned**: DevOps Team
+  - **Description**: Plan infrastructure, database, auth for cloudev.ai deployment.
+  - **Subtasks**:
+    - [ ] Design database schema for cloudev.ai deployment
+    - [ ] Plan user authentication and account management
+    - [ ] Create infrastructure architecture for cloud deployment (align with Auto-scaling/Self-healing task)
+  - **Dependencies**: None
+  - **Estimated Completion**: Sprint 2
 
-#### 1. Implement Performance Monitoring System
-- **Status**: 🟠 In Progress
-- **Assigned**: DevOps Team
-- **Description**: Implement proper monitoring and logging for agent performance and system metrics
-- **Subtasks**:
-  - 🟠 Set up agent performance monitoring
-  - 🟢 Implement system performance tracking
-  - 🟠 Create performance visualization dashboard
-  - 🔴 Implement alerting for performance issues
-  - 🔴 Set up trend analysis for performance metrics
-- **Dependencies**: None
-- **Estimated Completion**: 2025-04-08
-- **Progress Notes**:
-  - 2025-04-02: Started implementing agent performance monitoring with basic metrics
-  - 2025-04-02: Completed system performance tracking foundations
+### Pillar 7: Refined Developer Experience (DX)
+*Goal: Create an intuitive and powerful interface for developers interacting with ADE.*
 
-#### 2. Frontend Fixes and Restructuring
-- **Status**: 🟢 Completed
-- **Assigned**: Frontend Team
-- **Description**: Fix various issues in the frontend codebase and improve its structure
-- **Subtasks**:
-  - 🟢 Fix Material UI version compatibility issues
-  - 🟢 Fix TypeScript errors and improve type safety
-  - 🟢 Remove unused dependencies
-  - 🟢 Restructure component hierarchy for better maintainability
-- **Dependencies**: None
-- **Estimated Completion**: 2025-04-02
-- **Progress Notes**:
-  - 2025-04-02: Fixed all TypeScript errors in the frontend codebase
-  - 2025-04-02: Improved component structure and organization
-  - 2025-04-02: Enhanced error handling across all components
+- **Task**: Design & Implement Hybrid DX (Web Dashboard + IDE Extensions)
+  - **Status**: 🟠 In Progress (Consolidating existing UI tasks)
+  - **Assigned**: Frontend Team / Full-Stack Team
+  - **Description**: Develop a comprehensive user experience combining a powerful web-based Mission Control dashboard for high-level orchestration/monitoring and integrated IDE extensions (e.g., for VS Code) for in-context agent interactions. Consolidates previous tasks #2, #7, #8, #10, #12, #13.
+  - **Subtasks**:
+    - [ ] 🟢 Design Mission Control layout and component architecture (from Task 7)
+    - [ ] 🟢 Implement responsive grid-based layout framework (from Task 7)
+    - [ ] 🟢 Create LiveChat component (from Task 7)
+    - [ ] 🟠 Implement Agent Status Panel (from Task 7)
+    - [ ] 🟢 Enhance Command Hub Interface (Task 2 - Completed)
+    - [ ] 🟠 Implement Intelligent Agent Orchestration Dashboard components (SVG Vis, List Panel, etc. - from Tasks 8, 12, 13) - Resume work
+    - [ ] 🟠 Enhance Frontend State Management (Task 10)
+    - [ ] 🔴 Design and prototype IDE extension(s).
+    - [ ] 🔴 Define APIs for IDE extension communication.
+    - [ ] 🟢 Implement Error Logs Panel (Memory: 88e82f17...)
+  - **Dependencies**: Backend APIs for agents and system status.
+  - **Estimated Completion**: Ongoing (Dashboard Sprint 2+, IDE Ext Sprint 4+)
+  - **Progress Notes**:
+    - Existing progress from Tasks 7, 8, 10, 12 noted. SVG Vis implemented but needs integration/data. State management improvements ongoing. Error panel done. Command Hub done.
 
-#### 3. Frontend Automated Testing Setup
-- **Status**: 🟠 In Progress
-- **Assigned**: Frontend Team
-- **Description**: Set up comprehensive automated testing for frontend components
-- **Subtasks**:
-  - 🟠 Set up Jest testing framework
-  - 🔴 Implement unit tests for core components
-  - 🔴 Set up Cypress for end-to-end testing
-  - 🔴 Implement integration tests for key workflows
-  - 🔴 Set up continuous testing in CI pipeline
-- **Dependencies**: Task 7 (Frontend Mission Control Implementation)
-- **Estimated Completion**: 2025-04-12
-- **Progress Notes**:
-  - 2025-04-02: Started setting up Jest testing framework for frontend components
+### Foundational & Testing Tasks
 
-### Low Priority Tasks
+- **Task**: Core Prompt Processing Functionality (was NEW task)
+  - **Status**: 🟠 In Progress
+  - **Assigned**: Full-Stack Team
+  - **Description**: Ensure ADE can effectively process prompts locally and autonomously create simple applications (foundational end-to-end test).
+  - **Subtasks**:
+    - [ ] 🟢 Verify local development environment setup
+    - [ ] 🟠 Fix any frontend errors affecting prompt processing
+    - [ ] 🟠 Test prompt-to-application generation workflow
+    - [ ] 🟠 Implement robust error handling for prompt processing
+  - **Dependencies**: Basic agent functionality, Frontend stability.
+  - **Estimated Completion**: Sprint 1
+  - **Progress Notes**:
+    - Local env verified. Frontend fixes ongoing. Testing started.
 
-#### 1. Documentation Updates
-- **Status**: 🟠 In Progress
-- **Assigned**: Documentation Team
-- **Description**: Update documentation to reflect current state and functionality
-- **Subtasks**:
-  - 🟢 Update installation and setup documentation
-  - 🟠 Create user guides for core features
-  - 🔴 Document API endpoints
-  - 🔴 Create developer documentation
-  - 🔴 Update architecture documentation
-- **Dependencies**: None
-- **Estimated Completion**: 2025-04-14
-- **Progress Notes**:
-  - 2025-04-02: Updated installation and setup documentation
-  - 2025-04-02: Started creating user guides for Mission Control interface
+- **Task**: Comprehensive Local Testing (was Task 4)
+  - **Status**: 🟠 In Progress
+  - **Assigned**: QA Team
+  - **Description**: Test all aspects of the ADE platform locally, expanding scope to cover new strategic features as they are developed.
+  - **Subtasks**:
+    - [ ] 🟢 Test agent coordination system (basic)
+    - [ ] 🟠 Test consensus mechanism
+    - [ ] 🟠 Test application creation workflow (basic prompt processing)
+    - [ ] 🔴 Test deployment workflow (local simulation first)
+    - [ ] 🔴 Add tests for Advanced Collaborative Workflows
+    - [ ] 🔴 Add tests for Proactive Monitoring & Autonomous Actions
+    - [ ] 🔴 Add tests for Knowledge Graph integration
+  - **Dependencies**: Features being tested.
+  - **Estimated Completion**: Ongoing
 
-#### 2. Design System Standardization
-- **Status**: 🟠 In Progress
-- **Assigned**: Frontend Team
-- **Description**: Standardize design system across all components
-- **Subtasks**:
-  - 🟢 Define color palette and typography
-  - 🟠 Create reusable component library
-  - 🔴 Implement consistent spacing system
-  - 🔴 Create icon library
-  - 🔴 Implement design tokens
-- **Dependencies**: None
-- **Estimated Completion**: 2025-04-10
-- **Progress Notes**:
-  - 2025-04-02: Defined color palette and typography for the design system
-  - 2025-04-02: Started creating reusable component library
+- **Task**: Frontend Integration Testing (was Task 9)
+  - **Status**: 🟠 In Progress
+  - **Assigned**: Frontend Team & QA Team
+  - **Description**: Test the integration of all frontend components (Dashboard, potential IDE extensions) with the backend systems.
+  - **Subtasks**:
+    - [ ] 🟠 Create test scenarios for different user prompts and workflows
+    - [ ] 🟠 Test agent communication through LiveChat component
+    - [ ] 🟠 Verify real-time updates in AgentStatusPanel / Dashboard
+    - [ ] 🟠 Test Error Logs Panel integration
+    - [ ] 🟠 Test Agent Network Visualization interactions
+    - [ ] 🔴 Test IDE extension integration (when available)
+  - **Dependencies**: Frontend components, Backend APIs.
+  - **Estimated Completion**: Ongoing
 
-## Local Frontend & Prompt Processing (Phase 1 Focus)
+- **Task**: Develop Innovative Project Management Workflow (was Task 11)
+  - **Status**: 🟠 In Progress
+  - **Assigned**: Product Team
+  - **Description**: Design and potentially integrate project management features tailored to an AI-driven workflow within ADE.
+  - **Subtasks**: ... (Keep existing if relevant) ...
+  - **Estimated Completion**: Sprint 2
 
-- [ ] **Backend Setup & Verification:**
-    - [ ] Ensure all necessary backend services (FastAPI server, Agent Coordinator, specialized agents) can be started locally.
-    - [ ] Verify the API endpoints needed for prompt submission and status updates are functional.
-- [ ] **Frontend Setup & Basic Rendering:**
-    - [ ] Confirm the frontend development environment (`npm install`, etc.) is set up correctly.
-    - [ ] Start the frontend development server (`npm run start` or similar).
-    - [ ] Debug any critical rendering errors preventing the main layout (including the chat input) from appearing.
-- [ ] **Frontend-Backend Integration:**
-    - [ ] Implement or verify the frontend logic to send the user's prompt from the chat input to the correct backend API endpoint.
-- [ ] **Backend Workflow Implementation/Verification:**
-    - [ ] Ensure the backend Agent Coordinator correctly receives the prompt and initiates the agent workflow.
-    - [ ] Verify that agents process the request and (at minimum) simulate the application building process, providing status updates.
-- [ ] **Frontend Status Display:**
-    - [ ] Implement frontend logic to poll or receive status updates from the backend regarding the prompt processing (e.g., "Processing prompt...", "Generating code...", "Building application...").
-    - [ ] Display these status updates clearly to the user in the UI.
-- [ ] **Result Display (Initial):**
-    - [ ] Implement a basic way for the frontend to display the outcome, even if it's just a confirmation message or a link to generated artifacts initially.
-- [ ] **End-to-End Testing:**
-    - [ ] Test the entire flow locally: enter a prompt, see status updates, and view the final result/confirmation.
+## Immediate Action Items
+*Review and update this section based on current blockers/priorities*
+
+### Frontend Development
+- [x] Fix TypeScript errors in `AgentChatTabs.tsx` and `AgentCoordinator.tsx` to resolve blank page issue
+- [x] Implement diagnostic panel for monitoring backend connectivity
+- [x] Create PydanticTester component for validating Pydantic V2 compatibility
+- [x] Add SimpleDiagnostic component as an additional failsafe for frontend rendering
+- [ ] Fix missing imports in App.tsx (Suspense, CircularProgress)
+- [ ] Resolve remaining TypeScript compilation errors
+- [ ] Ensure proper component rendering order
+- [ ] Add error boundaries around diagnostic components
+- [ ] Complete integration testing of frontend-backend communication
+- [ ] Enhance error handling for API requests
+
+### Backend Development
+- [ ] Implement backend logic for agent coordination and workflow management
+- [ ] Develop APIs for frontend-backend communication
+- [ ] Integrate with cloud infrastructure for deployment and monitoring
 
 ## Verification and Testing Plan
+*Review and update this section to cover new strategic task areas*
 
 ### Automated Test Suite
 - **Status**: 🟠 In Progress

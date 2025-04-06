@@ -10,4 +10,5 @@ interface FetchEvent extends Event {
 
 interface ServiceWorkerGlobalScopeExtension extends ServiceWorkerGlobalScope {
   __WB_MANIFEST: Array<{ url: string; revision: string | null }>;
+  location: { origin: string };
 }

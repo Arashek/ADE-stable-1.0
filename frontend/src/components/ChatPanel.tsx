@@ -11,7 +11,6 @@ import {
   Tooltip,
   Divider,
 } from '@mui/material';
-import { visuallyHidden } from '@mui/utils';
 import {
   Send as SendIcon,
   Clear as ClearIcon,
@@ -78,8 +77,21 @@ interface ChatPanelProps {
   className?: string;
 }
 
-const VisuallyHidden: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Box sx={visuallyHidden}>{children}</Box>
+// Custom visually hidden component 
+const visuallyHiddenStyles = {
+  border: 0,
+  clip: 'rect(0 0 0 0)',
+  height: '1px',
+  margin: -1,
+  overflow: 'hidden',
+  padding: 0,
+  position: 'absolute',
+  whiteSpace: 'nowrap',
+  width: '1px'
+};
+
+const VisuallyHidden: React.FC<{ children: React.ReactNode, id?: string }> = ({ children, id }) => (
+  <Box sx={visuallyHiddenStyles} id={id}>{children}</Box>
 );
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ className }) => {

@@ -39,7 +39,7 @@ import {
   Search as SearchIcon,
   FilterList as FilterListIcon
 } from '@mui/icons-material';
-import { Agent, AgentStatus } from '../AgentListPanel';
+import { Agent, AgentStatus, AgentType } from '../AgentListPanel';
 
 // Decision status enum
 export enum DecisionStatus {
@@ -329,6 +329,26 @@ const ConsensusBuilderPanel: React.FC<ConsensusBuilderPanelProps> = ({
     }
   };
   
+  // Get color based on agent type
+  const getTypeColor = (type: AgentType) => {
+    switch (type) {
+      case AgentType.VALIDATOR:
+        return theme.palette.blue[500];
+      case AgentType.DESIGNER:
+        return theme.palette.purple[500];
+      case AgentType.ARCHITECT:
+        return theme.palette.orange[500];
+      case AgentType.SECURITY:
+        return theme.palette.red[500];
+      case AgentType.PERFORMANCE:
+        return theme.palette.green[500];
+      case AgentType.ADMIN:
+        return theme.palette.grey[700];
+      default:
+        return theme.palette.grey[500];
+    }
+  };
+  
   // Handle menu open
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchorEl(event.currentTarget);
@@ -440,7 +460,7 @@ const ConsensusBuilderPanel: React.FC<ConsensusBuilderPanelProps> = ({
                                 <Tooltip key={vote.agentId} title={`${agent?.name || 'Unknown'}: ${vote.vote}`}>
                                   <Avatar 
                                     sx={{ 
-                                      bgcolor: agent?.color || theme.palette.grey[500],
+                                      bgcolor: agent ? getTypeColor(agent.type) : theme.palette.grey[500],
                                       border: `2px solid ${
                                         vote.vote === VoteType.APPROVE ? theme.palette.success.main : 
                                         vote.vote === VoteType.REJECT ? theme.palette.error.main :

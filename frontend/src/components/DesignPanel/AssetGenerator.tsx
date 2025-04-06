@@ -1,197 +1,70 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Box,
-    TextField,
-    Button,
-    Grid,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
     Paper,
     Typography,
-    IconButton,
-    ImageList,
-    ImageListItem,
-    Chip,
+    Button,
+    Alert,
 } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { DesignRequest } from '../../types/design';
-import { useProjectContext } from '../../hooks/useProjectContext';
+import { styled } from '@mui/material/styles';
+import { Code as CodeIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
-interface AssetGeneratorProps {
-    onGenerate: (request: DesignRequest) => Promise<string[]>;
-}
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    margin: theme.spacing(2),
+    padding: theme.spacing(2),
+    height: 'calc(100vh - 100px)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: theme.spacing(3),
+}));
 
-export const AssetGenerator: React.FC<AssetGeneratorProps> = ({ onGenerate }) => {
-    const { projectContext } = useProjectContext();
-    const [requirements, setRequirements] = useState<string[]>([]);
-    const [newRequirement, setNewRequirement] = useState('');
-    const [style, setStyle] = useState({
-        colorScheme: '',
-        layout: '',
-    });
-    const [format, setFormat] = useState<'svg' | 'png' | 'jpg'>('svg');
-    const [loading, setLoading] = useState(false);
-    const [generatedAssets, setGeneratedAssets] = useState<string[]>([]);
+/**
+ * Simplified AssetGenerator component that focuses on the core functionality
+ * needed for local testing before cloud deployment
+ */
+export const AssetGenerator: React.FC = () => {
+    const navigate = useNavigate();
 
-    const handleAddRequirement = () => {
-        if (newRequirement.trim()) {
-            setRequirements([...requirements, newRequirement.trim()]);
-            setNewRequirement('');
-        }
-    };
-
-    const handleRemoveRequirement = (index: number) => {
-        setRequirements(requirements.filter((_, i) => i !== index));
-    };
-
-    const handleStyleChange = (field: string) => (event: any) => {
-        setStyle({ ...style, [field]: event.target.value });
-    };
-
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-        setLoading(true);
-        try {
-            const request: DesignRequest = {
-                id: crypto.randomUUID(),
-                requirements: [],
-                projectContext,
-                style,
-                assetRequirements: requirements,
-                assetFormat: format,
-            };
-
-            const assets = await onGenerate(request);
-            setGeneratedAssets(assets);
-        } catch (error) {
-            console.error('Error generating assets:', error);
-        } finally {
-            setLoading(false);
-        }
+    const handleGoToCodeEditor = () => {
+        navigate('/editor');
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                    <Box sx={{ mb: 3 }}>
-                        <TextField
-                            fullWidth
-                            label="Add Asset Requirement"
-                            value={newRequirement}
-                            onChange={(e) => setNewRequirement(e.target.value)}
-                            InputProps={{
-                                endAdornment: (
-                                    <IconButton 
-                                        onClick={handleAddRequirement}
-                                        disabled={!newRequirement.trim()}
-                                    >
-                                        <AddIcon />
-                                    </IconButton>
-                                ),
-                            }}
-                        />
-                    </Box>
+        <StyledPaper elevation={3}>
+            <Typography variant="h5" gutterBottom>
+                Asset Generator
+            </Typography>
 
-                    <Paper sx={{ p: 2, mb: 3 }}>
-                        <Typography variant="subtitle2" gutterBottom>
-                            Asset Requirements
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {requirements.map((req, index) => (
-                                <Chip
-                                    key={index}
-                                    label={req}
-                                    onDelete={() => handleRemoveRequirement(index)}
-                                    color="primary"
-                                />
-                            ))}
-                        </Box>
-                    </Paper>
+            <Alert severity="info">
+                The Asset Generator has been simplified to focus on the core multi-agent architecture 
+                for local testing before cloud deployment on cloudev.ai.
+            </Alert>
 
-                    <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Color Scheme</InputLabel>
-                                <Select
-                                    value={style.colorScheme}
-                                    onChange={handleStyleChange('colorScheme')}
-                                    label="Color Scheme"
-                                >
-                                    <MenuItem value="light">Light</MenuItem>
-                                    <MenuItem value="dark">Dark</MenuItem>
-                                    <MenuItem value="colorful">Colorful</MenuItem>
-                                    <MenuItem value="minimal">Minimal</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Format</InputLabel>
-                                <Select
-                                    value={format}
-                                    onChange={(e) => setFormat(e.target.value as 'svg' | 'png' | 'jpg')}
-                                    label="Format"
-                                >
-                                    <MenuItem value="svg">SVG</MenuItem>
-                                    <MenuItem value="png">PNG</MenuItem>
-                                    <MenuItem value="jpg">JPG</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                    </Grid>
-
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        type="submit"
-                        disabled={loading || requirements.length === 0}
-                        sx={{ mt: 3 }}
-                    >
-                        {loading ? 'Generating...' : 'Generate Assets'}
-                    </Button>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-                        {generatedAssets.length > 0 ? (
-                            <ImageList cols={2} gap={8}>
-                                {generatedAssets.map((asset, index) => (
-                                    <ImageListItem key={index}>
-                                        <img
-                                            src={format === 'svg' ? asset : `data:image/${format};base64,${asset}`}
-                                            alt={`Generated asset ${index + 1}`}
-                                            loading="lazy"
-                                            style={{ width: '100%', height: 'auto' }}
-                                        />
-                                        <Button
-                                            fullWidth
-                                            variant="outlined"
-                                            size="small"
-                                            onClick={() => {
-                                                const link = document.createElement('a');
-                                                link.href = format === 'svg' ? asset : `data:image/${format};base64,${asset}`;
-                                                link.download = `asset-${index + 1}.${format}`;
-                                                link.click();
-                                            }}
-                                            sx={{ mt: 1 }}
-                                        >
-                                            Download
-                                        </Button>
-                                    </ImageListItem>
-                                ))}
-                            </ImageList>
-                        ) : (
-                            <Typography color="textSecondary" align="center">
-                                Generated assets will appear here
-                            </Typography>
-                        )}
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Box>
+            <Box sx={{ p: 2 }}>
+                <Typography variant="h6" gutterBottom>
+                    Asset Generation Overview
+                </Typography>
+                <Typography paragraph>
+                    The ADE platform's asset generation functionality has been streamlined to focus on the essential
+                    multi-agent architecture that powers the platform. The specialized agents for architecture, 
+                    code generation, testing, debugging, and optimization are the core components that differentiate
+                    ADE from other platforms.
+                </Typography>
+                <Typography paragraph>
+                    For local testing purposes, you can proceed directly to the code editor to work with the
+                    multi-agent system.
+                </Typography>
+                <Button 
+                    variant="contained" 
+                    color="primary" 
+                    startIcon={<CodeIcon />}
+                    onClick={handleGoToCodeEditor}
+                    sx={{ mt: 2 }}
+                >
+                    Go to Code Editor
+                </Button>
+            </Box>
+        </StyledPaper>
     );
-}; 
+};

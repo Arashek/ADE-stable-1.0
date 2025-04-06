@@ -117,10 +117,44 @@ export const clearLocalErrors = (): void => {
   localStorage.removeItem(ERROR_STORAGE_KEY);
 };
 
+/**
+ * Higher-order function that wraps a function with error handling
+ * @param fn The function to wrap
+ * @param component The component name for error logging
+ * @param category The error category
+ * @returns The wrapped function
+ */
+export const withErrorHandling = <T extends (...args: any[]) => any>(
+  fn: T,
+  component: string,
+  category: ErrorCategory = ErrorCategory.FRONTEND
+): ((...args: Parameters<T>) => Promise<ReturnType<T>>) => {
+  return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+    try {
+      return await fn(...args);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      const stack = error instanceof Error ? error.stack || null : null;
+      
+      logError(
+        message,
+        category,
+        ErrorSeverity.ERROR,
+        component,
+        { args: JSON.stringify(args) },
+        stack
+      );
+      
+      throw error;
+    }
+  };
+};
+
 export default {
   logError,
   getLocalErrors,
   clearLocalErrors,
   ErrorCategory,
-  ErrorSeverity
+  ErrorSeverity,
+  withErrorHandling
 };

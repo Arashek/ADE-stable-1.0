@@ -18,31 +18,15 @@ export const usernameSchema = z
 
 // Command validation schemas
 export const commandSchema = z.object({
-  type: z.enum(['design', 'code', 'ai', 'tools']),
+  type: z.enum(['code', 'ai', 'tools']),
   content: z.string().min(1, 'Command cannot be empty'),
   parameters: z.record(z.any()).optional(),
-});
-
-// Design validation schemas
-export const designSchema = z.object({
-  name: z.string().min(1, 'Design name is required'),
-  description: z.string().optional(),
-  components: z.array(z.object({
-    id: z.string(),
-    type: z.string(),
-    props: z.record(z.any()),
-  })),
-  layout: z.object({
-    type: z.string(),
-    config: z.record(z.any()),
-  }),
 });
 
 // Code generation validation schemas
 export const codeGenerationSchema = z.object({
   language: z.string(),
   framework: z.string().optional(),
-  design: designSchema,
   options: z.object({
     includeTests: z.boolean().optional(),
     includeDocs: z.boolean().optional(),
@@ -57,19 +41,19 @@ export const chatMessageSchema = z.object({
   metadata: z.object({
     timestamp: z.string(),
     userId: z.string().optional(),
-    agent: z.enum(['design', 'code', 'ai', 'tools']).optional(),
+    agent: z.enum(['code', 'ai', 'tools']).optional(),
   }).optional(),
 });
 
 // Validation helper functions
 export const validateInput = <T>(schema: z.ZodSchema<T>, data: unknown): { success: boolean; data?: T; error?: string } => {
   try {
-    const validatedData = schema.parse(data);
-    return { success: true, data: validatedData };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { success: false, error: error.errors[0].message };
+    const validatedData = schema.safeParse(data);
+    if (!validatedData.success) {
+      return { success: false, error: validatedData.error.issues[0].message };
     }
+    return { success: true, data: validatedData.data };
+  } catch (error) {
     return { success: false, error: 'Validation failed' };
   }
 };
@@ -114,4 +98,4 @@ export class RateLimiter {
 }
 
 // Create a singleton instance
-export const rateLimiter = new RateLimiter(); 
+export const rateLimiter = new RateLimiter();

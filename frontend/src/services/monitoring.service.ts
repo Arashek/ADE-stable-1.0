@@ -500,10 +500,11 @@ export class MonitoringService {
     }
 
     // Error Tracking
-    public trackError(error: Omit<ErrorEvent, 'timestamp'>) {
+    public trackError(error: Omit<ErrorEvent, 'timestamp'>, tags?: Record<string, string>) {
         const fullError: ErrorEvent = {
             ...error,
             timestamp: Date.now(),
+            tags: { ...(error.tags || {}), ...(tags || {}) }
         };
         this.addErrorEvent(fullError);
         this.wsService.send({
@@ -563,14 +564,18 @@ export class MonitoringService {
         window.addEventListener('load', () => {
             const resources = performance.getEntriesByType('resource');
             resources.forEach((resource) => {
-                this.trackPerformance({
-                    name: 'resource_load',
-                    value: resource.duration,
-                    tags: {
-                        name: resource.name,
-                        type: resource.initiatorType,
-                    },
-                });
+                // Ensure we're working with PerformanceResourceTiming which has initiatorType
+                if (resource.entryType === 'resource') {
+                    const resourceTiming = resource as PerformanceResourceTiming;
+                    this.trackPerformance({
+                        name: 'resource_load',
+                        value: resourceTiming.duration,
+                        tags: {
+                            name: resourceTiming.name,
+                            type: resourceTiming.initiatorType,
+                        },
+                    });
+                }
             });
         });
     }
@@ -632,7 +637,7 @@ export class MonitoringService {
     }
 
     // Data Retrieval Methods
-    public getPerformanceMetrics(): PerformanceMetric[] {
+    public getLocalPerformanceMetrics(): PerformanceMetric[] {
         return [...this.performanceMetrics];
     }
 

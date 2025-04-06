@@ -1,3 +1,9 @@
+/**
+ * Simplified design types for the ADE platform
+ * Focused on core functionality needed for the multi-agent architecture
+ * and local testing before cloud deployment
+ */
+
 export interface DesignComponent {
   id: string;
   name: string;
@@ -30,28 +36,6 @@ export interface DesignPage {
   };
 }
 
-export interface DesignImplementation {
-  components: {
-    id: string;
-    code: string;
-    dependencies: string[];
-  }[];
-  styles: {
-    id: string;
-    code: string;
-    dependencies: string[];
-  }[];
-  pages: {
-    id: string;
-    code: string;
-    dependencies: string[];
-  }[];
-  layout: {
-    type: string;
-    components: string[];
-  };
-}
-
 export interface DesignTheme {
   colors: {
     primary: string;
@@ -66,30 +50,6 @@ export interface DesignTheme {
   typography: {
     fontFamily: string;
     fontSize: number;
-    h1: Partial<{
-      fontSize: string;
-      fontWeight: number;
-      lineHeight: number;
-      letterSpacing: string;
-    }>;
-    h2: Partial<{
-      fontSize: string;
-      fontWeight: number;
-      lineHeight: number;
-      letterSpacing: string;
-    }>;
-    h3: Partial<{
-      fontSize: string;
-      fontWeight: number;
-      lineHeight: number;
-      letterSpacing: string;
-    }>;
-    body: Partial<{
-      fontSize: string;
-      fontWeight: number;
-      lineHeight: number;
-      letterSpacing: string;
-    }>;
     [key: string]: any;
   };
   spacing: {
@@ -101,56 +61,6 @@ export interface DesignTheme {
     xl: number;
     [key: string]: number;
   };
-  borderRadius: {
-    sm: number;
-    md: number;
-    lg: number;
-    [key: string]: number;
-  };
-  breakpoints?: {
-    xs: number;
-    sm: number;
-    md: number;
-    lg: number;
-    xl: number;
-    [key: string]: number;
-  };
-  shadows?: string[];
-  transitions?: {
-    duration: {
-      short: number;
-      standard: number;
-      complex: number;
-      [key: string]: number;
-    };
-    easing: {
-      easeIn: string;
-      easeOut: string;
-      easeInOut: string;
-      [key: string]: string;
-    };
-  };
-}
-
-export interface DesignMetadata {
-  name: string;
-  description?: string;
-  version: string;
-  lastModified: string;
-  createdBy: string;
-  zoom?: number;
-  showGrid?: boolean;
-  snapToGrid?: boolean;
-  gridSize?: number;
-  snapThreshold?: number;
-  exportWithComments?: boolean;
-  exportWithStyles?: boolean;
-  integrations?: {
-    figma?: {
-      enabled: boolean;
-      token: string;
-    };
-  };
 }
 
 export interface DesignSystem {
@@ -159,34 +69,9 @@ export interface DesignSystem {
   components: DesignComponent[];
   styles: DesignStyle[];
   pages: DesignPage[];
-  implementation: DesignImplementation;
-  metadata: DesignMetadata;
-  currentPage?: string;
   theme: DesignTheme;
   version: string;
-}
-
-export interface DesignValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings: string[];
-  suggestions: Array<{
-    type: 'component' | 'style' | 'layout' | 'accessibility';
-    message: string;
-    priority: 'high' | 'medium' | 'low';
-  }>;
-}
-
-export interface DesignModification {
-  type: 'add' | 'update' | 'remove' | 'move';
-  target: 'component' | 'style' | 'page' | 'layout';
-  id: string;
-  changes: Record<string, any>;
-  context?: {
-    pageId?: string;
-    parentId?: string;
-    position?: number;
-  };
+  currentPage?: string;
 }
 
 export interface DesignSuggestion {
@@ -195,33 +80,17 @@ export interface DesignSuggestion {
   description: string;
   priority: 'high' | 'medium' | 'low';
   component?: DesignComponent;
-  styles?: Partial<DesignTheme>;
-  layout?: any;
   preview?: string;
 }
 
 export interface DesignFeedback {
   suggestions: DesignSuggestion[];
-  validations: DesignValidationResult;
   score: number;
-  analysis: {
+  analysis?: {
     accessibility: number;
     consistency: number;
     usability: number;
     responsiveness: number;
-  };
-}
-
-export interface DesignNotification {
-  id: string;
-  type: 'info' | 'warning' | 'error' | 'success';
-  message: string;
-  timestamp: Date;
-  source: 'user' | 'agent' | 'system';
-  read: boolean;
-  action?: {
-    label: string;
-    handler: () => void;
   };
 }
 
@@ -262,23 +131,10 @@ export interface StyleGuideProps {
   onUpdate: (theme: DesignTheme) => void;
 }
 
-export interface DesignChatProps {
-  designAgent: any;
-  currentDesign: DesignSystem;
-  onUpdateDesign: (updatedDesign: Partial<DesignSystem>) => void;
-  onApplySuggestion: (suggestion: DesignSuggestion) => void;
-}
-
 export interface DesignPreviewProps {
   currentDesign: DesignSystem;
   device?: 'desktop' | 'tablet' | 'mobile';
   onClose: () => void;
-}
-
-export interface DesignSuggestionsPanelProps {
-  suggestions: DesignSuggestion[];
-  onApplySuggestion: (suggestion: DesignSuggestion) => void;
-  onDismiss: () => void;
 }
 
 export interface DesignSystemConfigProps {

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Button, CircularProgress, Tooltip } from '@mui/material';
+import { Button, CircularProgress, Tooltip, ButtonProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { accessibilityService } from '../../services/accessibility.service';
 
-interface EnhancedButtonProps {
-  variant?: 'primary' | 'secondary' | 'outline' | 'text';
+interface EnhancedButtonProps extends ButtonProps {
+  variant?: ButtonProps['variant'];
   size?: 'small' | 'medium' | 'large';
   loading?: boolean;
   disabled?: boolean;
@@ -56,7 +56,7 @@ const IconWrapper = styled('span')(({ theme }) => ({
 }));
 
 export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
-  variant = 'primary',
+  variant = 'contained',
   size = 'medium',
   loading = false,
   disabled = false,

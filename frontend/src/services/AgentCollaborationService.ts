@@ -374,4 +374,38 @@ export class AgentCollaborationService {
     this.codebaseMap.relationships.clear();
     this.codebaseMap.dependencies.clear();
   }
-} 
+
+  /**
+   * Send a message to an agent and get a response
+   * @param message The message content to send
+   * @returns Promise with the agent's response
+   */
+  public async sendMessage(message: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const messageId = uuidv4();
+      
+      // Set up a one-time listener for the response
+      const responseHandler = (data: { id: string; response: string }) => {
+        if (data.id === messageId) {
+          this.ws.off('agent:response', responseHandler);
+          resolve(data.response);
+        }
+      };
+      
+      this.ws.on('agent:response', responseHandler);
+      
+      // Send the message to the agent
+      this.ws.emit('agent:request', {
+        id: messageId,
+        projectId: this.projectId,
+        message: message
+      });
+      
+      // Set a timeout to prevent hanging
+      setTimeout(() => {
+        this.ws.off('agent:response', responseHandler);
+        reject(new Error('Agent response timeout'));
+      }, 30000); // 30 second timeout
+    });
+  }
+}

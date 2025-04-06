@@ -102,7 +102,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ onRefresh }) => {
     }
   };
 
-  const getStatusColor = (status: TaskResult['status']) => {
+  const getStatusColor = (status: TaskResult['status']): 'default' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' => {
     switch (status) {
       case 'success':
         return 'success';
@@ -112,6 +112,19 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ onRefresh }) => {
         return 'warning';
       default:
         return 'default';
+    }
+  };
+
+  const getProgressColor = (status: TaskResult['status']): 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' => {
+    switch (status) {
+      case 'success':
+        return 'success';
+      case 'error':
+        return 'error';
+      case 'warning':
+        return 'warning';
+      default:
+        return 'primary';
     }
   };
 
@@ -170,7 +183,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ onRefresh }) => {
                             <LinearProgress
                               variant="determinate"
                               value={result.progress}
-                              color={getStatusColor(result.status)}
+                              color={getProgressColor(result.status)}
                             />
                           </Box>
                           <Typography variant="body2" color="text.secondary">

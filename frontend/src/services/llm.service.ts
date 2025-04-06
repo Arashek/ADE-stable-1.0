@@ -77,7 +77,12 @@ class LLMService {
       };
     } catch (error) {
       // Track error
-      monitoringService.trackError(error as Error, {
+      const err = error as Error;
+      monitoringService.trackError({
+        message: err.message || 'LLM generation error',
+        stack: err.stack,
+        severity: 'error'
+      }, {
         context: 'llm_generation',
         model: config.model,
       });
@@ -125,13 +130,18 @@ class LLMService {
         }
       };
 
-      ws.onerror = (error) => {
+      ws.onerror = (event: Event) => {
         // Track error
-        monitoringService.trackError(error as Error, {
+        const errorObj = event instanceof ErrorEvent ? event.error : new Error('WebSocket error');
+        monitoringService.trackError({
+          message: errorObj.message || 'WebSocket error',
+          stack: errorObj.stack,
+          severity: 'error'
+        }, {
           context: 'llm_streaming',
           model: config.model,
         });
-        reject(error);
+        reject(errorObj);
       };
     });
   }

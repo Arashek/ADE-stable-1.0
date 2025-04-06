@@ -262,17 +262,17 @@ const AgentActivityTimeline: React.FC<AgentActivityTimelineProps> = ({
   const getAvatarColor = (agentType: AgentType) => {
     switch (agentType) {
       case AgentType.VALIDATOR:
-        return theme.palette.purple.main;
+        return theme.palette.primary.light;
       case AgentType.DESIGNER:
-        return theme.palette.blue.main;
+        return theme.palette.info.light;
       case AgentType.ARCHITECT:
-        return theme.palette.green.main;
+        return theme.palette.success.light;
       case AgentType.SECURITY:
-        return theme.palette.red.main;
+        return theme.palette.error.light;
       case AgentType.PERFORMANCE:
-        return theme.palette.orange.main;
+        return theme.palette.warning.light;
       case AgentType.ADMIN:
-        return theme.palette.blueGrey.main;
+        return theme.palette.grey[300];
       default:
         return theme.palette.grey[500];
     }

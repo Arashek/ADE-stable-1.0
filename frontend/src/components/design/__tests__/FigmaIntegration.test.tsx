@@ -1,226 +1,70 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { FigmaIntegration } from '../FigmaIntegration';
-import { FigmaService } from '../../../../backend/src/services/design/FigmaService';
-
-// Mock the FigmaService
-jest.mock('../../../../backend/src/services/design/FigmaService');
 
 describe('FigmaIntegration', () => {
   const mockOnFileSelect = jest.fn();
   const mockOnComponentSelect = jest.fn();
   const mockOnStyleSelect = jest.fn();
+  const mockOnDesignUpdate = jest.fn();
+  const mockOnFinalize = jest.fn();
+  const mockDesignAgent = {
+    validateDesign: jest.fn(),
+    generateImplementation: jest.fn()
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders the authentication form', () => {
+  it('renders the simplified design integration component', () => {
     render(
       <FigmaIntegration
         onFileSelect={mockOnFileSelect}
         onComponentSelect={mockOnComponentSelect}
         onStyleSelect={mockOnStyleSelect}
+        onDesignUpdate={mockOnDesignUpdate}
+        onFinalize={mockOnFinalize}
+        designAgent={mockDesignAgent}
       />
     );
 
-    expect(screen.getByPlaceholderText('Figma Access Token')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Team ID')).toBeInTheDocument();
-    expect(screen.getByText('Authenticate')).toBeInTheDocument();
+    expect(screen.getByText('Design System Integration')).toBeInTheDocument();
+    expect(screen.getByText(/External design integrations have been simplified/)).toBeInTheDocument();
+    expect(screen.getByLabelText('Design System Name')).toBeInTheDocument();
+    expect(screen.getByText('Create Basic Design System')).toBeInTheDocument();
   });
 
-  it('handles successful authentication', async () => {
-    const mockValidateAccessToken = jest.fn().mockResolvedValue(true);
-    (FigmaService as jest.Mock).mockImplementation(() => ({
-      validateAccessToken: mockValidateAccessToken,
-      getTeamComponents: jest.fn().mockResolvedValue([]),
-      getTeamStyles: jest.fn().mockResolvedValue([]),
-    }));
-
+  it('creates a basic design system when button is clicked', async () => {
     render(
       <FigmaIntegration
         onFileSelect={mockOnFileSelect}
         onComponentSelect={mockOnComponentSelect}
         onStyleSelect={mockOnStyleSelect}
+        onDesignUpdate={mockOnDesignUpdate}
+        onFinalize={mockOnFinalize}
+        designAgent={mockDesignAgent}
       />
     );
 
-    const tokenInput = screen.getByPlaceholderText('Figma Access Token');
-    const teamInput = screen.getByPlaceholderText('Team ID');
-    const authenticateButton = screen.getByText('Authenticate');
-
-    fireEvent.change(tokenInput, { target: { value: 'test-token' } });
-    fireEvent.change(teamInput, { target: { value: 'test-team' } });
-    fireEvent.click(authenticateButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Files')).toBeInTheDocument();
-    });
-    expect(screen.getByText('Components')).toBeInTheDocument();
-    expect(screen.getByText('Styles')).toBeInTheDocument();
-  });
-
-  it('handles failed authentication', async () => {
-    const mockValidateAccessToken = jest.fn().mockResolvedValue(false);
-    (FigmaService as jest.Mock).mockImplementation(() => ({
-      validateAccessToken: mockValidateAccessToken,
-    }));
-
-    render(
-      <FigmaIntegration
-        onFileSelect={mockOnFileSelect}
-        onComponentSelect={mockOnComponentSelect}
-        onStyleSelect={mockOnStyleSelect}
-      />
-    );
-
-    const tokenInput = screen.getByPlaceholderText('Figma Access Token');
-    const teamInput = screen.getByPlaceholderText('Team ID');
-    const authenticateButton = screen.getByText('Authenticate');
-
-    fireEvent.change(tokenInput, { target: { value: 'invalid-token' } });
-    fireEvent.change(teamInput, { target: { value: 'test-team' } });
-    fireEvent.click(authenticateButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Invalid access token')).toBeInTheDocument();
-    });
-  });
-
-  it('handles file selection', async () => {
-    const mockValidateAccessToken = jest.fn().mockResolvedValue(true);
-    (FigmaService as jest.Mock).mockImplementation(() => ({
-      validateAccessToken: mockValidateAccessToken,
-      getTeamComponents: jest.fn().mockResolvedValue([]),
-      getTeamStyles: jest.fn().mockResolvedValue([]),
-    }));
-
-    render(
-      <FigmaIntegration
-        onFileSelect={mockOnFileSelect}
-        onComponentSelect={mockOnComponentSelect}
-        onStyleSelect={mockOnStyleSelect}
-      />
-    );
-
-    // Authenticate first
-    const tokenInput = screen.getByPlaceholderText('Figma Access Token');
-    const teamInput = screen.getByPlaceholderText('Team ID');
-    const authenticateButton = screen.getByText('Authenticate');
-
-    fireEvent.change(tokenInput, { target: { value: 'test-token' } });
-    fireEvent.change(teamInput, { target: { value: 'test-team' } });
-    fireEvent.click(authenticateButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Design System')).toBeInTheDocument();
+    // Enter a design name
+    fireEvent.change(screen.getByLabelText('Design System Name'), {
+      target: { value: 'Test Design System' }
     });
 
-    const fileButton = screen.getByText('Design System');
-    fireEvent.click(fileButton);
-    expect(mockOnFileSelect).toHaveBeenCalledWith('file1');
-  });
+    // Click the create button
+    fireEvent.click(screen.getByText('Create Basic Design System'));
 
-  it('handles component selection', async () => {
-    const mockComponents = [
-      { key: 'comp1', name: 'Button' },
-      { key: 'comp2', name: 'Input' },
-    ];
-
-    const mockValidateAccessToken = jest.fn().mockResolvedValue(true);
-    (FigmaService as jest.Mock).mockImplementation(() => ({
-      validateAccessToken: mockValidateAccessToken,
-      getTeamComponents: jest.fn().mockResolvedValue(mockComponents),
-      getTeamStyles: jest.fn().mockResolvedValue([]),
-    }));
-
-    render(
-      <FigmaIntegration
-        onFileSelect={mockOnFileSelect}
-        onComponentSelect={mockOnComponentSelect}
-        onStyleSelect={mockOnStyleSelect}
-      />
-    );
-
-    // Authenticate first
-    const tokenInput = screen.getByPlaceholderText('Figma Access Token');
-    const teamInput = screen.getByPlaceholderText('Team ID');
-    const authenticateButton = screen.getByText('Authenticate');
-
-    fireEvent.change(tokenInput, { target: { value: 'test-token' } });
-    fireEvent.change(teamInput, { target: { value: 'test-team' } });
-    fireEvent.click(authenticateButton);
-
+    // Wait for the async operation to complete
     await waitFor(() => {
-      expect(screen.getByText('Button')).toBeInTheDocument();
+      expect(mockOnFinalize).toHaveBeenCalled();
     });
 
-    const componentButton = screen.getByText('Button');
-    fireEvent.click(componentButton);
-    expect(mockOnComponentSelect).toHaveBeenCalledWith('comp1');
+    // Verify the design system structure
+    const designSystem = mockOnFinalize.mock.calls[0][0];
+    expect(designSystem).toHaveProperty('name', 'Test Design System');
+    expect(designSystem).toHaveProperty('components');
+    expect(designSystem).toHaveProperty('styles');
+    expect(designSystem).toHaveProperty('metadata');
   });
-
-  it('handles style selection', async () => {
-    const mockStyles = [
-      { key: 'style1', name: 'Primary Color' },
-      { key: 'style2', name: 'Secondary Color' },
-    ];
-
-    const mockValidateAccessToken = jest.fn().mockResolvedValue(true);
-    (FigmaService as jest.Mock).mockImplementation(() => ({
-      validateAccessToken: mockValidateAccessToken,
-      getTeamComponents: jest.fn().mockResolvedValue([]),
-      getTeamStyles: jest.fn().mockResolvedValue(mockStyles),
-    }));
-
-    render(
-      <FigmaIntegration
-        onFileSelect={mockOnFileSelect}
-        onComponentSelect={mockOnComponentSelect}
-        onStyleSelect={mockOnStyleSelect}
-      />
-    );
-
-    // Authenticate first
-    const tokenInput = screen.getByPlaceholderText('Figma Access Token');
-    const teamInput = screen.getByPlaceholderText('Team ID');
-    const authenticateButton = screen.getByText('Authenticate');
-
-    fireEvent.change(tokenInput, { target: { value: 'test-token' } });
-    fireEvent.change(teamInput, { target: { value: 'test-team' } });
-    fireEvent.click(authenticateButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Primary Color')).toBeInTheDocument();
-    });
-
-    const styleButton = screen.getByText('Primary Color');
-    fireEvent.click(styleButton);
-    expect(mockOnStyleSelect).toHaveBeenCalledWith('style1');
-  });
-
-  it('handles loading state', async () => {
-    const mockValidateAccessToken = jest.fn().mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
-    (FigmaService as jest.Mock).mockImplementation(() => ({
-      validateAccessToken: mockValidateAccessToken,
-    }));
-
-    render(
-      <FigmaIntegration
-        onFileSelect={mockOnFileSelect}
-        onComponentSelect={mockOnComponentSelect}
-        onStyleSelect={mockOnStyleSelect}
-      />
-    );
-
-    const tokenInput = screen.getByPlaceholderText('Figma Access Token');
-    const teamInput = screen.getByPlaceholderText('Team ID');
-    const authenticateButton = screen.getByText('Authenticate');
-
-    fireEvent.change(tokenInput, { target: { value: 'test-token' } });
-    fireEvent.change(teamInput, { target: { value: 'test-team' } });
-    fireEvent.click(authenticateButton);
-
-    expect(screen.getByText('Authenticating...')).toBeInTheDocument();
-  });
-}); 
+});

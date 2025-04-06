@@ -20,7 +20,7 @@ interface ModelSelectionPanelProps {
 }
 
 interface ModelConfig {
-  quality: 'high' | 'medium' | 'low';
+  quality: 'high' | 'medium' | 'low' | 'balanced';
   responseTimeLimit: number;
   contextLength: number;
   costPreference: 'optimize' | 'balanced' | 'performance';

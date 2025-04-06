@@ -6,7 +6,6 @@ import { DesignCanvas } from './DesignCanvas';
 import { DesignToolbar } from './DesignToolbar';
 import { DesignPreview } from './DesignPreview';
 import { DesignSystemConfig } from './DesignSystemConfig';
-import { FigmaService } from '../../services/FigmaService';
 
 interface DesignWorkspaceProps {
   currentDesign: DesignSystem;
@@ -29,18 +28,6 @@ export const DesignWorkspace: React.FC<DesignWorkspaceProps> = ({
   const [historyIndex, setHistoryIndex] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
-  const figmaService = FigmaService.getInstance();
-
-  // Initialize Figma service with current config
-  useEffect(() => {
-    const figmaConfig = currentDesign.metadata.integrations?.figma;
-    if (figmaConfig) {
-      figmaService.setConfig({
-        enabled: figmaConfig.enabled,
-        token: figmaConfig.token,
-      });
-    }
-  }, [currentDesign.metadata.integrations?.figma]);
 
   const handleComponentSelect = (component: DesignComponent) => {
     setSelectedComponent(component);
@@ -76,16 +63,9 @@ export const DesignWorkspace: React.FC<DesignWorkspaceProps> = ({
   }, []);
 
   const handleExport = useCallback(async () => {
-    // Check if Figma integration is enabled
-    const figmaConfig = currentDesign.metadata.integrations?.figma;
-    if (figmaConfig?.enabled) {
-      // Export to Figma if enabled
-      console.log('Exporting to Figma...');
-    } else {
-      // Export as regular design system
-      console.log('Exporting design system...');
-    }
-  }, [currentDesign.metadata.integrations?.figma]);
+    // Export as regular design system
+    console.log('Exporting design system...');
+  }, []);
 
   const handleGenerateCode = useCallback(() => {
     if (onGenerateCode) {

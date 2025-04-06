@@ -20,6 +20,7 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { AgentChat } from './AgentChat';
+import { AgentType } from '../services/AgentCollaborationService';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -56,7 +57,7 @@ interface TabState {
   id: string;
   label: string;
   icon: React.ReactNode;
-  agentType: string;
+  agentType: AgentType;
   hasUpdates: boolean;
   isActive: boolean;
   lastMessage?: string;
@@ -110,7 +111,7 @@ export const AgentChatTabs: React.FC<AgentChatTabsProps> = ({ projectId, onTabCh
       id: 'collaboration',
       label: 'Collaboration',
       icon: <GroupIcon />,
-      agentType: 'collaboration',
+      agentType: 'project-manager',
       hasUpdates: false,
       isActive: true,
     },
@@ -118,7 +119,7 @@ export const AgentChatTabs: React.FC<AgentChatTabsProps> = ({ projectId, onTabCh
       id: 'settings',
       label: 'Settings',
       icon: <SettingsIcon />,
-      agentType: 'settings',
+      agentType: 'integration',
       hasUpdates: false,
       isActive: true,
     },

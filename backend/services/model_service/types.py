@@ -13,8 +13,8 @@ class ModelRequest(BaseModel):
     context: Optional[Dict] = Field(None, description="Additional context for generation")
     style_guide: Optional[Dict] = Field(None, description="Style guide for code generation")
     
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "prompt": "Generate a Python function to calculate Fibonacci numbers",
                 "task_type": "code_generation",
@@ -26,6 +26,7 @@ class ModelRequest(BaseModel):
                 }
             }
         }
+    }
 
 class ModelResponse(BaseModel):
     """
@@ -36,8 +37,8 @@ class ModelResponse(BaseModel):
     cached: bool = Field(False, description="Whether the response was cached")
     metadata: Optional[Dict] = Field(None, description="Additional metadata about the generation")
     
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "result": "def fibonacci(n: int) -> int:\n    if n <= 1:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)",
@@ -49,3 +50,4 @@ class ModelResponse(BaseModel):
                 }
             }
         }
+    }

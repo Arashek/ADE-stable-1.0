@@ -1,56 +1,50 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper } from '@mui/material';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import { performanceMonitor } from '../services/performance';
 
-interface Props {
-  children: ReactNode;
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  componentName?: string;
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
-  errorInfo: ErrorInfo | null;
+  errorInfo: React.ErrorInfo | null;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null,
-    errorInfo: null
-  };
+const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children }) => {
+  const [hasError, setHasError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [errorInfo, setErrorInfo] = useState<React.ErrorInfo | null>(null);
 
-  public static getDerivedStateFromError(error: Error): State {
-    return {
-      hasError: true,
-      error,
-      errorInfo: null
-    };
-  }
+  useEffect(() => {
+    if (hasError) {
+      // Record error in performance metrics
+      performanceMonitor.recordMetric('error-boundary', 1);
+      performanceMonitor.recordMetric('error-boundary-' + error?.name, 1);
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.setState({
-      error,
-      errorInfo
-    });
+      // Log error to error reporting service
+      console.error('Uncaught error:', error, errorInfo);
+    }
+  }, [hasError, error, errorInfo]);
 
-    // Record error in performance metrics
-    performanceMonitor.recordMetric('error-boundary', 1);
-    performanceMonitor.recordMetric('error-boundary-' + error.name, 1);
-
-    // Log error to error reporting service
-    console.error('Uncaught error:', error, errorInfo);
-  }
-
-  private handleRefresh = () => {
+  const handleRefresh = () => {
     // Record refresh attempt
     performanceMonitor.recordMetric('error-boundary-refresh', 1);
     window.location.reload();
   };
 
-  public render() {
-    if (this.state.hasError) {
-      return (
+  const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
+    setHasError(true);
+    setError(error);
+    setErrorInfo(errorInfo);
+  };
+
+  return (
+    <React.ErrorBoundary onError={handleError}>
+      {hasError ? (
         <Box
           sx={{
             display: 'flex',
@@ -74,7 +68,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
               We apologize for the inconvenience. Please try refreshing the page.
             </Typography>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process.env.NODE_ENV === 'development' && error && (
               <Box sx={{ mb: 3, textAlign: 'left' }}>
                 <Typography variant="subtitle2" color="error" sx={{ mb: 1 }}>
                   Error Details:
@@ -88,8 +82,8 @@ export class ErrorBoundary extends Component<Props, State> {
                   }}
                 >
                   <pre style={{ margin: 0 }}>
-                    {this.state.error.toString()}
-                    {this.state.errorInfo?.componentStack}
+                    {error.toString()}
+                    {errorInfo?.componentStack}
                   </pre>
                 </Paper>
               </Box>
@@ -97,15 +91,17 @@ export class ErrorBoundary extends Component<Props, State> {
             <Button
               variant="contained"
               startIcon={<RefreshIcon />}
-              onClick={this.handleRefresh}
+              onClick={handleRefresh}
             >
               Refresh Page
             </Button>
           </Paper>
         </Box>
-      );
-    }
+      ) : (
+        children
+      )}
+    </React.ErrorBoundary>
+  );
+};
 
-    return this.props.children;
-  }
-} 
+export default ErrorBoundary;

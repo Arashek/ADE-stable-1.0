@@ -1,218 +1,70 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Box,
-    TextField,
-    Button,
-    Grid,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    Chip,
     Paper,
     Typography,
-    IconButton,
+    Button,
+    Alert,
 } from '@mui/material';
-import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import { DesignRequest } from '../../types/design';
-import { useProjectContext } from '../../hooks/useProjectContext';
+import { styled } from '@mui/material/styles';
+import { Code as CodeIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
-interface UIMockupGeneratorProps {
-    onGenerate: (request: DesignRequest) => Promise<any>;
-}
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    margin: theme.spacing(2),
+    padding: theme.spacing(2),
+    height: 'calc(100vh - 100px)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: theme.spacing(3),
+}));
 
-export const UIMockupGenerator: React.FC<UIMockupGeneratorProps> = ({ onGenerate }) => {
-    const { projectContext } = useProjectContext();
-    const [requirements, setRequirements] = useState<string[]>([]);
-    const [newRequirement, setNewRequirement] = useState('');
-    const [style, setStyle] = useState({
-        colorScheme: '',
-        typography: '',
-        spacing: '',
-        layout: '',
-    });
-    const [dimensions, setDimensions] = useState({
-        width: 1024,
-        height: 1024,
-    });
-    const [loading, setLoading] = useState(false);
-    const [preview, setPreview] = useState<string | null>(null);
+/**
+ * Simplified UIMockupGenerator component that focuses on the core functionality
+ * needed for local testing before cloud deployment
+ */
+export const UIMockupGenerator: React.FC = () => {
+    const navigate = useNavigate();
 
-    const handleAddRequirement = () => {
-        if (newRequirement.trim()) {
-            setRequirements([...requirements, newRequirement.trim()]);
-            setNewRequirement('');
-        }
-    };
-
-    const handleRemoveRequirement = (index: number) => {
-        setRequirements(requirements.filter((_, i) => i !== index));
-    };
-
-    const handleStyleChange = (field: string) => (event: any) => {
-        setStyle({ ...style, [field]: event.target.value });
-    };
-
-    const handleDimensionsChange = (field: string) => (event: any) => {
-        const value = parseInt(event.target.value, 10);
-        if (!isNaN(value)) {
-            setDimensions({ ...dimensions, [field]: value });
-        }
-    };
-
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-        setLoading(true);
-        try {
-            const request: DesignRequest = {
-                id: crypto.randomUUID(),
-                requirements,
-                projectContext,
-                style,
-                dimensions,
-            };
-
-            const response = await onGenerate(request);
-            setPreview(response.mockup);
-        } catch (error) {
-            console.error('Error generating mockup:', error);
-        } finally {
-            setLoading(false);
-        }
+    const handleGoToCodeEditor = () => {
+        navigate('/editor');
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                    <Box sx={{ mb: 3 }}>
-                        <TextField
-                            fullWidth
-                            label="Add Requirement"
-                            value={newRequirement}
-                            onChange={(e) => setNewRequirement(e.target.value)}
-                            InputProps={{
-                                endAdornment: (
-                                    <IconButton 
-                                        onClick={handleAddRequirement}
-                                        disabled={!newRequirement.trim()}
-                                    >
-                                        <AddIcon />
-                                    </IconButton>
-                                ),
-                            }}
-                        />
-                    </Box>
+        <StyledPaper elevation={3}>
+            <Typography variant="h5" gutterBottom>
+                UI Mockup Generator
+            </Typography>
 
-                    <Paper sx={{ p: 2, mb: 3 }}>
-                        <Typography variant="subtitle2" gutterBottom>
-                            Requirements
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {requirements.map((req, index) => (
-                                <Chip
-                                    key={index}
-                                    label={req}
-                                    onDelete={() => handleRemoveRequirement(index)}
-                                    color="primary"
-                                />
-                            ))}
-                        </Box>
-                    </Paper>
+            <Alert severity="info">
+                The UI Mockup Generator has been simplified to focus on the core multi-agent architecture 
+                for local testing before cloud deployment on cloudev.ai.
+            </Alert>
 
-                    <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Color Scheme</InputLabel>
-                                <Select
-                                    value={style.colorScheme}
-                                    onChange={handleStyleChange('colorScheme')}
-                                    label="Color Scheme"
-                                >
-                                    <MenuItem value="light">Light</MenuItem>
-                                    <MenuItem value="dark">Dark</MenuItem>
-                                    <MenuItem value="colorful">Colorful</MenuItem>
-                                    <MenuItem value="minimal">Minimal</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Typography</InputLabel>
-                                <Select
-                                    value={style.typography}
-                                    onChange={handleStyleChange('typography')}
-                                    label="Typography"
-                                >
-                                    <MenuItem value="modern">Modern</MenuItem>
-                                    <MenuItem value="classic">Classic</MenuItem>
-                                    <MenuItem value="playful">Playful</MenuItem>
-                                    <MenuItem value="technical">Technical</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                    </Grid>
-
-                    <Grid container spacing={2} sx={{ mt: 2 }}>
-                        <Grid item xs={6}>
-                            <TextField
-                                fullWidth
-                                type="number"
-                                label="Width"
-                                value={dimensions.width}
-                                onChange={handleDimensionsChange('width')}
-                                InputProps={{ inputProps: { min: 1 } }}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                fullWidth
-                                type="number"
-                                label="Height"
-                                value={dimensions.height}
-                                onChange={handleDimensionsChange('height')}
-                                InputProps={{ inputProps: { min: 1 } }}
-                            />
-                        </Grid>
-                    </Grid>
-
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        type="submit"
-                        disabled={loading || requirements.length === 0}
-                        sx={{ mt: 3 }}
-                    >
-                        {loading ? 'Generating...' : 'Generate UI Mockup'}
-                    </Button>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                    <Paper 
-                        sx={{ 
-                            p: 2, 
-                            height: '100%', 
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
-                    >
-                        {preview ? (
-                            <img 
-                                src={`data:image/png;base64,${preview}`}
-                                alt="Generated UI Mockup"
-                                style={{ maxWidth: '100%', maxHeight: '100%' }}
-                            />
-                        ) : (
-                            <Typography color="textSecondary">
-                                Generated mockup will appear here
-                            </Typography>
-                        )}
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Box>
+            <Box sx={{ p: 2 }}>
+                <Typography variant="h6" gutterBottom>
+                    UI Mockup Generation Overview
+                </Typography>
+                <Typography paragraph>
+                    The ADE platform's UI mockup generation functionality has been streamlined to focus on the essential
+                    multi-agent architecture that powers the platform. The specialized agents for architecture, 
+                    code generation, testing, debugging, and optimization are the core components that differentiate
+                    ADE from other platforms.
+                </Typography>
+                <Typography paragraph>
+                    For local testing purposes, you can proceed directly to the code editor to work with the
+                    multi-agent system.
+                </Typography>
+                <Button 
+                    variant="contained" 
+                    color="primary" 
+                    startIcon={<CodeIcon />}
+                    onClick={handleGoToCodeEditor}
+                    sx={{ mt: 2 }}
+                >
+                    Go to Code Editor
+                </Button>
+            </Box>
+        </StyledPaper>
     );
-}; 
+};

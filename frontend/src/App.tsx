@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import {
   Box,
   Paper,
@@ -26,6 +26,7 @@ import {
   Alert,
   AlertColor,
   Grid,
+  CircularProgress,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -61,6 +62,7 @@ import {
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import { createTheme, Theme } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
+import axios from 'axios';
 
 // Define prop interfaces for styled components
 interface AppBarStyledProps {
@@ -84,12 +86,15 @@ import Layout from './components/Layout';
 import Home from './routes/Home';
 import ModelDashboard from './components/ModelDashboard';
 import Settings from './routes/Settings';
-import ErrorBoundary from './components/common/ErrorBoundary';
 import errorLogger from './services/errorLogging';
 import TestApi from './TestApi';
 import PromptProcessor from './components/PromptProcessor';
 import ErrorMonitoringDashboard from './components/ErrorMonitoringDashboard';
 import ConsoleCapture from './components/debug/ConsoleCapture';
+import DiagnosticPanel from './components/DiagnosticPanel';
+import PydanticTester from './components/PydanticTester';
+import SimpleDiagnostic from './components/SimpleDiagnostic';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Mission Control theme styling
 const drawerWidth = 260;
@@ -260,6 +265,12 @@ function App() {
       return () => clearInterval(interval);
     }
   }, [isGenerating]);
+
+  useEffect(() => {
+    axios.get('/api/health')
+      .then(response => console.log('Backend connection:', response.data))
+      .catch(error => console.error('Backend connection failed:', error));
+  }, []);
 
   const showAlert = (message: string, severity: AlertColor = 'info') => {
     setAlertMessage(message);
@@ -531,41 +542,18 @@ function App() {
                         <ErrorBoundary componentName="Home">
                           <Box sx={{ p: 3 }}>
                             <Grid container spacing={3}>
-                              <Grid item xs={12} md={8}>
-                                <Paper 
-                                  elevation={2} 
-                                  sx={{ 
-                                    p: 3, 
-                                    borderRadius: 2, 
-                                    height: '100%',
-                                    background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                                    color: 'white'
-                                  }}
-                                >
-                                  <Typography variant="h4" gutterBottom fontWeight="bold">
-                                    Welcome to ADE Platform
-                                  </Typography>
-                                  <Typography variant="body1" paragraph>
-                                    Use specialized AI agents to build your application faster than ever before.
-                                  </Typography>
-                                  <Button 
-                                    variant="contained" 
-                                    color="primary" 
-                                    size="large"
-                                    component={Link}
-                                    to="/command-hub"
-                                    sx={{ 
-                                      mt: 2, 
-                                      bgcolor: 'white', 
-                                      color: '#2196F3',
-                                      '&:hover': {
-                                        bgcolor: 'rgba(255,255,255,0.9)',
-                                      }
-                                    }}
-                                  >
-                                    Launch Command Hub
-                                  </Button>
-                                </Paper>
+                              <Grid item xs={12}>
+                                <ErrorBoundary>
+                                  <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                                    <SimpleDiagnostic />
+                                    <Box mt={2}>
+                                      <DiagnosticPanel />
+                                    </Box>
+                                    <Box mt={2}>
+                                      <PydanticTester />
+                                    </Box>
+                                  </Box>
+                                </ErrorBoundary>
                               </Grid>
                               <Grid item xs={12}>
                                 <Typography variant="h5" gutterBottom>Getting Started</Typography>

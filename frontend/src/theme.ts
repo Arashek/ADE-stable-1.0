@@ -21,6 +21,43 @@ export const theme = createTheme({
       primary: '#ffffff',
       secondary: 'rgba(255, 255, 255, 0.7)',
     },
+    // Custom color palette extensions
+    purple: {
+      main: '#9c27b0',
+      light: '#ba68c8',
+      dark: '#7b1fa2',
+      contrastText: '#ffffff',
+    },
+    blue: {
+      main: '#2196f3',
+      light: '#64b5f6',
+      dark: '#1976d2',
+      contrastText: '#ffffff',
+    },
+    green: {
+      main: '#4caf50',
+      light: '#81c784',
+      dark: '#388e3c',
+      contrastText: '#ffffff',
+    },
+    red: {
+      main: '#f44336',
+      light: '#e57373',
+      dark: '#d32f2f',
+      contrastText: '#ffffff',
+    },
+    orange: {
+      main: '#ff9800',
+      light: '#ffb74d',
+      dark: '#f57c00',
+      contrastText: '#ffffff',
+    },
+    blueGrey: {
+      main: '#607d8b',
+      light: '#90a4ae',
+      dark: '#455a64',
+      contrastText: '#ffffff',
+    },
   },
   typography: {
     fontFamily: [

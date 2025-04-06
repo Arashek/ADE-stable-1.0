@@ -289,7 +289,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): 'default' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' => {
     switch (status) {
       case 'completed':
         return 'success';
@@ -301,6 +301,21 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
         return 'warning';
       default:
         return 'default';
+    }
+  };
+
+  const getIconColor = (status: string): 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' => {
+    switch (status) {
+      case 'completed':
+        return 'success';
+      case 'in_progress':
+        return 'primary';
+      case 'failed':
+        return 'error';
+      case 'pending':
+        return 'warning';
+      default:
+        return 'inherit';
     }
   };
 
@@ -317,7 +332,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
     }
   };
 
-  const getAgentStatusColor = (status: string) => {
+  const getAgentStatusColor = (status: string): 'inherit' | 'disabled' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' | 'action' => {
     switch (status) {
       case 'idle':
         return 'success';
@@ -326,7 +341,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
       case 'error':
         return 'error';
       default:
-        return 'default';
+        return 'inherit';
     }
   };
 
@@ -413,7 +428,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <ListItem>
                         <ListItemIcon>
-                          <TaskIcon color={getStatusColor(task.status)} />
+                          <TaskIcon color={getIconColor(task.status)} />
                         </ListItemIcon>
                         <ListItemText
                           primary={
@@ -632,7 +647,7 @@ const AgentCoordinator: React.FC<AgentCoordinatorProps> = ({ projectId }) => {
                 <Select
                   value={newTask.priority}
                   label="Priority"
-                  onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                  onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as 'high' | 'medium' | 'low' })}
                 >
                   <MenuItem value="high">High</MenuItem>
                   <MenuItem value="medium">Medium</MenuItem>

@@ -39,7 +39,14 @@ export class WebSocketService extends EventEmitter {
 
     this.ws.onmessage = (event) => {
       try {
-        const message: WebSocketMessage = JSON.parse(event.data);
+        // Convert data to string if it's not already a string
+        const dataString = typeof event.data === 'string' 
+          ? event.data 
+          : event.data instanceof ArrayBuffer 
+            ? new TextDecoder().decode(event.data)
+            : String(event.data);
+            
+        const message: WebSocketMessage = JSON.parse(dataString);
         this.emit(message.type, message.payload);
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -75,6 +82,7 @@ export class WebSocketService extends EventEmitter {
         ...message,
         timestamp: Date.now(),
       };
+      // Convert to string before sending
       this.ws.send(JSON.stringify(fullMessage));
     } else {
       console.warn('WebSocket is not connected');

@@ -46,7 +46,14 @@ export class DocumentationService {
             this.docsSubject.next([doc]);
             return doc;
         } catch (error) {
-            this.monitoring.recordError('generate_docs_failed', error);
+            const err = error as Error;
+            this.monitoring.trackError({
+                message: `Failed to generate documentation: ${err.message}`,
+                stack: err.stack,
+                severity: 'error'
+            }, {
+                context: 'generate_docs_failed'
+            });
             throw error;
         }
     }
@@ -66,7 +73,14 @@ export class DocumentationService {
 
             return await response.json();
         } catch (error) {
-            this.monitoring.recordError('update_docs_failed', error);
+            const err = error as Error;
+            this.monitoring.trackError({
+                message: `Failed to update documentation: ${err.message}`,
+                stack: err.stack,
+                severity: 'error'
+            }, {
+                context: 'update_docs_failed'
+            });
             throw error;
         }
     }
@@ -121,7 +135,14 @@ export class DocumentationService {
 
             return await response.json();
         } catch (error) {
-            this.monitoring.recordError('add_section_failed', error);
+            const err = error as Error;
+            this.monitoring.trackError({
+                message: `Failed to add documentation section: ${err.message}`,
+                stack: err.stack,
+                severity: 'error'
+            }, {
+                context: 'add_section_failed'
+            });
             throw error;
         }
     }
@@ -145,7 +166,14 @@ export class DocumentationService {
 
             return await response.json();
         } catch (error) {
-            this.monitoring.recordError('update_section_failed', error);
+            const err = error as Error;
+            this.monitoring.trackError({
+                message: `Failed to update documentation section: ${err.message}`,
+                stack: err.stack,
+                severity: 'error'
+            }, {
+                context: 'update_section_failed'
+            });
             throw error;
         }
     }
@@ -173,7 +201,14 @@ export class DocumentationService {
             const data = await response.json();
             return data.example;
         } catch (error) {
-            this.monitoring.recordError('generate_example_failed', error);
+            const err = error as Error;
+            this.monitoring.trackError({
+                message: `Failed to generate example: ${err.message}`,
+                stack: err.stack,
+                severity: 'error'
+            }, {
+                context: 'generate_example_failed'
+            });
             throw error;
         }
     }

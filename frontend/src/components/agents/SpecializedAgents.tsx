@@ -369,7 +369,7 @@ const SpecializedAgents: React.FC<SpecializedAgentsProps> = ({ projectId }) => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getChipColor = (status: string): 'default' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' => {
     switch (status) {
       case 'completed':
         return 'success';
@@ -384,7 +384,22 @@ const SpecializedAgents: React.FC<SpecializedAgentsProps> = ({ projectId }) => {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getIconColor = (status: string): 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' => {
+    switch (status) {
+      case 'completed':
+        return 'success';
+      case 'in_progress':
+        return 'primary';
+      case 'failed':
+        return 'error';
+      case 'pending':
+        return 'warning';
+      default:
+        return 'inherit';
+    }
+  };
+
+  const getPriorityColor = (priority: string): 'default' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' => {
     switch (priority) {
       case 'high':
         return 'error';
@@ -512,7 +527,7 @@ const SpecializedAgents: React.FC<SpecializedAgentsProps> = ({ projectId }) => {
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <ListItem>
                         <ListItemIcon>
-                          <TaskIcon color={getStatusColor(task.status)} />
+                          <TaskIcon color={getIconColor(task.status)} />
                         </ListItemIcon>
                         <ListItemText
                           primary={
@@ -521,7 +536,7 @@ const SpecializedAgents: React.FC<SpecializedAgentsProps> = ({ projectId }) => {
                               <Chip
                                 size="small"
                                 label={task.status}
-                                color={getStatusColor(task.status)}
+                                color={getChipColor(task.status)}
                               />
                               <Chip
                                 size="small"
@@ -695,7 +710,7 @@ const SpecializedAgents: React.FC<SpecializedAgentsProps> = ({ projectId }) => {
                                 {task.subtasks.map((subtask, index) => (
                                   <ListItem key={index}>
                                     <ListItemIcon>
-                                      <TaskIcon color={getStatusColor(subtask.status)} />
+                                      <TaskIcon color={getIconColor(subtask.status)} />
                                     </ListItemIcon>
                                     <ListItemText
                                       primary={subtask.title}
@@ -807,11 +822,13 @@ const SpecializedAgents: React.FC<SpecializedAgentsProps> = ({ projectId }) => {
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel>Priority</InputLabel>
+                <InputLabel id="priority-select-label">Priority</InputLabel>
                 <Select
+                  labelId="priority-select-label"
+                  id="priority-select"
                   value={newTask.priority}
                   label="Priority"
-                  onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                  onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as 'high' | 'medium' | 'low' })}
                 >
                   <MenuItem value="high">High</MenuItem>
                   <MenuItem value="medium">Medium</MenuItem>

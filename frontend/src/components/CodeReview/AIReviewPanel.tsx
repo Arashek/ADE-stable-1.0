@@ -205,7 +205,7 @@ const AIReviewPanel: React.FC<AIReviewPanelProps> = ({
             )}
             
             <Typography variant="body2" sx={{ mb: 2 }}>
-              {issue.fix?.description}
+              {issue.description}
             </Typography>
 
             {!hasUserFeedback && (
@@ -292,4 +292,4 @@ const AIReviewPanel: React.FC<AIReviewPanelProps> = ({
   );
 };
 
-export default AIReviewPanel; 
+export default AIReviewPanel;

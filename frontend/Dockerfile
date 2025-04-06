@@ -44,5 +44,5 @@ COPY . .
 # Expose port
 EXPOSE 3000
 
-# Start the development server with hot reloading
-CMD ["npm", "start"]
+# Start the development server with hot reloading and host binding to 0.0.0.0
+CMD ["npm", "start", "--", "--host", "0.0.0.0"]

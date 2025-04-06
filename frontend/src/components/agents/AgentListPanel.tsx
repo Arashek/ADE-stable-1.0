@@ -30,6 +30,7 @@ import ArchitectureIcon from '@mui/icons-material/Architecture';
 import SecurityIcon from '@mui/icons-material/Security';
 import SpeedIcon from '@mui/icons-material/Speed';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 // Agent status types
 export enum AgentStatus {

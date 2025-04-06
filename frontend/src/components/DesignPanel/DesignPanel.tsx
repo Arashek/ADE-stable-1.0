@@ -1,45 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Box,
     Paper,
-    Tabs,
-    Tab,
     Typography,
-    CircularProgress,
     Alert,
+    Button,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { UIMockupGenerator } from './UIMockupGenerator';
-import { DesignAnalyzer } from './DesignAnalyzer';
-import { AssetGenerator } from './AssetGenerator';
-import { DesignRequest, DesignResponse, DesignFeedback } from '../../types/design';
-import { useDesignAgent } from '../../hooks/useDesignAgent';
-
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
-}
-
-const TabPanel = (props: TabPanelProps) => {
-    const { children, value, index, ...other } = props;
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`design-tabpanel-${index}`}
-            aria-labelledby={`design-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box sx={{ p: 3 }}>
-                    {children}
-                </Box>
-            )}
-        </div>
-    );
-};
+import { Code as CodeIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
     margin: theme.spacing(2),
@@ -47,53 +16,18 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     height: 'calc(100vh - 100px)',
     display: 'flex',
     flexDirection: 'column',
+    gap: theme.spacing(3),
 }));
 
+/**
+ * Simplified DesignPanel component that focuses on the core functionality
+ * needed for local testing before cloud deployment
+ */
 export const DesignPanel: React.FC = () => {
-    const [activeTab, setActiveTab] = useState(0);
-    const { 
-        generateMockup,
-        analyzeDesign,
-        generateAssets,
-        loading,
-        error 
-    } = useDesignAgent();
+    const navigate = useNavigate();
 
-    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-        setActiveTab(newValue);
-    };
-
-    const handleGenerateMockup = async (request: DesignRequest) => {
-        try {
-            const response = await generateMockup(request);
-            // Handle successful mockup generation
-            return response;
-        } catch (err) {
-            console.error('Error generating mockup:', err);
-            throw err;
-        }
-    };
-
-    const handleAnalyzeDesign = async (design: any) => {
-        try {
-            const feedback = await analyzeDesign(design);
-            // Handle successful design analysis
-            return feedback;
-        } catch (err) {
-            console.error('Error analyzing design:', err);
-            throw err;
-        }
-    };
-
-    const handleGenerateAssets = async (request: DesignRequest) => {
-        try {
-            const assets = await generateAssets(request);
-            // Handle successful asset generation
-            return assets;
-        } catch (err) {
-            console.error('Error generating assets:', err);
-            throw err;
-        }
+    const handleGoToCodeEditor = () => {
+        navigate('/editor');
     };
 
     return (
@@ -102,49 +36,35 @@ export const DesignPanel: React.FC = () => {
                 Design Assistant
             </Typography>
 
-            {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                    {error}
-                </Alert>
-            )}
+            <Alert severity="info">
+                The Design Assistant has been simplified to focus on the core multi-agent architecture 
+                for local testing before cloud deployment on cloudev.ai.
+            </Alert>
 
-            <Tabs
-                value={activeTab}
-                onChange={handleTabChange}
-                aria-label="design panel tabs"
-                sx={{ borderBottom: 1, borderColor: 'divider' }}
-            >
-                <Tab label="UI Mockup" />
-                <Tab label="Design Analysis" />
-                <Tab label="Asset Generation" />
-            </Tabs>
-
-            {loading && (
-                <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center',
-                    height: '100%' 
-                }}>
-                    <CircularProgress />
-                </Box>
-            )}
-
-            {!loading && (
-                <>
-                    <TabPanel value={activeTab} index={0}>
-                        <UIMockupGenerator onGenerate={handleGenerateMockup} />
-                    </TabPanel>
-
-                    <TabPanel value={activeTab} index={1}>
-                        <DesignAnalyzer onAnalyze={handleAnalyzeDesign} />
-                    </TabPanel>
-
-                    <TabPanel value={activeTab} index={2}>
-                        <AssetGenerator onGenerate={handleGenerateAssets} />
-                    </TabPanel>
-                </>
-            )}
+            <Box sx={{ p: 2 }}>
+                <Typography variant="h6" gutterBottom>
+                    Design System Overview
+                </Typography>
+                <Typography paragraph>
+                    The ADE platform's design system functionality has been streamlined to focus on the essential
+                    multi-agent architecture that powers the platform. The specialized agents for architecture, 
+                    code generation, testing, debugging, and optimization are the core components that differentiate
+                    ADE from other platforms.
+                </Typography>
+                <Typography paragraph>
+                    For local testing purposes, you can proceed directly to the code editor to work with the
+                    multi-agent system.
+                </Typography>
+                <Button 
+                    variant="contained" 
+                    color="primary" 
+                    startIcon={<CodeIcon />}
+                    onClick={handleGoToCodeEditor}
+                    sx={{ mt: 2 }}
+                >
+                    Go to Code Editor
+                </Button>
+            </Box>
         </StyledPaper>
     );
-}; 
+};
