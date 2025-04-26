@@ -1,0 +1,55 @@
+# Istio basic setup for ADE cloud test phase
+# Deploys Istio Gateway and VirtualService for frontend and backend
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: ade-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ade-frontend
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - ade-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: frontend
+        port:
+          number: 80
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ade-backend
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - ade-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/api"
+    route:
+    - destination:
+        host: backend
+        port:
+          number: 8000
